@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
+import AccountAdvisor from '@/app/account-advisor';
 import {
   BUILDS,
   CHARACTER_GLOSSARY,
@@ -53,6 +54,12 @@ const categoryStyles: Record<GuideCategory, string> = {
   角色: 'border-violet-300/20 bg-violet-300/10 text-violet-200',
   關卡: 'border-primary/20 bg-primary/10 text-primary',
 };
+
+const buildUseWhen = [
+  '你要打 EE／公會遠征，重點是最短時間爆發',
+  '你要打 LME 等長場頭目，能讓 Chaos 與共鳴疊滿',
+  '你要穩過區域行動或 341–345 章，不想因詞條翻車',
+];
 
 export default function GuideApp() {
   const [category, setCategory] = useState<Category>('全部');
@@ -135,6 +142,9 @@ export default function GuideApp() {
             className="hidden items-center gap-7 text-sm font-semibold text-muted-foreground md:flex"
             aria-label="主要導覽"
           >
+            <a className="transition-colors hover:text-foreground" href="#advisor">
+              配裝診斷
+            </a>
             <a className="transition-colors hover:text-foreground" href="#guide-library">
               攻略庫
             </a>
@@ -158,97 +168,39 @@ export default function GuideApp() {
 
       <section
         id="top"
-        className="relative mx-auto grid max-w-7xl gap-8 px-5 pb-12 pt-8 lg:grid-cols-[1.04fr_.96fr] lg:px-8 lg:pb-18 lg:pt-12"
+        className="relative mx-auto max-w-7xl px-5 pb-12 pt-8 lg:px-8 lg:pb-16 lg:pt-12"
       >
         <div className="pointer-events-none absolute -left-40 top-4 size-[480px] rounded-full bg-primary/8 blur-[120px]" />
-        <div className="relative z-10 flex flex-col justify-center py-3 lg:py-12">
-          <span className="mb-5 inline-flex h-6 w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
-            {OFFICIAL_UPDATE.version} 四週年版本 · 2026/08/29 更新
-          </span>
-          <h1 className="max-w-xl text-4xl font-black leading-[1.07] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-            少走彎路，
-            <br />
-            <span className="text-primary">每一場都更強。</span>
-          </h1>
-          <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground sm:text-lg">
-            從武器進化、角色配裝到章節打法，一站查完。資料每日比對官方版本，改版也不怕攻略過期。
-          </p>
-
-          <div className="mt-7 flex max-w-xl items-center rounded-2xl border border-white/10 bg-white/[0.06] p-1.5 shadow-2xl shadow-black/20 transition focus-within:border-primary/40 focus-within:bg-white/[0.08]">
-            <Search
-              className="ml-3 size-5 shrink-0 text-primary"
-              aria-hidden="true"
-            />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') jumpToGuides();
-              }}
-              className="h-11 w-full min-w-0 border-0 bg-transparent px-2.5 text-base outline-none placeholder:text-muted-foreground"
-              aria-label="搜尋攻略"
-              placeholder="搜尋武器、技能、關卡…"
-            />
-            <button
-              type="button"
-              className="h-10 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition hover:bg-primary/80"
-              onClick={() => jumpToGuides()}
-            >
-              搜尋
-            </button>
+        <div className="relative z-10 mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <span className="mb-4 inline-flex h-6 w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
+              {OFFICIAL_UPDATE.version} 終局版 · 2026/08/29 更新
+            </span>
+            <h1 className="max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl">
+              別照抄榜單，先算出
+              <span className="text-primary">你現在最強的解。</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
+              選四個帳號狀態，直接得到主位、模式配裝與下一個投資目標。看不懂英文角色名也沒關係，後面都有照片。
+            </p>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span>熱門：</span>
-            {['苦無', '無人機', '341 章', '四週年'].map((term) => (
-              <button
-                key={term}
-                type="button"
-                className="rounded-full border border-white/8 px-2 py-1 transition hover:border-primary/30 hover:text-primary"
-                onClick={() => {
-                  setQuery(term);
-                  jumpToGuides();
-                }}
-              >
-                {term}
-              </button>
+          <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black sm:min-w-[360px]">
+            {[
+              ['1', '選目前門檻'],
+              ['2', '立刻看答案'],
+              ['3', '照順序升級'],
+            ].map(([step, label]) => (
+              <div key={step} className="rounded-xl border border-white/8 bg-white/[0.04] px-3 py-3">
+                <span className="mx-auto grid size-5 place-items-center rounded-full bg-primary text-[10px] text-primary-foreground">
+                  {step}
+                </span>
+                <span className="mt-1.5 block text-muted-foreground">{label}</span>
+              </div>
             ))}
           </div>
         </div>
 
-        <div className="relative min-h-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[#0a2423] shadow-[0_30px_90px_rgba(0,0,0,.38)] lg:min-h-[520px]">
-          <Image
-            src="/dada-guide-hero.png"
-            alt="原創的連帽生存者迎戰可愛綠色怪物群"
-            fill
-            priority
-            className="object-cover object-center transition duration-700 hover:scale-[1.02]"
-            sizes="(max-width: 1024px) 100vw, 48vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#071719] via-transparent to-transparent" />
-          <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4 rounded-2xl border border-white/10 bg-[#071719]/75 p-4 backdrop-blur-xl">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-primary">
-                今日推薦
-              </p>
-              <p className="mt-1 font-black">四週年回鍋：7 天資源規劃</p>
-              <p className="mt-1 hidden text-xs text-muted-foreground sm:block">
-                登入獎勵、活動資源與裝備整理一次看
-              </p>
-            </div>
-            <button
-              type="button"
-              className="inline-grid size-10 shrink-0 place-items-center rounded-full"
-              aria-label="查看今日推薦"
-              onClick={() => {
-                setQuery('四週年');
-                jumpToGuides('關卡');
-              }}
-              style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
-            >
-              <ArrowRight />
-            </button>
-          </div>
-        </div>
+        <AccountAdvisor />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-18 lg:px-8">
@@ -516,7 +468,7 @@ export default function GuideApp() {
         )}
       </section>
 
-      <section id="builds" className="bg-[#d8ff57] py-18 text-[#0b1f1e]">
+      <section id="meta" className="bg-[#d8ff57] py-18 text-[#0b1f1e]">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -524,11 +476,11 @@ export default function GuideApp() {
                 5.1.0 · ENDGAME META
               </p>
               <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-                終局玩家的三套天花板
+                診斷結果對應這三套
               </h2>
             </div>
             <p className="max-w-md text-sm font-semibold leading-6 opacity-65">
-              預設你已進入 SS、Chaos Fusion 與 Xeno Transmute 階段。終局沒有「全身 SS 就最強」的固定答案，暴率、核心與收藏門檻會改變最優解。
+              先看卡片上方的「適合你，如果」，符合再展開完整裝備。終局沒有一套通吃，模式與門檻不同就要切換。
             </p>
           </div>
 
@@ -610,7 +562,7 @@ export default function GuideApp() {
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          <div id="builds" className="mt-8 grid scroll-mt-24 gap-4 lg:grid-cols-3">
             {BUILDS.map((build, index) => (
               <article
                 key={build.name}
@@ -625,7 +577,9 @@ export default function GuideApp() {
                   </span>
                 </div>
                 <h3 className="mt-5 text-xl font-black">{build.name}</h3>
-                <p className="mt-1 text-sm font-medium opacity-65">{build.note}</p>
+                <p className="mt-2 rounded-lg bg-[#0b1f1e]/7 px-3 py-2 text-xs font-black leading-5">
+                  適合你，如果：{buildUseWhen[index]}
+                </p>
                 <div className="mt-5 rounded-2xl bg-[#0b1f1e]/6 p-4">
                   <div className="mb-4 flex flex-wrap gap-2">
                     {build.characterIds.map((characterId) => {
@@ -659,56 +613,65 @@ export default function GuideApp() {
                   <p className="mt-2 text-sm font-black">角色 · {build.hero}</p>
                   <p className="mt-2 text-sm font-black">異獸 · {build.pet}</p>
                   <p className="mt-2 text-sm font-black">武器 · {build.weapon}</p>
-                  <p className="mt-3 text-xs font-black uppercase tracking-wider opacity-50">
-                    場內技能
-                  </p>
-                  <p className="mt-1 text-sm font-semibold leading-6 opacity-70">
-                    {build.skills.join(' ／ ')}
-                  </p>
-                </div>
-                <div className="mt-5">
-                  <p className="text-xs font-black uppercase tracking-wider opacity-50">
-                    裝備槽位
-                  </p>
-                  <ul className="mt-2 space-y-2">
-                    {build.gear.map((gear) => (
-                      <li key={gear} className="flex gap-2 text-xs font-bold leading-5">
-                        <Check className="mt-0.5 size-3.5 shrink-0" />
-                        {gear}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="mt-5 space-y-3">
-                  {[
-                    ['清怪', build.stats.clear],
-                    ['頭目', build.stats.boss],
-                    ['生存', build.stats.safety],
-                  ].map(([label, value]) => (
-                    <div key={label}>
-                      <div className="mb-1 flex items-center justify-between text-xs font-black">
-                        <span>{label}</span>
-                        <span className="text-[#0b1f1e]/55">{value}</span>
-                      </div>
-                      <div
-                        className="h-1.5 overflow-hidden rounded-full bg-[#0b1f1e]/10"
-                        role="progressbar"
-                        aria-label={String(label)}
-                        aria-valuenow={value as number}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      >
-                        <div
-                          className="h-full rounded-full bg-[#0b1f1e]"
-                          style={{ width: `${value}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
                 </div>
                 <p className="mt-5 rounded-xl border border-[#0b1f1e]/12 bg-[#0b1f1e] px-3 py-2.5 text-xs font-bold leading-5 text-[#d8ff57]">
                   {build.breakpoint}
                 </p>
+                <details className="guide-details mt-4 rounded-xl border border-[#0b1f1e]/15 bg-white/35">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-3 text-xs font-black">
+                    完整裝備、技能與評分
+                    <ChevronRight className="size-4 transition-transform" />
+                  </summary>
+                  <div className="border-t border-[#0b1f1e]/10 px-3 pb-4 pt-3">
+                    <p className="text-xs font-black uppercase tracking-wider opacity-50">
+                      裝備槽位
+                    </p>
+                    <ul className="mt-2 space-y-2">
+                      {build.gear.map((gear) => (
+                        <li key={gear} className="flex gap-2 text-xs font-bold leading-5">
+                          <Check className="mt-0.5 size-3.5 shrink-0" />
+                          {gear}
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-xs font-black uppercase tracking-wider opacity-50">
+                      場內技能
+                    </p>
+                    <p className="mt-1 text-xs font-semibold leading-5 opacity-70">
+                      {build.skills.join(' ／ ')}
+                    </p>
+                    <p className="mt-4 text-xs font-semibold leading-5 opacity-70">
+                      {build.note}
+                    </p>
+                    <div className="mt-4 space-y-3">
+                      {[
+                        ['清怪', build.stats.clear],
+                        ['頭目', build.stats.boss],
+                        ['生存', build.stats.safety],
+                      ].map(([label, value]) => (
+                        <div key={label}>
+                          <div className="mb-1 flex items-center justify-between text-xs font-black">
+                            <span>{label}</span>
+                            <span className="text-[#0b1f1e]/55">{value}</span>
+                          </div>
+                          <div
+                            className="h-1.5 overflow-hidden rounded-full bg-[#0b1f1e]/10"
+                            role="progressbar"
+                            aria-label={String(label)}
+                            aria-valuenow={value as number}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <div
+                              className="h-full rounded-full bg-[#0b1f1e]"
+                              style={{ width: `${value}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </details>
               </article>
             ))}
           </div>
@@ -746,9 +709,9 @@ export default function GuideApp() {
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-[.16em] text-primary">
-                新手里程碑
+                終局帳號檢查
               </p>
-              <h2 className="text-xl font-black">今天先完成這四件事</h2>
+              <h2 className="text-xl font-black">給建議前，先確認這四項</h2>
             </div>
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -778,7 +741,7 @@ export default function GuideApp() {
             })}
           </div>
           <div className="mt-5 flex items-center justify-between text-xs font-bold text-muted-foreground">
-            <span>今日進度</span>
+            <span>帳號資料完整度</span>
             <span className="text-primary">
               {checkedTasks.length} / {STARTER_TASKS.length}
             </span>
@@ -843,7 +806,7 @@ export default function GuideApp() {
 
       <nav className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-around rounded-2xl border border-white/10 bg-[#0a1d1e]/92 p-2 shadow-2xl backdrop-blur-xl md:hidden" aria-label="行動版導覽">
         {[
-          { label: '攻略', icon: BookOpen, href: '#guide-library' },
+          { label: '診斷', icon: Target, href: '#advisor' },
           { label: '情報', icon: RefreshCw, href: '#latest' },
           { label: '配裝', icon: Swords, href: '#builds' },
           { label: '收藏', icon: Heart, action: () => jumpToGuides('收藏') },
