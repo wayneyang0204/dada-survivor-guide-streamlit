@@ -524,9 +524,11 @@ export default function GuideApp() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h4 className="text-lg font-black">{profile.nameZh}</h4>
-                        <p className="text-xs font-bold uppercase tracking-wider text-white/45">
-                          {profile.nameEn}
-                        </p>
+                        {profile.nameEn !== profile.nameZh && (
+                          <p className="text-xs font-bold uppercase tracking-wider text-white/45">
+                            {profile.nameEn}
+                          </p>
+                        )}
                       </div>
                       <span className="rounded-full bg-[#d8ff57] px-2.5 py-1 text-[11px] font-black text-[#0b1f1e]">
                         {profile.role}
@@ -551,7 +553,7 @@ export default function GuideApp() {
 
             <div className="mt-5 grid gap-3 text-xs font-bold sm:grid-cols-3">
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
-                <span className="text-[#d8ff57]">真正主位：</span>Venato／Taloxa
+                <span className="text-[#d8ff57]">真正主位：</span>Venato／塔洛莎
               </p>
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
                 <span className="text-[#d8ff57]">神火支援鏈：</span>哪吒 → 伏爾坎
@@ -590,7 +592,7 @@ export default function GuideApp() {
                         <a
                           key={profile.id}
                           href={`#character-${profile.id}`}
-                          title={`${profile.nameZh}（${profile.nameEn}）｜${profile.role}`}
+                          title={`${profile.nameZh}${profile.nameEn !== profile.nameZh ? `（${profile.nameEn}）` : ''}｜${profile.role}`}
                           className="group inline-flex items-center gap-2 rounded-full border border-[#0b1f1e]/10 bg-[#f8ffe1] py-1 pl-1 pr-2.5 text-[11px] font-black transition hover:-translate-y-0.5 hover:border-[#0b1f1e]/30"
                         >
                           <span className="relative size-7 overflow-hidden rounded-full bg-[#0b1f1e]/10">

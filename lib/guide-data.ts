@@ -111,7 +111,7 @@ export const GUIDES: Guide[] = [
     readTime: '5 分鐘',
     updated: '8/28',
     tags: ['伏爾坎', 'Vulcan', 'SP角色', '神火支援'],
-    takeaways: ['伏爾坎主要強化哪吒的神火被動', '先把哪吒推到 R1 以上，伏爾坎才開始有價值', '終局配裝中的主位通常是 Venato 或 Taloxa，不是伏爾坎'],
+    takeaways: ['伏爾坎主要強化哪吒的神火被動', '先把哪吒推到 R1 以上，伏爾坎才開始有價值', '終局配裝中的主位通常是 Venato 或塔洛莎，不是伏爾坎'],
   },
   {
     id: 'guardian-combo',
@@ -155,7 +155,7 @@ export const CHARACTER_GLOSSARY: CharacterProfile[] = [
     nameEn: 'Venato',
     kind: '生存者',
     role: '真終局主位',
-    summary: '資源與覺醒門檻都很高；通常要能組出 R5 Venato＋R4 Taloxa，再考慮從 Taloxa 轉主位。',
+    summary: '資源與覺醒門檻都很高；通常要能組出 R5 Venato＋R4 塔洛莎，再考慮從塔洛莎轉主位。',
     image: '/characters/venato-guide.jpg',
     imageAlt: 'Survivor.io 生存者 Venato 的角色畫面',
     sourceName: 'PlayMe 角色實測',
@@ -164,12 +164,12 @@ export const CHARACTER_GLOSSARY: CharacterProfile[] = [
   {
     id: 'taloxa',
     nameZh: '塔洛莎',
-    nameEn: 'Taloxa',
+    nameEn: '塔洛莎',
     kind: '生存者',
     role: '後期主位／終局協同',
     summary: '基礎暴率約 70% 以上開始發力；R5 前後是多數高端帳號的核心，轉 Venato 後仍可當強力協同。',
     image: '/characters/taloxa-guide.jpg',
-    imageAlt: 'Survivor.io 生存者 Taloxa 的角色畫面',
+    imageAlt: '《噠噠特攻》生存者塔洛莎的角色畫面',
     sourceName: 'Phasecast 角色介紹',
     sourceUrl: 'https://www.youtube.com/watch?v=SPWy0pNX5YQ',
   },
@@ -227,7 +227,7 @@ export const BUILDS = [
   {
     name: '短時頭目爆發天花板',
     mode: 'EE／公會遠征',
-    hero: 'Venato R5+ 主位｜Taloxa R4 協同；神火：哪吒 R2+ → 伏爾坎 R1+',
+    hero: 'Venato R5+ 主位｜塔洛莎 R4 協同；神火：哪吒 R2+ → 伏爾坎 R1+',
     pet: '幽冥之魂（Umbral Soul）R3+｜共鳴增益＋共鳴傷害',
     characterIds: ['venato', 'taloxa', 'nezha', 'vulcan', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4・C2+・Xeno Transmute',
@@ -246,7 +246,7 @@ export const BUILDS = [
   {
     name: '長戰疊層傷害極限',
     mode: 'LME／長線首領',
-    hero: 'Venato R5–R7 主位｜Taloxa R4＋梅塔莉亞／楊大師 R1 協同',
+    hero: 'Venato R5–R7 主位｜塔洛莎 R4＋梅塔莉亞／楊大師 R1 協同',
     pet: '幽冥之魂（Umbral Soul）｜保護＋共鳴增益＋共鳴傷害',
     characterIds: ['venato', 'taloxa', 'metallia', 'nezha', 'vulcan', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4・Chaos 9／18 門檻',
@@ -265,7 +265,7 @@ export const BUILDS = [
   {
     name: '區域行動零失誤配置',
     mode: 'Zone Ops／341–345',
-    hero: 'Taloxa R5 穩定主位／Venato R5 高投入；詞條關再調整梅塔莉亞協同',
+    hero: '塔洛莎 R5 穩定主位／Venato R5 高投入；詞條關再調整梅塔莉亞協同',
     pet: '幽冥之魂（Umbral Soul）／高星控制型異獸',
     characterIds: ['taloxa', 'venato', 'metallia', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4；特殊詞條關可切虛空之力',
@@ -286,6 +286,6 @@ export const BUILDS = [
 export const STARTER_TASKS = [
   '確認基礎暴率（不含戰鬥觸發）是否達 70%',
   '記下雙生槍的 E／V／C 與 Chaos Power',
-  '確認 Taloxa／Venato 的實際突破等級',
+  '確認塔洛莎／Venato 的實際突破等級',
   '確認哪吒與伏爾坎是否達神火支援門檻',
 ];

@@ -32,17 +32,17 @@ const DEFAULTS = {
 const mainOptions: { value: MainStage; label: string; hint: string }[] = [
   {
     value: 'venato',
-    label: 'Venato R5+ ＋ Taloxa R4+',
+    label: 'Venato R5+ ＋塔洛莎 R4+',
     hint: '已達真正轉主位門檻',
   },
   {
     value: 'taloxa-r5',
-    label: 'Taloxa R5+、基礎暴率 70%+',
+    label: '塔洛莎 R5+、基礎暴率 70%+',
     hint: '多數高端帳號在這裡',
   },
   {
     value: 'taloxa-building',
-    label: 'Taloxa R1–R4／暴率未滿 70%',
+    label: '塔洛莎 R1–R4／暴率未滿 70%',
     hint: '還在建立主位門檻',
   },
   {
@@ -130,26 +130,26 @@ export default function AccountAdvisor() {
 
     const main = {
       venato: {
-        title: 'Venato 主位，Taloxa 放協同',
-        reason: '你已達轉換門檻，現在才是 Venato 真正超過 Taloxa 的區間。',
-        action: '資源集中 Venato R5→R7，Taloxa 保留 R4 以上做協同。',
-        avoid: '不要把 Taloxa 吃掉或降到無法當協同。',
+        title: 'Venato 主位，塔洛莎放協同',
+        reason: '你已達轉換門檻，現在才是 Venato 真正超過塔洛莎的區間。',
+        action: '資源集中 Venato R5→R7，塔洛莎保留 R4 以上做協同。',
+        avoid: '不要把塔洛莎吃掉或降到無法當協同。',
       },
       'taloxa-r5': {
-        title: '繼續 Taloxa 主位，先別硬轉 Venato',
-        reason: '低星 Venato 不會自動贏；必須能直接做出 R5 Venato＋R4 Taloxa 才值得換。',
-        action: '先存好一次到位的轉換資源，裝備與異獸繼續服務 Taloxa。',
+        title: '繼續塔洛莎主位，先別硬轉 Venato',
+        reason: '低星 Venato 不會自動贏；必須能直接做出 R5 Venato＋R4 塔洛莎才值得換。',
+        action: '先存好一次到位的轉換資源，裝備與異獸繼續服務塔洛莎。',
         avoid: '不要做 R1–R4 Venato 當過渡，會同時削弱主位與協同。',
       },
       'taloxa-building': {
-        title: 'Taloxa 主位，第一優先推到 R5',
-        reason: '你還沒跨過 Taloxa 的主要爆發門檻，現在分資源給 Venato 會更慢。',
-        action: '先補基礎暴率到 70% 左右，再完成 Taloxa R5。',
+        title: '塔洛莎主位，第一優先推到 R5',
+        reason: '你還沒跨過塔洛莎的主要爆發門檻，現在分資源給 Venato 會更慢。',
+        action: '先補基礎暴率到 70% 左右，再完成塔洛莎 R5。',
         avoid: '先不投 Venato，也不要為伏爾坎延後主位突破。',
       },
       unsure: {
-        title: '維持你現有最強主位，先建立 Taloxa',
-        reason: '資訊不足時，最安全路線是完成 Taloxa 的暴率與 R5 門檻。',
+        title: '維持你現有最強主位，先建立塔洛莎',
+        reason: '資訊不足時，最安全路線是完成塔洛莎的暴率與 R5 門檻。',
         action: '先查角色突破與基礎暴率；達標前保留轉換箱與通用資源。',
         avoid: '不要因新角色上線就把資源平均分散。',
       },
@@ -217,7 +217,7 @@ export default function AccountAdvisor() {
           </Button>
         </div>
         <p className="mt-3 text-xs font-semibold leading-5 text-white/55">
-          已先套用「Taloxa R5＋Chaos 9–17」高端常見狀態。把不符合的選項改掉，答案會立即更新。
+          已先套用「塔洛莎 R5＋Chaos 9–17」高端常見狀態。把不符合的選項改掉，答案會立即更新。
         </p>
       </div>
 
