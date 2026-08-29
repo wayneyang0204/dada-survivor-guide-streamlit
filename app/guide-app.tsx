@@ -20,20 +20,6 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import {
-  Progress,
-  ProgressLabel,
-  ProgressValue,
-} from '@/components/ui/progress';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
 import {
   BUILDS,
   GUIDES,
@@ -154,11 +140,11 @@ export default function GuideApp() {
               流派配裝
             </a>
           </nav>
-          <Badge className="border border-emerald-300/20 bg-emerald-300/10 text-emerald-200">
+          <span className="inline-flex h-5 items-center justify-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 text-xs font-medium text-emerald-200">
             <span className="size-1.5 rounded-full bg-emerald-300" />
             <span className="hidden sm:inline">每日自動更新</span>
             <span className="sm:hidden">每日更新</span>
-          </Badge>
+          </span>
         </div>
       </header>
 
@@ -168,12 +154,9 @@ export default function GuideApp() {
       >
         <div className="pointer-events-none absolute -left-40 top-4 size-[480px] rounded-full bg-primary/8 blur-[120px]" />
         <div className="relative z-10 flex flex-col justify-center py-3 lg:py-12">
-          <Badge
-            variant="outline"
-            className="mb-5 w-fit border-primary/30 bg-primary/10 text-primary"
-          >
+          <span className="mb-5 inline-flex h-6 w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
             {OFFICIAL_UPDATE.version} 四週年版本 · 2026/08/29 更新
-          </Badge>
+          </span>
           <h1 className="max-w-xl text-4xl font-black leading-[1.07] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
             少走彎路，
             <br />
@@ -188,22 +171,23 @@ export default function GuideApp() {
               className="ml-3 size-5 shrink-0 text-primary"
               aria-hidden="true"
             />
-            <Input
+            <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') jumpToGuides();
               }}
-              className="h-11 border-0 bg-transparent text-base shadow-none focus-visible:ring-0"
+              className="h-11 w-full min-w-0 border-0 bg-transparent px-2.5 text-base outline-none placeholder:text-muted-foreground"
               aria-label="搜尋攻略"
               placeholder="搜尋武器、技能、關卡…"
             />
-            <Button
-              className="h-10 rounded-xl px-4 font-bold"
+            <button
+              type="button"
+              className="h-10 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground transition hover:bg-primary/80"
               onClick={() => jumpToGuides()}
             >
               搜尋
-            </Button>
+            </button>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span>熱門：</span>
@@ -243,17 +227,18 @@ export default function GuideApp() {
                 登入獎勵、活動資源與裝備整理一次看
               </p>
             </div>
-            <Button
-              size="icon"
-              className="size-10 rounded-full"
+            <button
+              type="button"
+              className="inline-grid size-10 shrink-0 place-items-center rounded-full"
               aria-label="查看今日推薦"
               onClick={() => {
                 setQuery('四週年');
                 jumpToGuides('關卡');
               }}
+              style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
             >
               <ArrowRight />
-            </Button>
+            </button>
           </div>
         </div>
       </section>
@@ -347,7 +332,9 @@ export default function GuideApp() {
                   </p>
                 </div>
               </div>
-              <Badge className="bg-primary text-primary-foreground">官方已確認</Badge>
+              <span className="inline-flex h-5 items-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
+                官方已確認
+              </span>
             </div>
             <h3 className="relative mt-7 text-2xl font-black">
               {OFFICIAL_UPDATE.headline}
@@ -388,10 +375,10 @@ export default function GuideApp() {
           </div>
           <div className="flex w-full max-w-sm items-center rounded-xl border border-white/10 bg-card px-3 focus-within:border-primary/40">
             <Search className="size-4 text-muted-foreground" />
-            <Input
+            <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              className="h-10 border-0 bg-transparent shadow-none focus-visible:ring-0"
+              className="h-10 w-full min-w-0 border-0 bg-transparent px-2.5 text-sm outline-none placeholder:text-muted-foreground"
               aria-label="篩選攻略"
               placeholder="在攻略庫內搜尋"
             />
@@ -407,17 +394,19 @@ export default function GuideApp() {
           </div>
         </div>
 
-        <Tabs
-          value={category}
-          onValueChange={(value) => setCategory(value as Category)}
-          className="mt-7"
-        >
-          <TabsList className="w-full justify-start overflow-x-auto rounded-xl bg-card p-1 sm:w-fit">
+        <div className="mt-7 flex w-full justify-start overflow-x-auto rounded-xl bg-card p-1 sm:w-fit" role="tablist" aria-label="攻略分類">
             {categories.map((item) => (
-              <TabsTrigger
+              <button
                 key={item}
-                value={item}
-                className="min-w-16 px-3 data-active:bg-primary data-active:text-primary-foreground"
+                type="button"
+                role="tab"
+                aria-selected={category === item}
+                onClick={() => setCategory(item)}
+                className={`inline-flex h-8 min-w-16 items-center justify-center gap-1.5 rounded-lg px-3 text-sm font-medium transition ${
+                  category === item
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
               >
                 {item}
                 {item === '收藏' && favorites.length > 0 && (
@@ -425,10 +414,9 @@ export default function GuideApp() {
                     {favorites.length}
                   </span>
                 )}
-              </TabsTrigger>
+              </button>
             ))}
-          </TabsList>
-        </Tabs>
+        </div>
 
         {filteredGuides.length > 0 ? (
           <div className="mt-7 grid gap-4 md:grid-cols-2">
@@ -440,12 +428,9 @@ export default function GuideApp() {
                   className="group flex flex-col rounded-2xl border border-white/8 bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/25"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <Badge
-                      variant="outline"
-                      className={categoryStyles[guide.category]}
-                    >
+                    <span className={`inline-flex h-5 items-center rounded-full border px-2 text-xs font-semibold ${categoryStyles[guide.category]}`}>
                       {guide.category}
-                    </Badge>
+                    </span>
                     <button
                       type="button"
                       onClick={() => toggleFavorite(guide.id)}
@@ -509,16 +494,16 @@ export default function GuideApp() {
             <p className="mt-2 text-sm text-muted-foreground">
               試試「苦無」、「無人機」或清除篩選條件。
             </p>
-            <Button
-              variant="outline"
-              className="mt-5"
+            <button
+              type="button"
+              className="mt-5 h-9 rounded-lg border border-white/12 bg-transparent px-3 text-sm font-semibold transition hover:bg-white/5"
               onClick={() => {
                 setQuery('');
                 setCategory('全部');
               }}
             >
               清除篩選
-            </Button>
+            </button>
           </div>
         )}
       </section>
@@ -528,14 +513,14 @@ export default function GuideApp() {
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-xs font-black uppercase tracking-[.18em] opacity-60">
-                一鍵照抄
+                5.1.0 · ENDGAME META
               </p>
               <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
-                三套實戰流派配裝
+                終局玩家的三套天花板
               </h2>
             </div>
             <p className="max-w-md text-sm font-semibold leading-6 opacity-65">
-              先依你現在卡住的模式選擇，再按裝備庫存微調；不要為了湊表格拆掉已成形的高品質裝備。
+              預設你已進入 SS、Chaos Fusion 與 Xeno Transmute 階段。終局沒有「全身 SS 就最強」的固定答案，暴率、核心與收藏門檻會改變最優解。
             </p>
           </div>
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
@@ -548,20 +533,38 @@ export default function GuideApp() {
                   <span className="grid size-9 place-items-center rounded-xl bg-[#0b1f1e] text-sm font-black text-[#d8ff57]">
                     0{index + 1}
                   </span>
-                  <Badge className="bg-[#0b1f1e]/8 text-[#0b1f1e]">
+                  <span className="inline-flex h-5 items-center rounded-full bg-[#0b1f1e]/8 px-2 text-xs font-semibold text-[#0b1f1e]">
                     {build.mode}
-                  </Badge>
+                  </span>
                 </div>
                 <h3 className="mt-5 text-xl font-black">{build.name}</h3>
                 <p className="mt-1 text-sm font-medium opacity-65">{build.note}</p>
                 <div className="mt-5 rounded-2xl bg-[#0b1f1e]/6 p-4">
                   <p className="text-xs font-black uppercase tracking-wider opacity-50">
-                    核心配置
+                    終局核心
                   </p>
-                  <p className="mt-2 font-black">主武器 · {build.weapon}</p>
-                  <p className="mt-2 text-sm font-semibold leading-6 opacity-70">
+                  <p className="mt-2 text-sm font-black">角色 · {build.hero}</p>
+                  <p className="mt-2 text-sm font-black">異獸 · {build.pet}</p>
+                  <p className="mt-2 text-sm font-black">武器 · {build.weapon}</p>
+                  <p className="mt-3 text-xs font-black uppercase tracking-wider opacity-50">
+                    場內技能
+                  </p>
+                  <p className="mt-1 text-sm font-semibold leading-6 opacity-70">
                     {build.skills.join(' ／ ')}
                   </p>
+                </div>
+                <div className="mt-5">
+                  <p className="text-xs font-black uppercase tracking-wider opacity-50">
+                    裝備槽位
+                  </p>
+                  <ul className="mt-2 space-y-2">
+                    {build.gear.map((gear) => (
+                      <li key={gear} className="flex gap-2 text-xs font-bold leading-5">
+                        <Check className="mt-0.5 size-3.5 shrink-0" />
+                        {gear}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="mt-5 space-y-3">
                   {[
@@ -569,18 +572,55 @@ export default function GuideApp() {
                     ['頭目', build.stats.boss],
                     ['生存', build.stats.safety],
                   ].map(([label, value]) => (
-                    <Progress key={label} value={value as number} className="gap-2">
-                      <ProgressLabel className="text-xs font-black">
-                        {label}
-                      </ProgressLabel>
-                      <ProgressValue className="text-xs font-black text-[#0b1f1e]/55">
-                        {value}
-                      </ProgressValue>
-                    </Progress>
+                    <div key={label}>
+                      <div className="mb-1 flex items-center justify-between text-xs font-black">
+                        <span>{label}</span>
+                        <span className="text-[#0b1f1e]/55">{value}</span>
+                      </div>
+                      <div
+                        className="h-1.5 overflow-hidden rounded-full bg-[#0b1f1e]/10"
+                        role="progressbar"
+                        aria-label={String(label)}
+                        aria-valuenow={value as number}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
+                        <div
+                          className="h-full rounded-full bg-[#0b1f1e]"
+                          style={{ width: `${value}%` }}
+                        />
+                      </div>
+                    </div>
                   ))}
                 </div>
+                <p className="mt-5 rounded-xl border border-[#0b1f1e]/12 bg-[#0b1f1e] px-3 py-2.5 text-xs font-bold leading-5 text-[#d8ff57]">
+                  {build.breakpoint}
+                </p>
               </article>
             ))}
+          </div>
+          <div className="mt-7 flex flex-col gap-3 rounded-2xl border-2 border-[#0b1f1e]/10 bg-[#f8ffe1]/70 p-4 text-xs font-semibold sm:flex-row sm:items-center sm:justify-between">
+            <p className="max-w-2xl leading-5 opacity-70">
+              終局玩家請把自己的基礎暴率、Relic Cores、Chaos Power 與收藏加成丟進計算器；同一件 SS 裝在未達門檻時，可能輸給 AF3 S 裝。
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <a
+                href="https://www.reddit.com/r/Survivorio/comments/1ca5t70/random_build_questions_mega_thread/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-full bg-[#0b1f1e] px-3 py-1.5 text-[#d8ff57]"
+              >
+                近期社群實測 <ExternalLink className="size-3" />
+              </a>
+              <a
+                href="https://survivoriocalc.com/survivor-io-build-calculator/"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-[#0b1f1e]/20 px-3 py-1.5"
+              >
+                配裝計算器 <ExternalLink className="size-3" />
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -610,10 +650,12 @@ export default function GuideApp() {
                       : 'border-white/8 bg-black/10 hover:border-primary/20'
                   }`}
                 >
-                  <Checkbox
+                  <input
+                    type="checkbox"
                     checked={checked}
-                    onCheckedChange={() => toggleTask(task)}
+                    onChange={() => toggleTask(task)}
                     aria-label={task}
+                    className="size-4 shrink-0 accent-[var(--primary)]"
                   />
                   <span className={`text-sm font-semibold ${checked ? 'line-through' : ''}`}>
                     {task}
