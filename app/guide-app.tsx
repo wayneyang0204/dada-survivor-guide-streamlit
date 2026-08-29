@@ -17,6 +17,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 
 import AccountAdvisor from '@/app/account-advisor';
+import CollectiblesDatabase from '@/app/collectibles-database';
 import {
   BUILDS,
   CHARACTER_GLOSSARY,
@@ -162,6 +163,9 @@ export default function GuideApp() {
             <a className="transition-colors hover:text-foreground" href="#characters">
               角色定位
             </a>
+            <a className="transition-colors hover:text-foreground" href="#collectibles">
+              收藏資料
+            </a>
             <a className="transition-colors hover:text-foreground" href="#latest">
               版本情報
             </a>
@@ -241,6 +245,8 @@ export default function GuideApp() {
           ))}
         </div>
       </section>
+
+      <CollectiblesDatabase />
 
       <section
         id="latest"
@@ -811,7 +817,7 @@ export default function GuideApp() {
           { label: '診斷', icon: Target, href: '#advisor', action: undefined },
           { label: '行動', icon: ShieldCheck, href: '#action-plan', action: undefined },
           { label: '配裝', icon: Swords, href: '#builds', action: undefined },
-          { label: '情報', icon: RefreshCw, href: '#latest', action: undefined },
+          { label: '收藏', icon: RefreshCw, href: '#collectibles', action: undefined },
         ].map((item) => {
           const Icon = item.icon;
           const content = (
