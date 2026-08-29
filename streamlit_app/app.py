@@ -7,6 +7,14 @@ from urllib.request import Request, urlopen
 
 import streamlit as st
 
+from data_engine import (
+    assess_event_plan,
+    fetch_source_posts,
+    load_collectible_catalog,
+    match_event_playbook,
+    rank_rewards,
+)
+
 
 st.set_page_config(
     page_title="噠噠特攻終局攻略",
@@ -263,6 +271,19 @@ def 取得最新文章() -> tuple[list[dict[str, str]], bool]:
         ], False
 
 
+@st.cache_data(ttl=900, show_spinner=False)
+def 取得完整文章庫() -> tuple[list[dict], bool]:
+    try:
+        return fetch_source_posts(), True
+    except Exception:
+        return [], False
+
+
+@st.cache_data(show_spinner=False)
+def 取得收藏圖鑑() -> list[dict]:
+    return load_collectible_catalog()
+
+
 def 顯示攻略卡片(item: dict) -> None:
     狀態色 = {"現行": "#d8ff57", "常駐": "#7ee7f2", "需版本核對": "#ffb86b"}[item["狀態"]]
     st.markdown(
@@ -319,7 +340,7 @@ with st.sidebar:
     st.caption("繁體中文・終局玩家版")
     頁面 = st.radio(
         "選擇功能",
-        ["帳號診斷", "終局配裝", "系統資料庫", "收藏優先級", "最新文章"],
+        ["活動最佳解", "帳號診斷", "終局配裝", "完整攻略庫", "收藏圖鑑", "收藏優先級", "最新文章"],
         label_visibility="collapsed",
     )
     st.divider()
@@ -336,7 +357,110 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if 頁面 == "帳號診斷":
+if 頁面 == "活動最佳解":
+    st.header("活動最佳解：先算免費進度，再決定要不要補")
+    全部文章, 文章即時 = 取得完整文章庫()
+    活動文章 = [item for item in 全部文章 if item["category"] == "活動攻略"]
+    if 活動文章:
+        預設活動索引 = next(
+            (index for index, item in enumerate(活動文章) if match_event_playbook(item["title"])["name"] != "通用活動模型"),
+            0,
+        )
+        活動選項 = [f"{item['date']}｜{item['title']}" for item in 活動文章[:40]]
+        活動標籤 = st.selectbox("自動偵測到的近期／歷史活動", 活動選項, index=min(預設活動索引, len(活動選項) - 1))
+        已選活動 = 活動文章[活動選項.index(活動標籤)]
+    else:
+        已選活動 = {
+            "title": "目前活動（手動輸入）",
+            "date": datetime.now().strftime("%Y/%m/%d"),
+            "excerpt": "來源暫時無法連線，仍可使用下方通用試算。",
+            "link": 來源分類網址,
+            "freshness": "待核對",
+        }
+    活動模型 = match_event_playbook(已選活動["title"])
+
+    info1, info2, info3 = st.columns(3)
+    info1.metric("同步攻略", f"{len(全部文章)} 篇" if 文章即時 else "備援模式")
+    info2.metric("偵測活動攻略", f"{len(活動文章)} 篇")
+    info3.metric("套用模型", 活動模型["name"])
+    with st.container(border=True):
+        st.markdown(f"### {已選活動['title']}")
+        st.caption(f"資料日期：{已選活動['date']}｜{已選活動.get('freshness', '待核對')}")
+        st.write(已選活動.get("excerpt") or 活動模型["mechanic"])
+        st.link_button("核對原始活動攻略", 已選活動["link"])
+
+    st.markdown("### 自動策略")
+    st.info(活動模型["mechanic"])
+    for step in 活動模型["steps"]:
+        st.markdown(f"- {step}")
+    st.warning(f"停損提醒：{活動模型['avoid']}")
+    st.caption(活動模型["free_hint"])
+
+    st.markdown("### 用你的帳號數字精算")
+    a1, a2, a3 = st.columns(3)
+    with a1:
+        帳號目標 = st.selectbox(
+            "帳號最大缺口",
+            ["不確定，幫我排", "神器核心", "異世寵物", "科技配件", "收藏品", "SP特工／覺醒", "S裝備", "載具"],
+        )
+    with a2:
+        帳號階段 = st.selectbox("帳號階段", ["尚未紅裝成套", "紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"])
+    with a3:
+        消費風格 = st.selectbox("消費風格", ["無課／只用免費資源", "微課／可小補寶石", "課金／只看效率"])
+
+    獎勵排序 = rank_rewards(帳號目標, 帳號階段)
+    目標獎勵名稱 = st.selectbox("想追的里程碑獎勵", [item["name"] for item in 獎勵排序])
+    目標獎勵 = next(item for item in 獎勵排序 if item["name"] == 目標獎勵名稱)
+
+    模型目標 = int(活動模型["target"])
+    預設目標 = 模型目標 if 0 < 模型目標 <= 10000 else 100
+    p1, p2, p3, p4 = st.columns(4)
+    with p1:
+        目前進度 = int(st.number_input("目前活動進度", min_value=0, value=0, step=1))
+    with p2:
+        剩餘天數 = int(st.number_input("剩餘天數", min_value=0, max_value=30, value=3, step=1))
+    with p3:
+        每日免費進度 = int(st.number_input("每天還可拿的免費進度", min_value=0, value=max(1, 預設目標 // 6), step=1))
+    with p4:
+        目標進度 = int(st.number_input("目標里程碑", min_value=1, value=預設目標, step=1))
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        每次付費進度 = float(st.number_input("一次票券／抽取增加進度", min_value=0.01, value=1.0, step=0.1))
+    with c2:
+        每次寶石成本 = int(st.number_input("一次票券／抽取寶石成本", min_value=0, value=100, step=10))
+    with c3:
+        現有寶石 = int(st.number_input("目前寶石", min_value=0, value=30000, step=500))
+
+    with st.expander("這些數字怎麼填？"):
+        st.write("免費進度包含剩餘登入、每日任務、廣告、免費票與預計開箱任務；付費進度只填需要用寶石補的部分。若遊戲顯示每次十連抽，請把進度與成本都換算成單次或都用十連，兩邊單位一致即可。")
+
+    if st.button("一鍵判斷這次活動", type="primary", use_container_width=True):
+        判斷 = assess_event_plan(
+            current_progress=目前進度,
+            days_remaining=剩餘天數,
+            free_progress_per_day=每日免費進度,
+            target_progress=目標進度,
+            progress_per_paid_action=每次付費進度,
+            gems_per_paid_action=每次寶石成本,
+            gems_owned=現有寶石,
+            spending_style=消費風格,
+            target_reward=目標獎勵,
+        )
+        getattr(st, 判斷["tone"])(f"{判斷['verdict']}｜{判斷['reason']}")
+        r1, r2, r3, r4 = st.columns(4)
+        r1.metric("免費期末進度", f"{判斷['projected_free']:,}")
+        r2.metric("仍缺進度", f"{判斷['gap']:,}")
+        r3.metric("估計補鑽", f"{判斷['gem_need']:,}")
+        r4.metric("每天至少要拿", f"{判斷['daily_needed']:,}")
+        st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
+        st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
+
+    st.markdown("### 兌換商店優先級")
+    for index, reward in enumerate(獎勵排序[:8], 1):
+        st.markdown(f"**{index}. {reward['name']}**　帳號適配分數 {reward['score']}｜建議補鑽上限約 {reward['adjusted_gem_value']:,}")
+
+elif 頁面 == "帳號診斷":
     st.header("依你現在的帳號給出行動順序")
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -376,28 +500,112 @@ elif 頁面 == "終局配裝":
             )
     st.warning("不要用同一套裝備同時判斷首領、區域與推圖強度。終局差距通常來自核心斷點、乘區與模式，而不是單件稀有度。")
 
-elif 頁面 == "系統資料庫":
-    st.header("完整系統攻略庫")
-    c1, c2 = st.columns([1.35, 1])
-    with c1:
-        查詢 = st.text_input("搜尋", placeholder="搜尋科技配件、收藏、寵物、覺醒……")
-    with c2:
-        分類 = st.selectbox("分類", ["全部", "最新系統", "科技配件", "收藏系統", "特工寵物", "裝備養成", "關卡活動"])
+elif 頁面 == "完整攻略庫":
+    st.header("完整攻略庫：精選決策＋全部來源自動同步")
+    精選頁, 全部頁 = st.tabs(["精選決策卡", "全部來源文章"])
+    with 精選頁:
+        c1, c2 = st.columns([1.35, 1])
+        with c1:
+            查詢 = st.text_input("搜尋精選攻略", placeholder="搜尋科技配件、收藏、寵物、覺醒……", key="curated_search")
+        with c2:
+            分類 = st.selectbox("精選分類", ["全部", "最新系統", "科技配件", "收藏系統", "特工寵物", "裝備養成", "關卡活動"], key="curated_category")
 
-    結果 = [
+        結果 = [
+            item
+            for item in 攻略資料
+            if (分類 == "全部" or item["分類"] == 分類)
+            and (not 查詢 or 查詢.lower() in " ".join([item["標題"], item["摘要"], *item["行動"]]).lower())
+        ]
+        st.caption(f"找到 {len(結果)} 個人工核對的決策主題")
+        for row_start in range(0, len(結果), 3):
+            cols = st.columns(3)
+            for col, item in zip(cols, 結果[row_start : row_start + 3]):
+                with col:
+                    顯示攻略卡片(item)
+        if not 結果:
+            st.info("沒有符合的精選主題，請改到『全部來源文章』搜尋。")
+
+    with 全部頁:
+        全部文章, 即時 = 取得完整文章庫()
+        if not 即時:
+            st.warning("來源目前無法連線；精選決策卡與收藏圖鑑仍可正常使用。")
+        else:
+            m1, m2, m3 = st.columns(3)
+            m1.metric("來源文章", len(全部文章))
+            m2.metric("活動攻略", sum(1 for item in 全部文章 if item["category"] == "活動攻略"))
+            m3.metric("資料分類", len({item["category"] for item in 全部文章}))
+            f1, f2 = st.columns([1.4, 1])
+            with f1:
+                全文查詢 = st.text_input("搜尋全部文章", placeholder="輸入活動、角色、裝備、配件或資源名稱", key="live_search")
+            with f2:
+                全部分類 = st.selectbox("文章分類", ["全部", *sorted({item["category"] for item in 全部文章})], key="live_category")
+            全文結果 = [
+                item
+                for item in 全部文章
+                if (全部分類 == "全部" or item["category"] == 全部分類)
+                and (not 全文查詢 or 全文查詢.lower() in f"{item['title']} {item['excerpt']}".lower())
+            ]
+            每頁數量 = 12
+            總頁數 = max(1, (len(全文結果) + 每頁數量 - 1) // 每頁數量)
+            頁碼 = st.selectbox("文章頁碼", list(range(1, 總頁數 + 1)), key=f"article_page_{len(全文結果)}")
+            st.caption(f"找到 {len(全文結果)} 篇｜第 {頁碼}/{總頁數} 頁")
+            當頁 = 全文結果[(頁碼 - 1) * 每頁數量 : 頁碼 * 每頁數量]
+            for row_start in range(0, len(當頁), 2):
+                cols = st.columns(2)
+                for col, item in zip(cols, 當頁[row_start : row_start + 2]):
+                    with col:
+                        with st.container(border=True):
+                            st.markdown(f"**{item['title']}**")
+                            st.caption(f"{item['category']}｜{item['freshness']}｜{item['date']}")
+                            摘要 = item["excerpt"] or "來源未提供摘要，請開啟原文核對。"
+                            st.write(摘要[:280] + ("…" if len(摘要) > 280 else ""))
+                            st.link_button("閱讀原文", item["link"])
+
+elif 頁面 == "收藏圖鑑":
+    st.header("完整收藏品圖鑑")
+    收藏圖鑑 = 取得收藏圖鑑()
+    d1, d2, d3 = st.columns(3)
+    d1.metric("收藏品總數", len(收藏圖鑑))
+    d2.metric("收錄期數", len({item["edition"] for item in 收藏圖鑑}))
+    d3.metric("傳奇收藏", sum(1 for item in 收藏圖鑑 if item["quality"] == "傳奇"))
+    q1, q2, q3 = st.columns([1.4, 1, 1])
+    with q1:
+        收藏查詢 = st.text_input("搜尋收藏品", placeholder="輸入名稱或編號")
+    with q2:
+        收藏品質 = st.selectbox("品質", ["全部", "傳奇", "史詩", "優秀", "精良", "普通"])
+    with q3:
+        收藏期數 = st.selectbox("期數", ["全部", *range(1, 11)])
+    收藏結果 = [
         item
-        for item in 攻略資料
-        if (分類 == "全部" or item["分類"] == 分類)
-        and (not 查詢 or 查詢.lower() in " ".join([item["標題"], item["摘要"], *item["行動"]]).lower())
+        for item in 收藏圖鑑
+        if (收藏品質 == "全部" or item["quality"] == 收藏品質)
+        and (收藏期數 == "全部" or item["edition"] == 收藏期數)
+        and (not 收藏查詢 or 收藏查詢.lower() in f"{item['id']} {item['name']}".lower())
     ]
-    st.caption(f"找到 {len(結果)} 個主題")
-    for row_start in range(0, len(結果), 3):
-        cols = st.columns(3)
-        for col, item in zip(cols, 結果[row_start : row_start + 3]):
-            with col:
-                顯示攻略卡片(item)
-    if not 結果:
-        st.info("沒有符合的主題，請換一個關鍵字。")
+    收藏每頁 = 25
+    收藏總頁 = max(1, (len(收藏結果) + 收藏每頁 - 1) // 收藏每頁)
+    收藏頁碼 = st.selectbox("圖鑑頁碼", list(range(1, 收藏總頁 + 1)), key=f"collectible_page_{len(收藏結果)}")
+    收藏當頁 = 收藏結果[(收藏頁碼 - 1) * 收藏每頁 : 收藏頁碼 * 收藏每頁]
+    st.caption(f"找到 {len(收藏結果)} 件｜第 {收藏頁碼}/{收藏總頁} 頁")
+    st.dataframe(
+        [
+            {
+                "圖片": item["image"],
+                "編號": item["id"],
+                "名稱": item["name"],
+                "品質": item["quality"],
+                "期數": item["edition"],
+                "詳細資料": item["link"],
+            }
+            for item in 收藏當頁
+        ],
+        hide_index=True,
+        use_container_width=True,
+        column_config={
+            "圖片": st.column_config.ImageColumn("圖示", width="small"),
+            "詳細資料": st.column_config.LinkColumn("詳細資料", display_text="開啟"),
+        },
+    )
 
 elif 頁面 == "收藏優先級":
     st.header("收藏品不是全收，先跨有效斷點")
@@ -416,13 +624,19 @@ elif 頁面 == "收藏優先級":
 
 elif 頁面 == "最新文章":
     st.header("最新來源動態")
-    最新, 即時 = 取得最新文章()
-    st.caption("已連接即時文章" if 即時 else "來源暫時無法連線，顯示最近備援資料")
+    全部文章, 全部即時 = 取得完整文章庫()
+    if 全部即時:
+        最新 = [{"標題": item["title"], "日期": item["date"], "網址": item["link"], "分類": item["category"]} for item in 全部文章[:15]]
+    else:
+        最新, _ = 取得最新文章()
+    st.caption(f"已同步完整來源，共 {len(全部文章)} 篇" if 全部即時 else "來源暫時無法連線，顯示最近備援資料")
     for item in 最新:
         with st.container(border=True):
             col1, col2 = st.columns([4, 1])
             col1.markdown(f"**{item['標題']}**")
             col2.caption(item["日期"])
+            if item.get("分類"):
+                st.caption(item["分類"])
             st.link_button("閱讀原始文章", item["網址"])
     st.link_button("查看完整文章分類", 來源分類網址)
 
