@@ -2,8 +2,6 @@
 
 import Image from 'next/image';
 import {
-  ArrowRight,
-  BookOpen,
   Check,
   ChevronRight,
   Clock3,
@@ -12,10 +10,8 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
-  Sparkles,
   Swords,
   Target,
-  Trophy,
   Zap,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -37,15 +33,27 @@ const characterIndex = new Map(
 const categories = ['全部', '武器', '技能', '角色', '關卡', '收藏'] as const;
 type Category = (typeof categories)[number];
 
-const quickGuides: {
-  icon: typeof Swords;
-  label: GuideCategory;
-  hint: string;
-}[] = [
-  { icon: Swords, label: '武器', hint: '武器排行與養成' },
-  { icon: Sparkles, label: '技能', hint: '進化組合圖鑑' },
-  { icon: BookOpen, label: '關卡', hint: '更新至 345 章' },
-  { icon: Trophy, label: '角色', hint: '角色投資指南' },
+const decisionPrinciples = [
+  {
+    icon: Target,
+    title: '先鎖定主位',
+    hint: '角色未達轉換門檻，就不為排行榜分散資源。',
+  },
+  {
+    icon: Zap,
+    title: '再補關鍵斷點',
+    hint: '以混沌之力9與18為重算點，不做無效換裝。',
+  },
+  {
+    icon: Swords,
+    title: '依模式換配裝',
+    hint: '短場、長場與區域行動不共用同一套答案。',
+  },
+  {
+    icon: ShieldCheck,
+    title: '最後補支援鏈',
+    hint: '哪吒與伏爾坎是支援，不搶主位養成資源。',
+  },
 ];
 
 const categoryStyles: Record<GuideCategory, string> = {
@@ -143,19 +151,19 @@ export default function GuideApp() {
             aria-label="主要導覽"
           >
             <a className="transition-colors hover:text-foreground" href="#advisor">
-              配裝診斷
+              帳號診斷
             </a>
-            <a className="transition-colors hover:text-foreground" href="#guide-library">
-              攻略庫
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#latest">
-              最新情報
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#characters">
-              角色圖鑑
+            <a className="transition-colors hover:text-foreground" href="#action-plan">
+              行動清單
             </a>
             <a className="transition-colors hover:text-foreground" href="#builds">
-              流派配裝
+              完整配裝
+            </a>
+            <a className="transition-colors hover:text-foreground" href="#characters">
+              角色定位
+            </a>
+            <a className="transition-colors hover:text-foreground" href="#latest">
+              版本情報
             </a>
           </nav>
           <span className="inline-flex h-5 items-center justify-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 text-xs font-medium text-emerald-200">
@@ -177,18 +185,18 @@ export default function GuideApp() {
               {OFFICIAL_UPDATE.version} 終局版 · 2026/08/29 更新
             </span>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl">
-              別照抄榜單，先算出
-              <span className="text-primary">你現在最強的解。</span>
+              先知道現在該做什麼，
+              <span className="text-primary">再追求真正天花板。</span>
             </h1>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
-              選四個帳號狀態，直接得到主位、模式配裝與下一個投資目標。全站使用中文名稱，後面也都有角色照片。
+              這不是單純排行表。輸入四個帳號狀態，直接取得主位結論、三步行動清單、資源凍結項目與下一個轉換門檻。
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black sm:min-w-[360px]">
             {[
               ['1', '選目前門檻'],
-              ['2', '立刻看答案'],
-              ['3', '照順序升級'],
+              ['2', '取得行動排序'],
+              ['3', '逐項完成'],
             ].map(([step, label]) => (
               <div key={step} className="rounded-xl border border-white/8 bg-white/[0.04] px-3 py-3">
                 <span className="mx-auto grid size-5 place-items-center rounded-full bg-primary text-[10px] text-primary-foreground">
@@ -204,40 +212,32 @@ export default function GuideApp() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-18 lg:px-8">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-primary">
-              快速入口
-            </p>
-            <h2 className="mt-1 text-2xl font-black">你現在想查什麼？</h2>
-          </div>
-          <button
-            className="hidden items-center gap-1 text-sm font-bold text-primary sm:flex"
-            onClick={() => jumpToGuides()}
-            type="button"
-          >
-            瀏覽全部 <ArrowRight className="size-4" />
-          </button>
+        <div className="mb-5 max-w-2xl">
+          <p className="text-xs font-bold tracking-[.18em] text-primary">
+            專業判斷框架
+          </p>
+          <h2 className="mt-2 text-2xl font-black">不只告訴你穿什麼，也告訴你為什麼</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            所有推薦都按同一套順序判斷，避免因新角色或新裝備推出就浪費資源。
+          </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {quickGuides.map(({ icon: Icon, label, hint }) => (
-            <button
-              key={label}
-              type="button"
-              onClick={() => jumpToGuides(label)}
-              className="group flex items-center gap-4 rounded-2xl border border-white/8 bg-card p-5 text-left transition-all hover:-translate-y-1 hover:border-primary/35 hover:bg-card/80"
+          {decisionPrinciples.map(({ icon: Icon, title, hint }, index) => (
+            <article
+              key={title}
+              className="relative overflow-hidden rounded-2xl border border-white/8 bg-card p-5"
             >
-              <span className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-                <Icon className="size-5" />
+              <span className="absolute right-4 top-3 text-3xl font-black text-white/[0.035]">
+                0{index + 1}
               </span>
-              <span className="flex-1">
-                <strong className="block text-base">{label}攻略</strong>
-                <span className="mt-1 block text-xs text-muted-foreground">
-                  {hint}
-                </span>
+              <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Icon className="size-4" />
               </span>
-              <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-            </button>
+              <h3 className="mt-4 text-sm font-black">{title}</h3>
+              <p className="mt-2 text-xs font-semibold leading-5 text-muted-foreground">
+                {hint}
+              </p>
+            </article>
           ))}
         </div>
       </section>
@@ -808,10 +808,10 @@ export default function GuideApp() {
 
       <nav className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-around rounded-2xl border border-white/10 bg-[#0a1d1e]/92 p-2 shadow-2xl backdrop-blur-xl md:hidden" aria-label="行動版導覽">
         {[
-          { label: '診斷', icon: Target, href: '#advisor' },
-          { label: '情報', icon: RefreshCw, href: '#latest' },
-          { label: '配裝', icon: Swords, href: '#builds' },
-          { label: '收藏', icon: Heart, action: () => jumpToGuides('收藏') },
+          { label: '診斷', icon: Target, href: '#advisor', action: undefined },
+          { label: '行動', icon: ShieldCheck, href: '#action-plan', action: undefined },
+          { label: '配裝', icon: Swords, href: '#builds', action: undefined },
+          { label: '情報', icon: RefreshCw, href: '#latest', action: undefined },
         ].map((item) => {
           const Icon = item.icon;
           const content = (
