@@ -32,17 +32,17 @@ const DEFAULTS = {
 const mainOptions: { value: MainStage; label: string; hint: string }[] = [
   {
     value: 'venato',
-    label: 'Venato R5+ ＋塔洛莎 R4+',
+    label: '維納托覺醒5階以上＋塔洛莎覺醒4階以上',
     hint: '已達真正轉主位門檻',
   },
   {
     value: 'taloxa-r5',
-    label: '塔洛莎 R5+、基礎暴率 70%+',
+    label: '塔洛莎覺醒5階以上、基礎暴率70%以上',
     hint: '多數高端帳號在這裡',
   },
   {
     value: 'taloxa-building',
-    label: '塔洛莎 R1–R4／暴率未滿 70%',
+    label: '塔洛莎覺醒1至4階／暴率未滿70%',
     hint: '還在建立主位門檻',
   },
   {
@@ -65,7 +65,7 @@ const modeOptions: { value: PlayMode; label: string }[] = [
 ];
 
 const divineOptions: { value: DivineStage; label: string }[] = [
-  { value: 'complete', label: '哪吒 R2+ ＋ 伏爾坎 R1+' },
+  { value: 'complete', label: '哪吒覺醒2階以上＋伏爾坎覺醒1階以上' },
   { value: 'nezha', label: '只有哪吒' },
   { value: 'none', label: '都沒有／不確定' },
 ];
@@ -130,40 +130,40 @@ export default function AccountAdvisor() {
 
     const main = {
       venato: {
-        title: 'Venato 主位，塔洛莎放協同',
-        reason: '你已達轉換門檻，現在才是 Venato 真正超過塔洛莎的區間。',
-        action: '資源集中 Venato R5→R7，塔洛莎保留 R4 以上做協同。',
+        title: '維納托主位，塔洛莎放協同',
+        reason: '你已達轉換門檻，現在才是維納托真正超過塔洛莎的區間。',
+        action: '資源集中維納托覺醒5階升到7階，塔洛莎保留覺醒4階以上做協同。',
         avoid: '不要把塔洛莎吃掉或降到無法當協同。',
       },
       'taloxa-r5': {
-        title: '繼續塔洛莎主位，先別硬轉 Venato',
-        reason: '低星 Venato 不會自動贏；必須能直接做出 R5 Venato＋R4 塔洛莎才值得換。',
+        title: '繼續塔洛莎主位，先別硬轉維納托',
+        reason: '低覺醒維納托不會自動贏；必須能直接做出覺醒5階維納托＋覺醒4階塔洛莎才值得換。',
         action: '先存好一次到位的轉換資源，裝備與異獸繼續服務塔洛莎。',
-        avoid: '不要做 R1–R4 Venato 當過渡，會同時削弱主位與協同。',
+        avoid: '不要做覺醒1至4階維納托當過渡，會同時削弱主位與協同。',
       },
       'taloxa-building': {
-        title: '塔洛莎主位，第一優先推到 R5',
-        reason: '你還沒跨過塔洛莎的主要爆發門檻，現在分資源給 Venato 會更慢。',
-        action: '先補基礎暴率到 70% 左右，再完成塔洛莎 R5。',
-        avoid: '先不投 Venato，也不要為伏爾坎延後主位突破。',
+        title: '塔洛莎主位，第一優先推到覺醒5階',
+        reason: '你還沒跨過塔洛莎的主要爆發門檻，現在分資源給維納托會更慢。',
+        action: '先補基礎暴率到70%左右，再完成塔洛莎覺醒5階。',
+        avoid: '先不投維納托，也不要為伏爾坎延後主位突破。',
       },
       unsure: {
         title: '維持你現有最強主位，先建立塔洛莎',
-        reason: '資訊不足時，最安全路線是完成塔洛莎的暴率與 R5 門檻。',
+        reason: '資訊不足時，最安全路線是完成塔洛莎的暴率與覺醒5階門檻。',
         action: '先查角色突破與基礎暴率；達標前保留轉換箱與通用資源。',
         avoid: '不要因新角色上線就把資源平均分散。',
       },
     }[mainStage];
 
     const chaos = {
-      '18-plus': 'Chaos 18 已達高階重算點：長場可重新比較腰帶與項鍊。',
-      '9-17': 'Chaos 9 已能用終局骨架；下一個明確目標是 18。',
-      'below-9': 'Chaos 未滿 9：先補到 9，不要直接照抄 Chaos 18 的長場配置。',
+      '18-plus': '混沌之力18已達高階重算點：長場可重新比較腰帶與項鍊。',
+      '9-17': '混沌之力9已能用終局骨架；下一個明確目標是18。',
+      'below-9': '混沌之力未滿9：先補到9，不要直接照抄混沌之力18的長場配置。',
     }[chaosStage];
 
     const divine = {
-      complete: '神火鏈已完成：哪吒放 Teamwork，被動吃伏爾坎加成；兩者都不是主位。',
-      nezha: '先保留哪吒；主位與裝備門檻完成後，再補伏爾坎 R1。',
+      complete: '神火鏈已完成：哪吒放協同被動，並獲得伏爾坎加成；兩者都不是主位。',
+      nezha: '先保留哪吒；主位與裝備門檻完成後，再補伏爾坎覺醒1階。',
       none: '先跳過伏爾坎；資源優先放在主位、雙生槍與裝備門檻。',
     }[divineStage];
 
@@ -217,7 +217,7 @@ export default function AccountAdvisor() {
           </Button>
         </div>
         <p className="mt-3 text-xs font-semibold leading-5 text-white/55">
-          已先套用「塔洛莎 R5＋Chaos 9–17」高端常見狀態。把不符合的選項改掉，答案會立即更新。
+          已先套用「塔洛莎覺醒5階＋混沌之力9至17」高端常見狀態。把不符合的選項改掉，答案會立即更新。
         </p>
       </div>
 
@@ -231,7 +231,7 @@ export default function AccountAdvisor() {
           />
           <div className="grid gap-5 sm:grid-cols-2">
             <ChoiceGroup
-              label="2｜Chaos Power"
+              label="2｜混沌之力"
               value={chaosStage}
               options={chaosOptions}
               onChange={setChaosStage}
@@ -251,7 +251,7 @@ export default function AccountAdvisor() {
           />
           <div className="flex items-center gap-2 text-[11px] font-semibold text-white/40">
             <Gauge className="size-3.5" />
-            不知道 Chaos 或基礎暴率，就選「不確定」，不會叫你亂花資源。
+            不知道混沌之力或基礎暴率，就選「不確定」，不會叫你亂花資源。
           </div>
         </div>
 

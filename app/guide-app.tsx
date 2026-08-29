@@ -56,8 +56,8 @@ const categoryStyles: Record<GuideCategory, string> = {
 };
 
 const buildUseWhen = [
-  '你要打 EE／公會遠征，重點是最短時間爆發',
-  '你要打 LME 等長場頭目，能讓 Chaos 與共鳴疊滿',
+  '你要打短場頭目／公會遠征，重點是最短時間爆發',
+  '你要打長場頭目，能讓混沌之力與共鳴疊滿',
   '你要穩過區域行動或 341–345 章，不想因詞條翻車',
 ];
 
@@ -181,7 +181,7 @@ export default function GuideApp() {
               <span className="text-primary">你現在最強的解。</span>
             </h1>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
-              選四個帳號狀態，直接得到主位、模式配裝與下一個投資目標。看不懂英文角色名也沒關係，後面都有照片。
+              選四個帳號狀態，直接得到主位、模式配裝與下一個投資目標。全站使用中文名稱，後面也都有角色照片。
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black sm:min-w-[360px]">
@@ -260,7 +260,7 @@ export default function GuideApp() {
               我們每天替你追。
             </h2>
             <p className="mt-4 max-w-md text-sm leading-6 text-muted-foreground">
-              每天上午 9:00 比對 HABBY 的官方商店版本與公告；只有可核實的內容才會放進攻略。
+              每天上午 9:00 比對官方商店版本與公告；只有可核實的內容才會放進攻略。
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {OFFICIAL_UPDATE.sources.map((source) => (
@@ -473,7 +473,7 @@ export default function GuideApp() {
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-xs font-black uppercase tracking-[.18em] opacity-60">
-                5.1.0 · ENDGAME META
+                5.1.0 · 終局強勢配置
               </p>
               <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
                 診斷結果對應這三套
@@ -496,7 +496,7 @@ export default function GuideApp() {
                 <h3 className="mt-2 text-2xl font-black">終局配裝角色圖鑑</h3>
               </div>
               <p className="max-w-lg text-sm font-semibold leading-6 text-white/55">
-                「主位、協同、Teamwork 被動、異獸」是四種不同位置。下方每張卡都附中英文名與用途，英文不再只丟一串給你猜。
+                「主位、協同、協同被動、異獸」是四種不同位置。下方每張卡都只顯示中文名稱與用途。
               </p>
             </div>
 
@@ -553,7 +553,7 @@ export default function GuideApp() {
 
             <div className="mt-5 grid gap-3 text-xs font-bold sm:grid-cols-3">
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
-                <span className="text-[#d8ff57]">真正主位：</span>Venato／塔洛莎
+                <span className="text-[#d8ff57]">真正主位：</span>維納托／塔洛莎
               </p>
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
                 <span className="text-[#d8ff57]">神火支援鏈：</span>哪吒 → 伏爾坎
@@ -592,7 +592,7 @@ export default function GuideApp() {
                         <a
                           key={profile.id}
                           href={`#character-${profile.id}`}
-                          title={`${profile.nameZh}${profile.nameEn !== profile.nameZh ? `（${profile.nameEn}）` : ''}｜${profile.role}`}
+                          title={`${profile.nameZh}｜${profile.role}`}
                           className="group inline-flex items-center gap-2 rounded-full border border-[#0b1f1e]/10 bg-[#f8ffe1] py-1 pl-1 pr-2.5 text-[11px] font-black transition hover:-translate-y-0.5 hover:border-[#0b1f1e]/30"
                         >
                           <span className="relative size-7 overflow-hidden rounded-full bg-[#0b1f1e]/10">
@@ -679,7 +679,7 @@ export default function GuideApp() {
           </div>
           <div className="mt-7 flex flex-col gap-3 rounded-2xl border-2 border-[#0b1f1e]/10 bg-[#f8ffe1]/70 p-4 text-xs font-semibold sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-2xl leading-5 opacity-70">
-              終局玩家請把自己的基礎暴率、Relic Cores、Chaos Power 與收藏加成丟進計算器；同一件 SS 裝在未達門檻時，可能輸給 AF3 S 裝。
+              終局玩家請把自己的基礎暴率、遺物核心、混沌之力與收藏加成丟進計算器；同一件雙生階裝備在未達門檻時，可能輸給神鑄3的單系裝備。
             </p>
             <div className="flex flex-wrap gap-2">
               <a
