@@ -18,6 +18,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import AccountAdvisor from '@/app/account-advisor';
 import CollectiblesDatabase from '@/app/collectibles-database';
+import SourceLibrary from '@/app/source-library';
 import {
   BUILDS,
   CHARACTER_GLOSSARY,
@@ -166,6 +167,9 @@ export default function GuideApp() {
             <a className="transition-colors hover:text-foreground" href="#collectibles">
               收藏資料
             </a>
+            <a className="transition-colors hover:text-foreground" href="#systems">
+              系統大全
+            </a>
             <a className="transition-colors hover:text-foreground" href="#latest">
               版本情報
             </a>
@@ -247,6 +251,8 @@ export default function GuideApp() {
       </section>
 
       <CollectiblesDatabase />
+
+      <SourceLibrary />
 
       <section
         id="latest"
