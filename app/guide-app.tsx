@@ -22,11 +22,16 @@ import { useEffect, useMemo, useState } from 'react';
 
 import {
   BUILDS,
+  CHARACTER_GLOSSARY,
   GUIDES,
   OFFICIAL_UPDATE,
   STARTER_TASKS,
   type GuideCategory,
 } from '@/lib/guide-data';
+
+const characterIndex = new Map(
+  CHARACTER_GLOSSARY.map((profile) => [profile.id, profile]),
+);
 
 const categories = ['全部', '武器', '技能', '角色', '關卡', '收藏'] as const;
 type Category = (typeof categories)[number];
@@ -135,6 +140,9 @@ export default function GuideApp() {
             </a>
             <a className="transition-colors hover:text-foreground" href="#latest">
               最新情報
+            </a>
+            <a className="transition-colors hover:text-foreground" href="#characters">
+              角色圖鑑
             </a>
             <a className="transition-colors hover:text-foreground" href="#builds">
               流派配裝
@@ -523,6 +531,85 @@ export default function GuideApp() {
               預設你已進入 SS、Chaos Fusion 與 Xeno Transmute 階段。終局沒有「全身 SS 就最強」的固定答案，暴率、核心與收藏門檻會改變最優解。
             </p>
           </div>
+
+          <div
+            id="characters"
+            className="mt-8 scroll-mt-24 overflow-hidden rounded-[28px] bg-[#0b1f1e] p-5 text-[#f8ffe1] sm:p-7"
+          >
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[.18em] text-[#d8ff57]">
+                  先認人，再看配裝
+                </p>
+                <h3 className="mt-2 text-2xl font-black">終局配裝角色圖鑑</h3>
+              </div>
+              <p className="max-w-lg text-sm font-semibold leading-6 text-white/55">
+                「主位、協同、Teamwork 被動、異獸」是四種不同位置。下方每張卡都附中英文名與用途，英文不再只丟一串給你猜。
+              </p>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {CHARACTER_GLOSSARY.map((profile) => (
+                <article
+                  id={`character-${profile.id}`}
+                  key={profile.id}
+                  className="scroll-mt-24 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06]"
+                >
+                  <div className="relative aspect-[16/9] overflow-hidden bg-white/5">
+                    <Image
+                      src={profile.image}
+                      alt={profile.imageAlt}
+                      fill
+                      className="object-cover transition duration-500 hover:scale-[1.03]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b1f1e] via-transparent to-transparent" />
+                    <span className="absolute left-3 top-3 inline-flex h-6 items-center rounded-full border border-white/15 bg-[#0b1f1e]/80 px-2.5 text-[11px] font-black text-[#d8ff57] backdrop-blur">
+                      {profile.kind}
+                    </span>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h4 className="text-lg font-black">{profile.nameZh}</h4>
+                        <p className="text-xs font-bold uppercase tracking-wider text-white/45">
+                          {profile.nameEn}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-[#d8ff57] px-2.5 py-1 text-[11px] font-black text-[#0b1f1e]">
+                        {profile.role}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-sm font-medium leading-6 text-white/65">
+                      {profile.summary}
+                    </p>
+                    <a
+                      href={profile.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-[#d8ff57]/75 transition hover:text-[#d8ff57]"
+                    >
+                      圖片／資料：{profile.sourceName}
+                      <ExternalLink className="size-3" />
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-5 grid gap-3 text-xs font-bold sm:grid-cols-3">
+              <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
+                <span className="text-[#d8ff57]">真正主位：</span>Venato／Taloxa
+              </p>
+              <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
+                <span className="text-[#d8ff57]">神火支援鏈：</span>哪吒 → 伏爾坎
+              </p>
+              <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
+                <span className="text-[#d8ff57]">不是角色：</span>幽冥之魂是異獸
+              </p>
+            </div>
+          </div>
+
           <div className="mt-8 grid gap-4 lg:grid-cols-3">
             {BUILDS.map((build, index) => (
               <article
@@ -540,6 +627,32 @@ export default function GuideApp() {
                 <h3 className="mt-5 text-xl font-black">{build.name}</h3>
                 <p className="mt-1 text-sm font-medium opacity-65">{build.note}</p>
                 <div className="mt-5 rounded-2xl bg-[#0b1f1e]/6 p-4">
+                  <div className="mb-4 flex flex-wrap gap-2">
+                    {build.characterIds.map((characterId) => {
+                      const profile = characterIndex.get(characterId);
+                      if (!profile) return null;
+
+                      return (
+                        <a
+                          key={profile.id}
+                          href={`#character-${profile.id}`}
+                          title={`${profile.nameZh}（${profile.nameEn}）｜${profile.role}`}
+                          className="group inline-flex items-center gap-2 rounded-full border border-[#0b1f1e]/10 bg-[#f8ffe1] py-1 pl-1 pr-2.5 text-[11px] font-black transition hover:-translate-y-0.5 hover:border-[#0b1f1e]/30"
+                        >
+                          <span className="relative size-7 overflow-hidden rounded-full bg-[#0b1f1e]/10">
+                            <Image
+                              src={profile.image}
+                              alt=""
+                              fill
+                              className="object-cover"
+                              sizes="28px"
+                            />
+                          </span>
+                          {profile.nameZh}
+                        </a>
+                      );
+                    })}
+                  </div>
                   <p className="text-xs font-black uppercase tracking-wider opacity-50">
                     終局核心
                   </p>

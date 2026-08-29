@@ -1,5 +1,26 @@
 export type GuideCategory = '武器' | '技能' | '角色' | '關卡';
 
+export type CharacterId =
+  | 'venato'
+  | 'taloxa'
+  | 'nezha'
+  | 'vulcan'
+  | 'metallia'
+  | 'umbral-soul';
+
+export type CharacterProfile = {
+  id: CharacterId;
+  nameZh: string;
+  nameEn: string;
+  kind: '生存者' | 'SP 神火生存者' | '異獸';
+  role: string;
+  summary: string;
+  image: string;
+  imageAlt: string;
+  sourceName: string;
+  sourceUrl: string;
+};
+
 export type Guide = {
   id: string;
   category: GuideCategory;
@@ -84,13 +105,13 @@ export const GUIDES: Guide[] = [
   {
     id: 'vulcan-overview',
     category: '角色',
-    title: 'SP 神火角色 Vulcan：資源投資觀察',
+    title: '伏爾坎（Vulcan）：他不是終局主位',
     description: '整理官方已公開資訊與目前仍待實測部分，避免新角色推出就一次梭哈。',
     level: '進階',
     readTime: '5 分鐘',
     updated: '8/28',
-    tags: ['Vulcan', 'SP角色', '資源規劃'],
-    takeaways: ['先看既有隊伍是否已成形', '保留重置與升星資源直到完整測試', '活動兌換以通用資源優先'],
+    tags: ['伏爾坎', 'Vulcan', 'SP角色', '神火支援'],
+    takeaways: ['伏爾坎主要強化哪吒的神火被動', '先把哪吒推到 R1 以上，伏爾坎才開始有價值', '終局配裝中的主位通常是 Venato 或 Taloxa，不是伏爾坎'],
   },
   {
     id: 'guardian-combo',
@@ -127,12 +148,88 @@ export const GUIDES: Guide[] = [
   },
 ];
 
+export const CHARACTER_GLOSSARY: CharacterProfile[] = [
+  {
+    id: 'venato',
+    nameZh: '維納托',
+    nameEn: 'Venato',
+    kind: '生存者',
+    role: '真終局主位',
+    summary: '資源與覺醒門檻都很高；通常要能組出 R5 Venato＋R4 Taloxa，再考慮從 Taloxa 轉主位。',
+    image: '/characters/venato-guide.jpg',
+    imageAlt: 'Survivor.io 生存者 Venato 的角色畫面',
+    sourceName: 'PlayMe 角色實測',
+    sourceUrl: 'https://www.youtube.com/watch?v=B-lmUhtuH3g',
+  },
+  {
+    id: 'taloxa',
+    nameZh: '塔洛莎',
+    nameEn: 'Taloxa',
+    kind: '生存者',
+    role: '後期主位／終局協同',
+    summary: '基礎暴率約 70% 以上開始發力；R5 前後是多數高端帳號的核心，轉 Venato 後仍可當強力協同。',
+    image: '/characters/taloxa-guide.jpg',
+    imageAlt: 'Survivor.io 生存者 Taloxa 的角色畫面',
+    sourceName: 'Phasecast 角色介紹',
+    sourceUrl: 'https://www.youtube.com/watch?v=SPWy0pNX5YQ',
+  },
+  {
+    id: 'nezha',
+    nameZh: '哪吒',
+    nameEn: 'Nezha',
+    kind: 'SP 神火生存者',
+    role: 'Teamwork 被動',
+    summary: '提供神火傷害的起點，主要放在 Teamwork Passive；這條神火鏈先投資哪吒，再考慮伏爾坎。',
+    image: '/characters/nezha-guide.jpg',
+    imageAlt: 'Survivor.io SP 神火生存者哪吒的角色畫面',
+    sourceName: 'Phasecast 角色介紹',
+    sourceUrl: 'https://www.youtube.com/watch?v=qB49TkoZuXE',
+  },
+  {
+    id: 'vulcan',
+    nameZh: '伏爾坎',
+    nameEn: 'Vulcan',
+    kind: 'SP 神火生存者',
+    role: '全域被動支援',
+    summary: '不是上場主位，也不必佔 Teamwork 槽；R1 起主要強化哪吒的神火效果，沒有哪吒 R1 時先不要投。',
+    image: '/characters/vulcan-guide.jpg',
+    imageAlt: 'Survivor.io SP 神火生存者 Vulcan 的角色畫面',
+    sourceName: 'Phasecast 角色介紹',
+    sourceUrl: 'https://www.youtube.com/watch?v=r8LE32kgQ1c',
+  },
+  {
+    id: 'metallia',
+    nameZh: '梅塔莉亞',
+    nameEn: 'Metallia',
+    kind: '生存者',
+    role: '異常狀態／協同支援',
+    summary: '搖滾歌手造型的 S 級生存者；終局更常拿來補毒、冰、虛弱等異常狀態與協同，而非固定主位。',
+    image: '/characters/metallia-guide.jpg',
+    imageAlt: 'Survivor.io 生存者 Metallia 的角色宣傳畫面',
+    sourceName: 'AllClash 角色攻略',
+    sourceUrl: 'https://www.allclash.com/best-build-for-metallia-in-survivor-io-gear-weapon-skill-choices/',
+  },
+  {
+    id: 'umbral-soul',
+    nameZh: '幽冥之魂',
+    nameEn: 'Umbral Soul',
+    kind: '異獸',
+    role: '共鳴／傷害支援',
+    summary: '牠是 Xeno Pet（異獸），不是角色。配裝裡看到牠時，要到異獸與共鳴欄位處理。',
+    image: '/characters/umbral-soul-official.webp',
+    imageAlt: 'Survivor.io 異獸 Umbral Soul 的官方活動圖',
+    sourceName: 'App Store｜HABBY 官方活動圖',
+    sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310?eventid=6799857083',
+  },
+];
+
 export const BUILDS = [
   {
     name: '短時頭目爆發天花板',
     mode: 'EE／公會遠征',
-    hero: '哪吒高覺醒主位＋Vulcan R1–R4 被動',
-    pet: 'Umbral Soul R3+｜共鳴增益＋共鳴傷害',
+    hero: 'Venato R5+ 主位｜Taloxa R4 協同；神火：哪吒 R2+ → 伏爾坎 R1+',
+    pet: '幽冥之魂（Umbral Soul）R3+｜共鳴增益＋共鳴傷害',
+    characterIds: ['venato', 'taloxa', 'nezha', 'vulcan', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4・C2+・Xeno Transmute',
     gear: [
       'AF3 虛空項鍊／SS 審判項鍊（依計算器）',
@@ -149,8 +246,9 @@ export const BUILDS = [
   {
     name: '長戰疊層傷害極限',
     mode: 'LME／長線首領',
-    hero: '哪吒覺醒矩陣＋神火支援位',
-    pet: 'Umbral Soul｜保護＋共鳴增益＋共鳴傷害',
+    hero: 'Venato R5–R7 主位｜Taloxa R4＋梅塔莉亞／楊大師 R1 協同',
+    pet: '幽冥之魂（Umbral Soul）｜保護＋共鳴增益＋共鳴傷害',
+    characterIds: ['venato', 'taloxa', 'metallia', 'nezha', 'vulcan', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4・Chaos 9／18 門檻',
     gear: [
       'SS 審判項鍊（高暴率）／AF3 虛空項鍊',
@@ -167,8 +265,9 @@ export const BUILDS = [
   {
     name: '區域行動零失誤配置',
     mode: 'Zone Ops／341–345',
-    hero: '高覺醒主力｜哪吒優先，弱點關再切 Metallia',
-    pet: 'Umbral Soul／高星控制型異獸',
+    hero: 'Taloxa R5 穩定主位／Venato R5 高投入；詞條關再調整梅塔莉亞協同',
+    pet: '幽冥之魂（Umbral Soul）／高星控制型異獸',
+    characterIds: ['taloxa', 'venato', 'metallia', 'umbral-soul'] as CharacterId[],
     weapon: '雙生之槍 E4V4；特殊詞條關可切虛空之力',
     gear: [
       'AF3 虛空項鍊',
