@@ -324,11 +324,28 @@ def 取得活動重點(活動模型: dict) -> list[tuple[str, str]]:
     ]
 
 
+def 取得活動重點區塊(活動模型: dict) -> list[dict]:
+    if 活動模型.get("summary_sections"):
+        return list(活動模型["summary_sections"])
+    return [
+        {"title": label, "items": [("重點", content)]}
+        for label, content in 取得活動重點(活動模型)
+    ]
+
+
 def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str = "30 秒攻略") -> None:
-    重點項目 = "".join(
-        f'<div class="速覽項"><span class="速覽號">{index}</span><div><strong>{html.escape(label)}</strong><p>{html.escape(content)}</p></div></div>'
-        for index, (label, content) in enumerate(取得活動重點(活動模型), 1)
-    )
+    重點區塊 = ""
+    for index, section in enumerate(取得活動重點區塊(活動模型), 1):
+        條目 = "".join(
+            f'<li><b>{html.escape(str(label))}：</b>{html.escape(str(content))}</li>'
+            for label, content in section["items"]
+        )
+        重點區塊 += (
+            f'<article class="速覽區塊"><div class="速覽區塊標題"><span class="速覽號">{index}</span>'
+            f'<strong>{html.escape(str(section["title"]))}</strong></div><ul>{條目}</ul></article>'
+        )
+    標籤列 = "".join(f"<span>{html.escape(str(tag))}</span>" for tag in 活動模型.get("tags", []))
+    時間文字 = f"活動時間：{活動模型['period']}" if 活動模型.get("period") else f"攻略更新：{日期}"
     結論 = str(
         活動模型.get("verdict")
         or (f"先把免費進度跑完，只補到 {int(活動模型['target']):,} {活動模型['unit']}。" if int(活動模型.get("target", 0)) > 0 else "先做完免費任務，最後一天再決定是否投入。")
@@ -336,10 +353,11 @@ def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str
     st.markdown(
         f"""
         <section class="重點速覽">
-          <div class="速覽頂列"><span class="速覽徽章">{html.escape(狀態)}</span><span>{html.escape(日期)}</span></div>
+          <div class="速覽頂列"><span class="速覽徽章">{html.escape(狀態)}</span><span>{html.escape(時間文字)}</span></div>
           <h3>{html.escape(標題)}</h3>
+          <div class="速覽標籤列">{標籤列}</div>
           <p class="速覽結論"><b>結論</b>{html.escape(結論)}</p>
-          <div class="速覽清單">{重點項目}</div>
+          <div class="速覽清單">{重點區塊}</div>
           <p class="速覽停損"><b>停損提醒</b>{html.escape(str(活動模型['avoid']))}</p>
         </section>
         """,
@@ -405,13 +423,25 @@ st.markdown(
       .速覽頂列 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; color:rgba(23,48,50,.5); font-size:.68rem; font-weight:800; }
       .速覽徽章 { padding:.28rem .55rem; border-radius:999px; background:var(--lime); color:#fff; letter-spacing:.08em; }
       .重點速覽 h3 { margin:.65rem 0 .7rem; font-size:clamp(1.15rem,2.5vw,1.55rem); line-height:1.38; }
+      .速覽標籤列 { display:flex; flex-wrap:wrap; gap:.35rem; margin:-.2rem 0 .8rem; }
+      .速覽標籤列 span { padding:.28rem .5rem; border-radius:999px; background:#eef8f5; color:#227d82; font-size:.66rem; font-weight:850; }
       .速覽結論 { display:flex; gap:.65rem; align-items:flex-start; margin:0 0 .9rem; padding:.75rem .85rem; border-radius:.8rem; background:#edf7d8; color:#31530e; font-size:.86rem; line-height:1.55; }
       .速覽結論 b, .速覽停損 b { flex:0 0 auto; color:#557d08; }
       .速覽清單 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
-      .速覽項 { display:grid; grid-template-columns:auto 1fr; gap:.7rem; align-items:flex-start; min-height:5.5rem; padding:.85rem; border:1px solid var(--line); border-radius:.9rem; background:#fff; }
+      .速覽區塊 { min-height:12rem; padding:.95rem 1rem; border:1px solid rgba(34,125,130,.2); border-radius:.95rem; background:#fff; box-shadow:0 8px 20px rgba(39,72,61,.035); }
+      .速覽區塊:nth-child(2) { border-color:rgba(184,105,18,.24); }
+      .速覽區塊:nth-child(3) { border-color:rgba(115,159,18,.28); }
+      .速覽區塊:nth-child(4) { border-color:rgba(164,68,127,.22); }
+      .速覽區塊標題 { display:flex; gap:.6rem; align-items:center; margin-bottom:.55rem; }
+      .速覽區塊標題 strong { color:var(--ink); font-size:.88rem; }
       .速覽號 { display:grid; place-items:center; width:1.55rem; height:1.55rem; border-radius:.5rem; background:#227d82; color:#fff; font-size:.72rem; font-weight:950; box-shadow:0 7px 14px rgba(34,125,130,.16); }
-      .速覽項 strong { display:block; margin:.05rem 0 .25rem; color:var(--ink); font-size:.8rem; }
-      .速覽項 p { margin:0; color:rgba(23,48,50,.68); font-size:.76rem; line-height:1.55; }
+      .速覽區塊:nth-child(2) .速覽號 { background:#b86912; }
+      .速覽區塊:nth-child(3) .速覽號 { background:#739f12; }
+      .速覽區塊:nth-child(4) .速覽號 { background:#9e467e; }
+      .速覽區塊 ul { margin:0; padding-left:1.1rem; }
+      .速覽區塊 li { margin:.36rem 0; color:rgba(23,48,50,.69); font-size:.78rem; line-height:1.58; }
+      .速覽區塊 li::marker { color:var(--lime); }
+      .速覽區塊 li b { color:var(--ink); font-weight:900; }
       .速覽停損 { display:flex; gap:.65rem; margin:.8rem 0 0; padding-top:.8rem; border-top:1px solid var(--line); color:#8a510f; font-size:.76rem; line-height:1.5; }
       .速覽停損 b { color:#a65c0b; }
       .快捷格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin:.65rem 0 1.2rem; }
@@ -508,7 +538,8 @@ st.markdown(
         .主視覺 { margin:1rem 0; }
         .說明 { font-size:.84rem; }
         .重點速覽 { padding:1rem; }
-        .速覽項 { min-height:0; }
+        .速覽區塊 { min-height:0; }
+        .速覽區塊 li { font-size:.82rem; }
         .速覽結論, .速覽停損 { display:block; }
         .速覽結論 b, .速覽停損 b { display:block; margin-bottom:.25rem; }
         .快捷格 { grid-template-columns:1fr; }
