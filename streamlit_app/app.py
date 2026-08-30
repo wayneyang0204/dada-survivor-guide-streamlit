@@ -352,13 +352,25 @@ st.markdown(
       div[role="radiogroup"] label:has(input:checked) { color:#173032; background:#dff49e; box-shadow:0 8px 20px rgba(115,159,18,.12); }
       label[data-testid="stRadioOption"] > div > div > div:first-child { display:none; }
 
-      .主視覺 { position:relative; overflow:hidden; margin:1.7rem 0 1.5rem; padding:2.4rem 2.5rem; border:1px solid rgba(83,131,63,.18); border-radius:1.8rem; background:linear-gradient(135deg, #ffffff, #f2f8e8 58%, #e9f4e1); box-shadow:0 22px 55px rgba(45,79,58,.10); }
-      .主視覺::after { content:""; position:absolute; width:24rem; height:24rem; right:-8rem; top:-11rem; border-radius:50%; background:rgba(151,201,61,.17); filter:blur(24px); pointer-events:none; }
-      .主標 { position:relative; z-index:1; font-size:clamp(2.25rem, 5vw, 4.35rem); line-height:1.02; font-weight:950; letter-spacing:-.055em; max-width:920px; margin:.35rem 0 .9rem; text-wrap:balance; }
+      .主視覺 { position:relative; overflow:hidden; margin:1rem 0 1.25rem; padding:1.45rem 1.7rem; border:1px solid rgba(83,131,63,.18); border-radius:1.4rem; background:linear-gradient(135deg, #ffffff, #f2f8e8 58%, #e9f4e1); box-shadow:0 16px 38px rgba(45,79,58,.08); }
+      .主視覺::after { content:""; position:absolute; width:20rem; height:20rem; right:-7rem; top:-10rem; border-radius:50%; background:rgba(151,201,61,.16); filter:blur(24px); pointer-events:none; }
+      .主標 { position:relative; z-index:1; font-size:clamp(1.85rem, 4vw, 3rem); line-height:1.06; font-weight:950; letter-spacing:-.05em; max-width:920px; margin:.25rem 0 .65rem; text-wrap:balance; }
       .主標 span { color:var(--lime); }
       .說明 { position:relative; z-index:1; margin:0; color:var(--muted); max-width:820px; line-height:1.75; font-size:.95rem; font-weight:560; }
       .小標 { position:relative; z-index:1; color:var(--lime); font-size:.72rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
-      .主視覺徽章 { display:inline-flex; margin-top:1.15rem; padding:.38rem .68rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.7rem; font-weight:850; }
+      .主視覺徽章 { display:inline-flex; margin-top:.8rem; padding:.34rem .62rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
+
+      .首頁焦點 { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(230px,.65fr); gap:1rem; padding:1.35rem 1.45rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(135deg,#ffffff,#f3f9e8); box-shadow:0 12px 30px rgba(39,72,61,.06); }
+      .首頁焦點 h3 { margin:.35rem 0 .5rem; font-size:1.35rem; line-height:1.35; }
+      .首頁焦點 p { margin:0; max-width:760px; font-size:.86rem; line-height:1.65; }
+      .焦點步驟 { display:grid; align-content:center; gap:.45rem; }
+      .焦點步驟 span { display:flex; gap:.55rem; align-items:center; padding:.55rem .65rem; border-radius:.75rem; background:rgba(255,255,255,.82); color:rgba(23,48,50,.75); font-size:.76rem; font-weight:760; }
+      .焦點步驟 b { display:grid; place-items:center; flex:0 0 auto; width:1.15rem; height:1.15rem; border-radius:50%; background:var(--lime); color:#fff; font-size:.62rem; }
+      .快捷格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin:.65rem 0 1.2rem; }
+      .快捷卡 { min-height:8.4rem; padding:1rem 1.05rem; border:1px solid var(--line); border-radius:1rem; background:#ffffff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
+      .快捷卡 strong { display:block; margin:.25rem 0 .45rem; color:var(--ink); font-size:1.02rem; }
+      .快捷卡 p { margin:0; font-size:.78rem; line-height:1.55; }
+      .快捷編號 { color:var(--lime); font-size:.66rem; font-weight:950; letter-spacing:.1em; }
 
       h1, h2, h3 { color:var(--ink) !important; letter-spacing:-.025em; }
       h2 { margin-top:1.25rem !important; font-size:clamp(1.65rem, 3vw, 2.35rem) !important; font-weight:950 !important; }
@@ -431,8 +443,9 @@ st.markdown(
 
       @media (max-width: 900px) {
         .block-container { padding:1rem 1rem 3rem; }
-        .主視覺 { padding:1.75rem 1.3rem; border-radius:1.35rem; }
-        .主標 { font-size:clamp(2rem, 10vw, 3.2rem); }
+        .主視覺 { padding:1.3rem 1.25rem; border-radius:1.2rem; }
+        .主標 { font-size:clamp(1.8rem, 7vw, 2.6rem); }
+        .首頁焦點 { grid-template-columns:1fr; }
         .策略卡 { grid-template-columns:1fr; }
         .步驟列 { grid-template-columns:1fr; }
         .獎勵格 { grid-template-columns:1fr; }
@@ -442,10 +455,12 @@ st.markdown(
         .block-container { padding:.65rem .8rem 2.5rem; }
         .同步徽章 { font-size:0; padding:.45rem; }
         .同步徽章::after { content:"同步"; font-size:.68rem; }
-        div[role="radiogroup"] { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+        div[role="radiogroup"] { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
         div[role="radiogroup"] label { min-width:0; padding:.55rem .35rem; font-size:.7rem; }
         .主視覺 { margin:1rem 0; }
         .說明 { font-size:.84rem; }
+        .快捷格 { grid-template-columns:1fr; }
+        .快捷卡 { min-height:0; }
       }
     </style>
     """,
@@ -462,15 +477,25 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-頁面 = st.radio(
+主頁面 = st.radio(
     "選擇功能",
-    ["活動最佳解", "帳號診斷", "終局配裝", "完整攻略庫", "收藏圖鑑", "收藏優先級", "最新文章"],
+    ["首頁", "活動", "養成", "資料庫"],
     horizontal=True,
     label_visibility="collapsed",
-    key="頂部導覽",
+    key="主導覽",
 )
 
+if 主頁面 == "活動":
+    頁面 = "活動最佳解"
+elif 主頁面 == "養成":
+    頁面 = st.selectbox("選擇養成工具", ["帳號診斷", "終局配裝", "收藏優先級"], key="養成分類")
+elif 主頁面 == "資料庫":
+    頁面 = st.selectbox("選擇資料內容", ["完整攻略庫", "收藏圖鑑", "最新文章"], key="資料分類")
+else:
+    頁面 = "首頁"
+
 頁面主視覺 = {
+    "首頁": ("今日攻略中心", "先看今天該做什麼，<br><span>再進工具查細節。</span>", "活動判斷、養成路線與完整資料集中在三個入口，減少來回尋找。"),
     "活動最佳解": ("活動決策中心", "先算完免費進度，<br><span>再決定要不要補。</span>", "選活動、填進度，直接得到補鑽上限、寶石安全線與兌換優先級。"),
     "帳號診斷": ("個人化養成路線", "先找到最大缺口，<br><span>再集中跨過斷點。</span>", "依模式、裝備階段與稀缺資源，整理現在最該做的三件事。"),
     "終局配裝": ("終局實戰配置", "不是只有一套神裝，<br><span>模式不同，答案就不同。</span>", "把首領、區域行動與高速清怪拆開判斷，避免用錯配置。"),
@@ -492,7 +517,67 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-if 頁面 == "活動最佳解":
+if 頁面 == "首頁":
+    全部文章首頁, 首頁即時 = 取得完整文章庫()
+    首頁活動文章 = [item for item in 全部文章首頁 if item["category"] == "活動攻略"]
+    首頁收藏圖鑑 = 取得收藏圖鑑()
+
+    st.header("今日重點")
+    if 首頁活動文章:
+        首頁活動 = 首頁活動文章[0]
+        首頁活動模型 = match_event_playbook(首頁活動["title"])
+        首頁步驟 = "".join(
+            f'<span><b>{index}</b>{html.escape(str(step))}</span>'
+            for index, step in enumerate(首頁活動模型["steps"][:3], 1)
+        )
+        st.markdown(
+            f"""
+            <article class="首頁焦點">
+              <div>
+                <div class="資料標籤">{html.escape(str(首頁活動['date']))}　·　目前優先活動</div>
+                <h3>{html.escape(str(首頁活動['title']))}</h3>
+                <p>{html.escape(str(首頁活動.get('excerpt') or 首頁活動模型['mechanic']))}</p>
+              </div>
+              <div class="焦點步驟">{首頁步驟}</div>
+            </article>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.link_button("閱讀目前活動攻略", 首頁活動["link"])
+    else:
+        st.info("活動來源暫時無法連線；活動試算與既有攻略仍可正常使用。")
+
+    st.markdown("### 快速入口")
+    st.markdown(
+        f"""
+        <div class="快捷格">
+          <div class="快捷卡"><span class="快捷編號">01 · 活動</span><strong>這次活動值不值得追？</strong><p>先算免費進度，再看補鑽上限、寶石安全線與獎勵兌換順序。</p></div>
+          <div class="快捷卡"><span class="快捷編號">02 · 養成</span><strong>下一份資源投在哪？</strong><p>集中帳號診斷、終局配裝與收藏優先級，依模式判斷下一個斷點。</p></div>
+          <div class="快捷卡"><span class="快捷編號">03 · 資料庫</span><strong>需要查完整資料？</strong><p>搜尋 {len(全部文章首頁)} 篇來源文章與 {len(首頁收藏圖鑑)} 件收藏，另有人工整理的精選攻略。</p></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    數據1, 數據2, 數據3 = st.columns(3)
+    數據1.metric("來源攻略", f"{len(全部文章首頁)} 篇" if 首頁即時 else "備援模式")
+    數據2.metric("活動攻略", f"{len(首頁活動文章)} 篇")
+    數據3.metric("收藏圖鑑", f"{len(首頁收藏圖鑑)} 件")
+
+    st.markdown("### 最新情報")
+    首頁最新 = 全部文章首頁[:3]
+    if 首頁最新:
+        最新欄 = st.columns(3)
+        for 欄位, item in zip(最新欄, 首頁最新):
+            with 欄位:
+                with st.container(border=True):
+                    st.caption(f"{item['category']}｜{item['date']}")
+                    st.markdown(f"**{item['title']}**")
+                    st.link_button("閱讀原文", item["link"], use_container_width=True)
+    else:
+        st.caption("最新來源暫時無法載入。")
+
+elif 頁面 == "活動最佳解":
     st.header("活動最佳解：先算免費進度，再決定要不要補")
     全部文章, 文章即時 = 取得完整文章庫()
     活動文章 = [item for item in 全部文章 if item["category"] == "活動攻略"]
