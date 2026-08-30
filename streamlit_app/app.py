@@ -4,11 +4,13 @@ import html
 import json
 from datetime import datetime
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 import streamlit as st
 
 from data_engine import (
     assess_event_plan,
+    diagnose_account,
     fetch_source_posts,
     load_collectible_catalog,
     match_event_playbook,
@@ -205,22 +207,40 @@ st.set_page_config(
 
 終局配置 = [
     {
-        "名稱": "首領極限輸出",
-        "適用": "討伐、遠征首領、傷害排行",
-        "核心": "用已達斷點的終局武器與腰帶，科技配件全部服務主輸出技能。",
-        "檢查": ["先看武器與腰帶核心數", "寵物比較主人總傷而非自身傷害", "收藏先補暴擊與技能傷害斷點"],
+        "名稱": "短時首領爆發天花板",
+        "適用": "末世反響／公會遠征／短場首領",
+        "角色": "維納托覺醒5以上主位｜塔洛莎覺醒4協同｜哪吒覺醒2 → 伏爾坎覺醒1支援鏈",
+        "寵物": "幽冥之魂覺醒3以上｜共鳴增益＋共鳴傷害",
+        "武器": "雙生之槍｜永恆4、虛空4、混沌2以上、異界轉化",
+        "裝備": ["虛空項鍊神鑄3／審判項鍊雙生階", "月痕護腕雙生階｜基礎暴率至少70%", "星塵腰帶雙生階 E3／V2", "冰川戰靴雙生階 E1／V2／C1", "永虛戰甲雙生階 E3起"],
+        "技能": ["雙生槍", "雙生無人機", "燃燒瓶", "足球", "鑽頭", "雷電"],
+        "核心": "以最快進化與首領增傷為核心；短場先確保雙生槍永恆1，技能格優先無人機與冷卻。",
+        "斷點": "基礎暴率70～100%、雙生槍至少永恆1＋虛空2；未達時神鑄3虛空手套通常更強。",
+        "評分": {"清怪": 84, "首領": 100, "生存": 82},
     },
     {
-        "名稱": "區域行動穩定通關",
-        "適用": "高難區域、容易翻車的限制關",
-        "核心": "保留一個生存來源，再用區域強化補回輸出；不要直接照抄首領配裝。",
-        "檢查": ["先讀限制與異常效果", "防禦配件補當關缺口", "普通關穩定後才換純輸出"],
+        "名稱": "長戰疊層傷害極限",
+        "適用": "長線首領／完整疊層場景",
+        "角色": "維納托覺醒5～7主位｜塔洛莎覺醒4＋梅塔莉亞／楊大師覺醒1協同",
+        "寵物": "幽冥之魂｜保護＋共鳴增益＋共鳴傷害",
+        "武器": "雙生之槍｜永恆4、虛空4；混沌之力9／18為重算點",
+        "裝備": ["審判項鍊雙生階／虛空項鍊神鑄3", "月痕護腕雙生階 E1／V2以上", "星塵腰帶雙生階；收藏滿門檻才測扭曲腰帶", "冰川戰靴雙生階 E1／V2／C1", "永虛戰甲雙生階 E3／V2／C2"],
+        "技能": ["雙生槍", "雙生無人機", "燃油桶", "量子球", "永恆鑽頭", "超級雷暴"],
+        "核心": "讓混沌之力與寵物共鳴完整疊滿；燃燒、虛弱與冰凍觸發需配合異界轉化詞條。",
+        "斷點": "混沌之力9起跳、永虛甲至少永恆3；混沌之力18後再重算腰帶與項鍊。",
+        "評分": {"清怪": 88, "首領": 99, "生存": 90},
     },
     {
-        "名稱": "高速清怪與推圖",
-        "適用": "主線、資源關、活動刷取",
-        "核心": "以範圍、持續輸出與移動效率為主，不浪費資源追單體首領數字。",
-        "檢查": ["武器先確保清場範圍", "技能保留範圍與冷卻", "只在卡王時補單體傷害"],
+        "名稱": "區域行動零失誤配置",
+        "適用": "區域行動／341～345章／極端詞條",
+        "角色": "塔洛莎覺醒5穩定主位／維納托覺醒5高投入；詞條關再調整梅塔莉亞協同",
+        "寵物": "幽冥之魂／高星控制型異獸",
+        "武器": "雙生之槍 E4／V4；特殊詞條關可切虛空之力",
+        "裝備": ["虛空項鍊神鑄3", "月痕護腕雙生階／虛空手套神鑄3", "星塵腰帶雙生階 E3／V2", "冰川戰靴雙生階 E1／V2／C1", "亡者風衣神鑄3／永虛甲雙生階 E3"],
+        "技能": ["雙生無人機", "燃油桶", "守衛者", "量子球", "力場", "高爆燃料"],
+        "核心": "不是堆面板，而是針對詞條保證通關；極端怪潮用死神流，禁復活關改永虛甲。",
+        "斷點": "亡者風衣必須神鑄3才值得當核心；禁復活或限制護盾時必須依詞條切換。",
+        "評分": {"清怪": 100, "首領": 90, "生存": 98},
     },
 ]
 
@@ -284,6 +304,22 @@ def 取得收藏圖鑑() -> list[dict]:
     return load_collectible_catalog()
 
 
+官方版本資訊 = {
+    "版本": "5.1.0",
+    "查核": "2026/08/31",
+    "標題": "四週年慶典與主線 341～345 章",
+    "重點": ["主線 341～345 章與挑戰章節", "音樂圓盤與彩虹骰活動", "足球模式共鳴超載預告", "料理主題活動預告"],
+}
+
+
+def 切換主頁面(主要: str, 次要: str | None = None) -> None:
+    st.session_state["主導覽"] = 主要
+    if 主要 == "養成" and 次要:
+        st.session_state["養成分類"] = 次要
+    if 主要 == "資料庫" and 次要:
+        st.session_state["資料分類"] = 次要
+
+
 def 顯示攻略卡片(item: dict) -> None:
     狀態色 = {"現行": "#5f860b", "常駐": "#187178", "需版本核對": "#a85a08"}[item["狀態"]]
     st.markdown(
@@ -303,7 +339,7 @@ def 顯示攻略卡片(item: dict) -> None:
     with st.expander("你現在該做什麼"):
         for action in item["行動"]:
             st.markdown(f"- {action}")
-        st.link_button("核對原始文章", item["來源"], use_container_width=True)
+        st.link_button("核對原始文章", item["來源"], width="stretch")
 
 
 def 取得活動重點(活動模型: dict) -> list[tuple[str, str]]:
@@ -403,7 +439,8 @@ st.markdown(
       .同步徽章 { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .65rem; border:1px solid rgba(34,125,130,.18); border-radius:999px; background:#eef8f5; color:#246d70; font-size:.72rem; font-weight:850; }
       .同步點 { width:.42rem; height:.42rem; border-radius:50%; background:#2fb678; box-shadow:0 0 10px rgba(47,182,120,.35); }
 
-      [data-testid="stRadio"], [data-testid="stRadio"] > div { width:100%; }
+      [data-testid="stRadio"] { position:sticky; top:.45rem; z-index:999; width:100%; }
+      [data-testid="stRadio"] > div { width:100%; }
       div[role="radiogroup"] { display:flex; flex-wrap:wrap; gap:.35rem; width:100%; padding:.35rem; border:1px solid var(--line); border-radius:1rem; background:rgba(255,255,255,.92); box-shadow:0 12px 32px rgba(39,72,61,.08); }
       div[role="radiogroup"] label { flex:1 1 auto; min-width:max-content; justify-content:center; padding:.62rem .78rem; border-radius:.72rem; color:rgba(23,48,50,.65); font-size:.78rem; font-weight:850; cursor:pointer; transition:all .18s ease; }
       div[role="radiogroup"] label p { color:inherit !important; }
@@ -418,6 +455,11 @@ st.markdown(
       .說明 { position:relative; z-index:1; margin:0; color:var(--muted); max-width:820px; line-height:1.75; font-size:.95rem; font-weight:560; }
       .小標 { position:relative; z-index:1; color:var(--lime); font-size:.72rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
       .主視覺徽章 { display:inline-flex; margin-top:.8rem; padding:.34rem .62rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
+      [data-testid="stImage"] { height:100%; margin:1rem 0 1.25rem; }
+      [data-testid="stImage"] img { width:100%; height:100%; min-height:220px; max-height:245px; object-fit:cover; object-position:68% center; border:1px solid rgba(29,73,63,.14); border-radius:1.4rem; box-shadow:0 16px 38px rgba(45,79,58,.1); }
+      .信任列 { display:flex; flex-wrap:wrap; gap:.45rem; margin:-.35rem 0 1.1rem; }
+      .信任列 span { display:inline-flex; align-items:center; gap:.35rem; padding:.38rem .62rem; border:1px solid var(--line); border-radius:999px; background:#fff; color:rgba(23,48,50,.64); font-size:.68rem; font-weight:820; }
+      .信任列 b { color:#557d08; }
 
       .重點速覽 { padding:1.3rem 1.4rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(145deg,#ffffff,#f5faec); box-shadow:0 12px 30px rgba(39,72,61,.06); }
       .速覽頂列 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; color:rgba(23,48,50,.5); font-size:.68rem; font-weight:800; }
@@ -450,26 +492,43 @@ st.markdown(
       .快捷卡 p { margin:0; font-size:.78rem; line-height:1.55; }
       .快捷編號 { color:var(--lime); font-size:.66rem; font-weight:950; letter-spacing:.1em; }
 
+      .診斷結論 { padding:1.3rem 1.4rem; border:1px solid rgba(34,125,130,.22); border-radius:1.2rem; background:linear-gradient(135deg,#eef8f5,#ffffff); box-shadow:0 12px 30px rgba(39,72,61,.06); }
+      .診斷標籤 { color:#227d82; font-size:.68rem; font-weight:950; letter-spacing:.11em; }
+      .診斷結論 h3 { margin:.4rem 0 .45rem; font-size:1.45rem; }
+      .診斷結論 p { margin:0; max-width:900px; font-size:.86rem; line-height:1.65; }
+      .優先格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:.8rem 0; }
+      .優先項 { padding:1rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 8px 20px rgba(39,72,61,.04); }
+      .優先項 small { color:var(--lime); font-size:.65rem; font-weight:950; letter-spacing:.08em; }
+      .優先項 strong { display:block; margin:.32rem 0 .38rem; color:var(--ink); font-size:.92rem; }
+      .優先項 p { margin:0; font-size:.76rem; line-height:1.55; }
+      .建議框 { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin:.7rem 0 1rem; }
+      .建議框 > div { padding:.9rem 1rem; border-radius:.9rem; background:#f3f8ed; color:rgba(23,48,50,.74); font-size:.78rem; line-height:1.55; }
+      .建議框 > div:last-child { background:#fff5e8; color:#7c470f; }
+      .建議框 b { display:block; margin-bottom:.25rem; color:var(--ink); }
+
+      .配置總覽 { min-height:14rem; padding:1.05rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
+      .配置總覽 small { color:#227d82; font-weight:850; }
+      .配置總覽 h3 { margin:.45rem 0 .55rem; font-size:1rem; }
+      .配置總覽 p { font-size:.76rem; line-height:1.55; }
+      .評分列 { display:grid; grid-template-columns:repeat(3,1fr); gap:.35rem; margin-top:.8rem; }
+      .評分 { padding:.5rem .35rem; border-radius:.65rem; background:#f2f7ef; text-align:center; }
+      .評分 b { display:block; color:var(--ink); font-size:.92rem; }
+      .評分 span { color:rgba(23,48,50,.5); font-size:.62rem; font-weight:800; }
+      .配置詳情 { padding:1.15rem 1.25rem; border:1px solid rgba(115,159,18,.22); border-radius:1rem; background:#f7fbea; }
+      .配置詳情 p, .配置詳情 li { font-size:.8rem; line-height:1.6; }
+      .配置詳情 b { color:var(--ink); }
+      .版本卡 { padding:1.1rem 1.2rem; border:1px solid rgba(34,125,130,.18); border-radius:1rem; background:linear-gradient(135deg,#eef8f5,#fff); }
+      .版本卡 h3 { margin:.35rem 0 .55rem; font-size:1.02rem; }
+      .版本卡 ul { margin:.4rem 0 0; padding-left:1.15rem; }
+      .版本卡 li { margin:.25rem 0; font-size:.76rem; line-height:1.5; }
+
       h1, h2, h3 { color:var(--ink) !important; letter-spacing:-.025em; }
       h2 { margin-top:1.25rem !important; font-size:clamp(1.65rem, 3vw, 2.35rem) !important; font-weight:950 !important; }
       h3 { font-weight:900 !important; }
       p, li { color:rgba(23,48,50,.75); }
       [data-testid="stCaptionContainer"] p { color:rgba(23,48,50,.56) !important; }
 
-      .活動焦點 { position:relative; overflow:hidden; padding:1.4rem 1.5rem; border:1px solid rgba(115,159,18,.2); border-radius:1.35rem; background:linear-gradient(135deg, #f5faeb, #ffffff); }
-      .活動焦點::before { content:"EVENT"; position:absolute; right:1rem; top:-.5rem; font-size:4.5rem; font-weight:950; color:rgba(115,159,18,.055); }
-      .活動焦點 h3 { position:relative; margin:.35rem 0 .55rem; font-size:1.28rem; line-height:1.35; }
-      .活動焦點 p { position:relative; margin:.55rem 0 0; max-width:920px; line-height:1.65; font-size:.87rem; }
       .資料標籤 { position:relative; color:var(--lime); font-size:.7rem; font-weight:900; letter-spacing:.08em; }
-      .策略卡 { display:grid; grid-template-columns:1.1fr 1fr; gap:1rem; margin:1rem 0 .6rem; }
-      .策略主體, .停損卡 { padding:1.2rem 1.3rem; border-radius:1.15rem; border:1px solid var(--line); background:#ffffff; box-shadow:0 10px 26px rgba(39,72,61,.05); }
-      .策略主體 strong, .停損卡 strong { display:block; margin-bottom:.45rem; color:var(--ink); }
-      .策略主體 p, .停損卡 p { margin:0; line-height:1.6; font-size:.84rem; }
-      .停損卡 { border-color:rgba(184,105,18,.2); background:#fff9f0; }
-      .停損卡 strong { color:#a65c0b; }
-      .步驟列 { display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem; margin:.7rem 0 1.4rem; }
-      .步驟 { display:flex; gap:.65rem; align-items:flex-start; min-height:4rem; padding:.85rem; border:1px solid var(--line); border-radius:.9rem; background:#ffffff; color:rgba(23,48,50,.75); font-size:.78rem; line-height:1.45; }
-      .步驟 b { display:grid; place-items:center; flex:0 0 auto; width:1.25rem; height:1.25rem; border-radius:50%; color:#fff; background:var(--lime); font-size:.65rem; }
 
       div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid var(--line) !important; border-radius:1.35rem !important; background:#ffffff !important; box-shadow:0 14px 34px rgba(39,72,61,.07); }
       div[data-testid="stMetric"] { min-height:6.1rem; border:1px solid var(--line); border-radius:1.05rem; padding:1rem 1.05rem; background:linear-gradient(145deg, #ffffff, #f5f8f3); box-shadow:0 8px 22px rgba(39,72,61,.045); }
@@ -510,9 +569,6 @@ st.markdown(
       .狀態 { border:1px solid; border-radius:999px; padding:.2rem .55rem; font-size:.65rem; font-weight:900; }
       .更新日 { color:rgba(23,48,50,.48); font-size:.68rem; margin-top:.7rem; }
       .提醒 { border-left:4px solid var(--orange); padding:.9rem 1rem; background:#fff6e8; border-radius:.8rem; color:#77410b; }
-      .配置卡 { border:1px solid rgba(115,159,18,.22); border-radius:1.15rem; background:#eff8d7; color:#173032; padding:1.2rem; min-height:250px; box-shadow:0 14px 30px rgba(39,72,61,.08); }
-      .配置卡 h3 { margin:.35rem 0 .7rem; }
-      .配置卡 p, .配置卡 li { font-size:.83rem; line-height:1.6; }
       .獎勵格 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; margin:.5rem 0 1rem; }
       .獎勵項 { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.8rem; padding:.9rem 1rem; border:1px solid var(--line); border-radius:.95rem; background:#ffffff; box-shadow:0 8px 20px rgba(39,72,61,.045); }
       .獎勵序 { display:grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:.55rem; background:#edf7d8; color:#5d850a; font-size:.72rem; font-weight:950; }
@@ -524,15 +580,15 @@ st.markdown(
         .主視覺 { padding:1.3rem 1.25rem; border-radius:1.2rem; }
         .主標 { font-size:clamp(1.8rem, 7vw, 2.6rem); }
         .速覽清單 { grid-template-columns:1fr; }
-        .策略卡 { grid-template-columns:1fr; }
-        .步驟列 { grid-template-columns:1fr; }
         .獎勵格 { grid-template-columns:1fr; }
+        .優先格 { grid-template-columns:1fr; }
       }
       @media (max-width: 640px) {
         [data-testid="stHeader"] { height:1.4rem; }
-        .block-container { padding:.65rem .8rem 2.5rem; }
+        .block-container { padding:.65rem .8rem 6.5rem; }
         .同步徽章 { font-size:0; padding:.45rem; }
         .同步徽章::after { content:"同步"; font-size:.68rem; }
+        [data-testid="stRadio"] { position:fixed; left:.6rem; right:.6rem; bottom:max(.55rem, env(safe-area-inset-bottom)); top:auto; width:auto; z-index:9999; filter:drop-shadow(0 12px 26px rgba(29,73,63,.2)); }
         div[role="radiogroup"] { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
         div[role="radiogroup"] label { min-width:0; padding:.55rem .35rem; font-size:.7rem; }
         .主視覺 { margin:1rem 0; }
@@ -544,6 +600,9 @@ st.markdown(
         .速覽結論 b, .速覽停損 b { display:block; margin-bottom:.25rem; }
         .快捷格 { grid-template-columns:1fr; }
         .快捷卡 { min-height:0; }
+        [data-testid="stImage"] { display:none; }
+        .建議框 { grid-template-columns:1fr; }
+        .配置總覽 { min-height:0; }
       }
     </style>
     """,
@@ -578,7 +637,7 @@ else:
     頁面 = "首頁"
 
 頁面主視覺 = {
-    "首頁": ("今日攻略中心", "先看今天該做什麼，<br><span>再進工具查細節。</span>", "活動判斷、養成路線與完整資料集中在三個入口，減少來回尋找。"),
+    "首頁": ("PRO DECISION HUB", "今天該做什麼，<br><span>三十秒做對決定。</span>", "即時活動、終局養成與完整資料庫集中在同一套決策流程；先看結論，再查完整依據。"),
     "活動最佳解": ("活動決策中心", "先算完免費進度，<br><span>再決定要不要補。</span>", "選活動、填進度，直接得到補鑽上限、寶石安全線與兌換優先級。"),
     "帳號診斷": ("個人化養成路線", "先找到最大缺口，<br><span>再集中跨過斷點。</span>", "依模式、裝備階段與稀缺資源，整理現在最該做的三件事。"),
     "終局配裝": ("終局實戰配置", "不是只有一套神裝，<br><span>模式不同，答案就不同。</span>", "把首領、區域行動與高速清怪拆開判斷，避免用錯配置。"),
@@ -588,33 +647,49 @@ else:
     "最新文章": ("版本情報同步", "新活動、新系統，<br><span>一次掌握真正有用的變化。</span>", "自動彙整最新來源，版本變動時保留原文入口供你快速核對。"),
 }
 視覺小標, 視覺標題, 視覺說明 = 頁面主視覺[頁面]
-st.markdown(
-    f"""
+主視覺內容 = f"""
     <section class="主視覺">
       <div class="小標">{視覺小標}</div>
       <div class="主標">{視覺標題}</div>
       <p class="說明">{視覺說明}</p>
-      <span class="主視覺徽章">繁體中文・終局玩家版・版本狀態已標記</span>
+      <span class="主視覺徽章">繁體中文・終局玩家版・每筆資料標記狀態</span>
     </section>
-    """,
-    unsafe_allow_html=True,
-)
+    """
+if 頁面 == "首頁":
+    主視覺左, 主視覺右 = st.columns([1.25, 0.75])
+    with 主視覺左:
+        st.markdown(主視覺內容, unsafe_allow_html=True)
+    with 主視覺右:
+        st.image("public/dada-guide-hero.png", width="stretch")
+else:
+    st.markdown(主視覺內容, unsafe_allow_html=True)
 
 if 頁面 == "首頁":
     全部文章首頁, 首頁即時 = 取得完整文章庫()
     首頁活動文章 = [item for item in 全部文章首頁 if item["category"] == "活動攻略"]
     首頁收藏圖鑑 = 取得收藏圖鑑()
 
-    st.header("今日重點")
+    st.markdown(
+        f'<div class="信任列"><span><b>{官方版本資訊["版本"]}</b> 版本追蹤</span>'
+        f'<span><b>{len(全部文章首頁)}</b> 篇來源攻略</span><span><b>{len(首頁活動文章)}</b> 篇活動資料</span>'
+        f'<span><b>{len(首頁收藏圖鑑)}</b> 件收藏圖鑑</span><span><b>{"即時" if 首頁即時 else "備援"}</b> 資料模式</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    st.header("今天只看這裡")
     if 首頁活動文章:
         首頁活動 = 首頁活動文章[0]
         首頁活動模型 = match_event_playbook(首頁活動["title"])
         顯示活動重點(首頁活動["title"], 首頁活動["date"], 首頁活動模型, "目前活動 · 30 秒攻略")
-        st.link_button("閱讀目前活動攻略", 首頁活動["link"])
+        活動操作, 原文操作 = st.columns(2)
+        with 活動操作:
+            st.button("用我的帳號精算這次活動", type="primary", width="stretch", on_click=切換主頁面, args=("活動",))
+        with 原文操作:
+            st.link_button("核對完整原始攻略 ↗", 首頁活動["link"], width="stretch")
     else:
         st.info("活動來源暫時無法連線；活動試算與既有攻略仍可正常使用。")
 
-    st.markdown("### 快速入口")
+    st.markdown("### 三個專業決策入口")
     st.markdown(
         f"""
         <div class="快捷格">
@@ -625,24 +700,41 @@ if 頁面 == "首頁":
         """,
         unsafe_allow_html=True,
     )
+    入口一, 入口二, 入口三 = st.columns(3)
+    with 入口一:
+        st.button("開啟活動判斷", width="stretch", on_click=切換主頁面, args=("活動",))
+    with 入口二:
+        st.button("進行帳號診斷", width="stretch", on_click=切換主頁面, args=("養成", "帳號診斷"))
+    with 入口三:
+        st.button("搜尋完整資料", width="stretch", on_click=切換主頁面, args=("資料庫", "完整攻略庫"))
 
-    數據1, 數據2, 數據3 = st.columns(3)
-    數據1.metric("來源攻略", f"{len(全部文章首頁)} 篇" if 首頁即時 else "備援模式")
-    數據2.metric("活動攻略", f"{len(首頁活動文章)} 篇")
-    數據3.metric("收藏圖鑑", f"{len(首頁收藏圖鑑)} 件")
-
-    st.markdown("### 最新情報")
-    首頁最新 = 全部文章首頁[:3]
-    if 首頁最新:
-        最新欄 = st.columns(3)
-        for 欄位, item in zip(最新欄, 首頁最新):
-            with 欄位:
+    最新區, 版本區 = st.columns([1.35, 0.65])
+    with 最新區:
+        st.markdown("### 最新情報")
+        首頁最新 = 全部文章首頁[:3]
+        if 首頁最新:
+            for item in 首頁最新:
                 with st.container(border=True):
                     st.caption(f"{item['category']}｜{item['date']}")
                     st.markdown(f"**{item['title']}**")
-                    st.link_button("閱讀原文", item["link"], use_container_width=True)
-    else:
-        st.caption("最新來源暫時無法載入。")
+                    摘要 = item.get("excerpt") or "開啟原文查看完整內容。"
+                    st.write(摘要[:120] + ("…" if len(摘要) > 120 else ""))
+                    st.link_button("閱讀原文", item["link"], width="stretch")
+        else:
+            st.caption("最新來源暫時無法載入。")
+    with 版本區:
+        st.markdown("### 版本雷達")
+        版本項目 = "".join(f"<li>{html.escape(item)}</li>" for item in 官方版本資訊["重點"])
+        st.markdown(
+            f'<div class="版本卡"><span class="資料標籤">官方商店版本 {官方版本資訊["版本"]}</span>'
+            f'<h3>{官方版本資訊["標題"]}</h3><p>最後查核：{官方版本資訊["查核"]}</p><ul>{版本項目}</ul></div>',
+            unsafe_allow_html=True,
+        )
+        官方一, 官方二 = st.columns(2)
+        with 官方一:
+            st.link_button("Apple 官方", "https://apps.apple.com/us/app/survivor-io/id1528941310", width="stretch")
+        with 官方二:
+            st.link_button("Google 官方", "https://play.google.com/store/apps/details?id=com.dxx.firenow", width="stretch")
 
 elif 頁面 == "活動最佳解":
     st.header("活動最佳解：先算免費進度，再決定要不要補")
@@ -659,7 +751,7 @@ elif 頁面 == "活動最佳解":
     else:
         已選活動 = {
             "title": "目前活動（手動輸入）",
-            "date": datetime.now().strftime("%Y/%m/%d"),
+            "date": datetime.now(ZoneInfo("Asia/Taipei")).strftime("%Y/%m/%d"),
             "excerpt": "來源暫時無法連線，仍可使用下方通用試算。",
             "link": 來源分類網址,
             "freshness": "待核對",
@@ -725,7 +817,7 @@ elif 頁面 == "活動最佳解":
     with st.expander("這些數字怎麼填？"):
         st.write("免費進度包含剩餘登入、每日任務、廣告、免費票與預計開箱任務；付費進度只填需要用寶石補的部分。若遊戲顯示每次十連抽，請把進度與成本都換算成單次或都用十連，兩邊單位一致即可。")
 
-    if st.button("一鍵判斷這次活動", type="primary", use_container_width=True):
+    if st.button("一鍵判斷這次活動", type="primary", width="stretch"):
         判斷 = assess_event_plan(
             current_progress=目前進度,
             days_remaining=剩餘天數,
@@ -743,6 +835,8 @@ elif 頁面 == "活動最佳解":
         r2.metric("仍缺進度", f"{判斷['gap']:,}")
         r3.metric("估計補鑽", f"{判斷['gem_need']:,}")
         r4.metric("每天至少要拿", f"{判斷['daily_needed']:,}")
+        免費達成率 = min(1.0, 判斷["projected_free"] / max(目標進度, 1))
+        st.progress(免費達成率, text=f"免費進度可完成目標的 {免費達成率 * 100:.0f}%")
         st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
         st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
 
@@ -756,44 +850,67 @@ elif 頁面 == "活動最佳解":
     st.markdown(f'<div class="獎勵格">{獎勵卡片}</div>', unsafe_allow_html=True)
 
 elif 頁面 == "帳號診斷":
-    st.header("依你現在的帳號給出行動順序")
-    col1, col2, col3 = st.columns(3)
+    st.header("終局帳號診斷：四個狀態，直接決定下一步")
+    st.caption("選項變更後會自動重算；先確認不含場內觸發的基礎暴率，以及角色實際覺醒階級。")
+    col1, col2 = st.columns(2)
     with col1:
-        主要模式 = st.selectbox("目前最在意的模式", ["首領傷害", "區域行動", "主線推圖", "活動刷取"])
+        主位階段 = st.selectbox(
+            "① 主位與暴率門檻",
+            ["塔洛莎覺醒5＋暴率70%", "維納托覺醒5＋塔洛莎覺醒4", "塔洛莎覺醒1～4／暴率未滿70%", "都未達／不確定"],
+        )
+        遊玩模式 = st.selectbox("③ 目前主要模式", ["短場首領", "長場首領", "區域行動"])
     with col2:
-        裝備階段 = st.selectbox("終局裝備進度", ["尚未成套", "已有套裝但核心不足", "主要斷點已完成", "接近滿配"])
-    with col3:
-        最大缺口 = st.selectbox("目前最缺的資源", ["裝備核心", "收藏品", "科技配件", "覺醒核心", "寵物與核心"])
+        混沌階段 = st.selectbox("② 混沌之力", ["混沌之力9～17", "混沌之力18以上", "混沌之力未滿9／不確定"])
+        神火階段 = st.selectbox("④ 神火支援鏈", ["都沒有／不確定", "只有哪吒", "哪吒覺醒2＋伏爾坎覺醒1"])
 
-    if st.button("產生我的優先順序", type="primary", use_container_width=True):
-        st.success(f"目前目標：{主要模式}｜裝備：{裝備階段}｜缺口：{最大缺口}")
-        if 裝備階段 in {"尚未成套", "已有套裝但核心不足"}:
-            st.markdown("### 第一順位：停止分散，先跨過一個核心斷點")
-            st.write("選定目前主要模式，只強化能直接改變實戰效果的武器、腰帶或科技配件。")
-        else:
-            st.markdown("### 第一順位：用收藏、諧振與覺醒放大已完成的裝備")
-            st.write("你的裝備已過主要斷點，下一階段應比較跨系統乘區，而不是繼續追小幅面板。")
-        模式建議 = {
-            "首領傷害": "先做同一場首領的固定時間測試，科技、寵物與收藏只保留能提高主人總傷的項目。",
-            "區域行動": "先讀當區限制，保留一個生存來源，通關普通區後再把首領戰換成純輸出。",
-            "主線推圖": "優先範圍與持續輸出；只有卡王時才犧牲清場能力補單體。",
-            "活動刷取": "比較每分鐘收益，不必為低難活動更換或重置終局裝備。",
-        }
-        st.info(模式建議[主要模式])
-        st.markdown(f"### 資源建議：{最大缺口}")
-        st.write("自選箱與可回退資源保留到差一步就能跨斷點時再使用；不要為了單一面板數字提前消耗。")
+    診斷 = diagnose_account(main_stage=主位階段, chaos_stage=混沌階段, play_mode=遊玩模式, divine_stage=神火階段)
+    st.markdown(
+        f'<section class="診斷結論"><span class="診斷標籤">{診斷["phase"]} · 即時判斷</span>'
+        f'<h3>{診斷["title"]}</h3><p>{診斷["reason"]}</p></section>',
+        unsafe_allow_html=True,
+    )
+    st.progress(診斷["readiness"] / 100, text=f"終局準備度 {診斷['readiness']}%｜下一個斷點：{診斷['next_breakpoint']}")
+
+    優先卡片 = "".join(
+        f'<article class="優先項"><small>0{index} · {html.escape(item["label"])}</small><strong>{html.escape(item["title"])}</strong><p>{html.escape(item["detail"])}</p></article>'
+        for index, item in enumerate(診斷["priorities"], 1)
+    )
+    st.markdown(f'<div class="優先格">{優先卡片}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="建議框"><div><b>模式配置｜{診斷["build"]}</b>{診斷["mode_instruction"]}</div>'
+        f'<div><b>現在不要做</b>{診斷["avoid"]}</div></div>',
+        unsafe_allow_html=True,
+    )
+    st.info(f"轉換條件：{診斷['switch_condition']}")
+    st.button("依這個結果查看完整配裝", type="primary", width="stretch", on_click=切換主頁面, args=("養成", "終局配裝"))
 
 elif 頁面 == "終局配裝":
-    st.header("三套終局實戰思路")
+    st.header("三套終局配置：先選模式，再核對斷點")
     cols = st.columns(3)
     for col, build in zip(cols, 終局配置):
         with col:
-            items = "".join(f"<li>{x}</li>" for x in build["檢查"])
+            評分 = "".join(f'<div class="評分"><b>{score}</b><span>{label}</span></div>' for label, score in build["評分"].items())
             st.markdown(
-                f'<div class="配置卡"><small>{build["適用"]}</small><h3>{build["名稱"]}</h3><p>{build["核心"]}</p><ul>{items}</ul></div>',
+                f'<article class="配置總覽"><small>{build["適用"]}</small><h3>{build["名稱"]}</h3><p>{build["核心"]}</p><div class="評分列">{評分}</div></article>',
                 unsafe_allow_html=True,
             )
-    st.warning("不要用同一套裝備同時判斷首領、區域與推圖強度。終局差距通常來自核心斷點、乘區與模式，而不是單件稀有度。")
+    選擇配置名稱 = st.selectbox("展開完整配置", [build["名稱"] for build in 終局配置])
+    選擇配置 = next(build for build in 終局配置 if build["名稱"] == 選擇配置名稱)
+    詳情左, 詳情右 = st.columns(2)
+    with 詳情左:
+        st.markdown(
+            f'<div class="配置詳情"><p><b>角色：</b>{選擇配置["角色"]}</p><p><b>異獸：</b>{選擇配置["寵物"]}</p>'
+            f'<p><b>武器：</b>{選擇配置["武器"]}</p><p><b>關鍵斷點：</b>{選擇配置["斷點"]}</p></div>',
+            unsafe_allow_html=True,
+        )
+    with 詳情右:
+        裝備清單 = "".join(f"<li>{html.escape(item)}</li>" for item in 選擇配置["裝備"])
+        技能文字 = "、".join(選擇配置["技能"])
+        st.markdown(
+            f'<div class="配置詳情"><p><b>裝備：</b></p><ul>{裝備清單}</ul><p><b>技能：</b>{技能文字}</p></div>',
+            unsafe_allow_html=True,
+        )
+    st.warning("縮寫 E／V／C 分別代表永恆／虛空／混沌神鑄。不要用同一套配置同時評估短場、長場與區域行動；跨過門檻後仍需固定場景 A/B 實測。")
 
 elif 頁面 == "完整攻略庫":
     st.header("完整攻略庫：精選決策＋全部來源自動同步")
@@ -895,7 +1012,7 @@ elif 頁面 == "收藏圖鑑":
             for item in 收藏當頁
         ],
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
         column_config={
             "圖片": st.column_config.ImageColumn("圖示", width="small"),
             "詳細資料": st.column_config.LinkColumn("詳細資料", display_text="開啟"),
@@ -936,4 +1053,5 @@ elif 頁面 == "最新文章":
     st.link_button("查看完整文章分類", 來源分類網址)
 
 st.divider()
-st.caption(f"最後載入：{datetime.now().strftime('%Y/%m/%d %H:%M')}｜攻略僅供遊戲決策參考，版本變動時以官方內容為準。")
+台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
+st.caption(f"最後載入：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")

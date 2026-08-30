@@ -25,7 +25,7 @@ def classify_article(title: str, excerpt: str = "") -> str:
     if "區域行動" in title:
         return "關卡模式"
     rules = [
-        ("活動攻略", ("活動", "慶典", "派對", "扭蛋", "拼圖", "探寶", "尋寶", "格子舖", "礦場", "彩虹礦", "彩虹棋", "彩虹骰", "一番賞", "訂單員", "轉盤")),
+        ("活動攻略", ("活動", "慶典", "派對", "扭蛋", "拼圖", "探寶", "尋寶", "格子舖", "礦場", "彩虹礦", "彩虹棋", "彩虹骰", "一番賞", "訂單員", "轉盤", "圓盤", "麥克風")),
         ("角色特工", ("特工", "角色", "覺醒", "同調", "協同", "碎片")),
         ("寵物系統", ("寵物", "異世", "異寵", "助戰")),
         ("科技配件", ("科技配件", "雙生配件", "諧振", "共振", "制導系統", "控制器", "偏振器", "裝置")),
@@ -68,6 +68,8 @@ def fetch_source_posts(max_pages: int = 2, per_page: int = 100) -> list[dict[str
                 "categories": 624,
                 "per_page": per_page,
                 "page": page,
+                "orderby": "date",
+                "order": "desc",
                 "_fields": fields,
             }
         )
@@ -108,7 +110,7 @@ def fetch_source_posts(max_pages: int = 2, per_page: int = 100) -> list[dict[str
             )
         if len(batch) < per_page:
             break
-    return posts
+    return sorted(posts, key=lambda item: item.get("raw_date", ""), reverse=True)
 
 
 def _edition_for_id(item_id: int) -> int:
@@ -443,4 +445,126 @@ def assess_event_plan(
         "tone": tone,
         "reason": reason,
         "daily_needed": daily_needed,
+    }
+
+
+def diagnose_account(
+    *,
+    main_stage: str,
+    chaos_stage: str,
+    play_mode: str,
+    divine_stage: str,
+) -> dict[str, Any]:
+    main = {
+        "維納托覺醒5＋塔洛莎覺醒4": {
+            "phase": "真終局主位期",
+            "title": "維納托主位，塔洛莎保留協同",
+            "reason": "角色組合已跨過主位轉換門檻，維納托現在才有條件穩定超過塔洛莎。",
+            "action": "維納托由覺醒5繼續升到7；塔洛莎維持覺醒4以上，不要拆掉協同。",
+            "avoid": "不要分解塔洛莎，也不要為短期面板把她降出協同門檻。",
+            "switch": "已達主位轉換條件，後續集中強化維納托與終局裝備。",
+            "score": 95,
+        },
+        "塔洛莎覺醒5＋暴率70%": {
+            "phase": "高端成熟期",
+            "title": "塔洛莎繼續主位，暫時不要轉維納托",
+            "reason": "低覺醒維納托不會自動更強；現在轉換會同時失去成熟主位與高階協同。",
+            "action": "存到能一次完成維納托覺醒5，並同時保留塔洛莎覺醒4，再一次轉換。",
+            "avoid": "不要做覺醒1～4維納托過渡，也不要平均分配通用角色資源。",
+            "switch": "維納托覺醒5＋塔洛莎覺醒4同時成立後再轉主位。",
+            "score": 82,
+        },
+        "塔洛莎覺醒1～4／暴率未滿70%": {
+            "phase": "主位養成期",
+            "title": "塔洛莎主位，第一目標是覺醒5",
+            "reason": "目前還沒跨過塔洛莎的主要爆發門檻，分資源給其他主位只會延後成形。",
+            "action": "先把基礎暴率補到約70%，接著把塔洛莎推到覺醒5。",
+            "avoid": "先不投維納托，也不要為伏爾坎延後塔洛莎突破。",
+            "switch": "先完成塔洛莎覺醒5；維納托轉換是更後面的階段。",
+            "score": 58,
+        },
+        "都未達／不確定": {
+            "phase": "資料確認期",
+            "title": "維持現有最強主位，資源先不要分散",
+            "reason": "主位與暴率資料不完整時，任何大額轉換都可能讓帳號實際變弱。",
+            "action": "確認塔洛莎、維納托突破，以及不含場內觸發的基礎暴率。",
+            "avoid": "不要因新角色推出就開自選箱或消耗通用突破資源。",
+            "switch": "資料確認後重新診斷，再決定主位轉換。",
+            "score": 35,
+        },
+    }[main_stage]
+
+    chaos = {
+        "混沌之力18以上": {
+            "label": "高階重算",
+            "title": "重新比較項鍊與腰帶",
+            "detail": "混沌之力18已達重算點；長場可開始比較雙生階與神鑄3單系裝備。",
+            "next": "固定首領、固定時間做 A/B 實測",
+            "score": 5,
+        },
+        "混沌之力9～17": {
+            "label": "下一斷點",
+            "title": "混沌之力推到18",
+            "detail": "目前已能使用終局骨架；在18以前，不要頻繁更換腰帶與項鍊。",
+            "next": "混沌之力18",
+            "score": 0,
+        },
+        "混沌之力未滿9／不確定": {
+            "label": "第一斷點",
+            "title": "混沌之力先補到9",
+            "detail": "未滿9時先完成基本門檻，不要直接照抄混沌之力18的長場配置。",
+            "next": "混沌之力9",
+            "score": -10,
+        },
+    }[chaos_stage]
+
+    divine = {
+        "哪吒覺醒2＋伏爾坎覺醒1": {
+            "title": "維持完整神火支援鏈",
+            "detail": "哪吒放協同被動並獲得伏爾坎加成；兩者都不改成主位。",
+            "score": 0,
+        },
+        "只有哪吒": {
+            "title": "先保留哪吒，再補伏爾坎",
+            "detail": "等主位與混沌之力門檻完成後，再把伏爾坎補到覺醒1。",
+            "score": -5,
+        },
+        "都沒有／不確定": {
+            "title": "暫時跳過神火投資",
+            "detail": "通用資源先給主位、雙生之槍與裝備門檻，伏爾坎不是現在的優先項。",
+            "score": -10,
+        },
+    }[divine_stage]
+
+    mode = {
+        "短場首領": {
+            "build": "短時首領爆發天花板",
+            "instruction": "先讓雙生之槍進化，技能優先無人機與冷卻，追求最短時間爆發。",
+        },
+        "長場首領": {
+            "build": "長戰疊層傷害極限",
+            "instruction": "讓混沌之力、共鳴、燃燒與虛弱完整疊滿，不用短場配裝硬套。",
+        },
+        "區域行動": {
+            "build": "區域行動零失誤配置",
+            "instruction": "依詞條切換亡者風衣或永虛戰甲，穩定通關優先於面板數字。",
+        },
+    }[play_mode]
+
+    readiness = max(15, min(100, main["score"] + chaos["score"] + divine["score"]))
+    return {
+        "phase": main["phase"],
+        "title": main["title"],
+        "reason": main["reason"],
+        "readiness": readiness,
+        "build": mode["build"],
+        "mode_instruction": mode["instruction"],
+        "priorities": [
+            {"label": "主位第一順位", "title": main["title"], "detail": main["action"]},
+            {"label": chaos["label"], "title": chaos["title"], "detail": chaos["detail"]},
+            {"label": "支援鏈", "title": divine["title"], "detail": divine["detail"]},
+        ],
+        "avoid": main["avoid"],
+        "switch_condition": main["switch"],
+        "next_breakpoint": chaos["next"],
     }
