@@ -518,15 +518,15 @@ def diagnose_account(
         },
     }[chaos_stage]
 
-    divine = {
-        "哪吒覺醒2＋伏爾坎覺醒1": {
-            "title": "維持完整神火支援鏈",
-            "detail": "哪吒放協同被動並獲得伏爾坎加成；兩者都不改成主位。",
+    divine_options = {
+        "哪吒R4＋伏爾坎R4支援鏈": {
+            "title": "維持完整 SP 支援鏈",
+            "detail": "兩者以支援用途的 R4 門檻核對；不要把 R5 主位效果誤當成支援必升。",
             "score": 0,
         },
-        "只有哪吒": {
-            "title": "先保留哪吒，再補伏爾坎",
-            "detail": "等主位與混沌之力門檻完成後，再把伏爾坎補到覺醒1。",
+        "只有哪吒或伏爾坎": {
+            "title": "先保留現有 SP，再評估第二支援",
+            "detail": "主位、塔洛莎協同與核心門檻完成後，才考慮把另一位補到有效支援節點。",
             "score": -5,
         },
         "都沒有／不確定": {
@@ -534,7 +534,11 @@ def diagnose_account(
             "detail": "通用資源先給主位、雙生之槍與裝備門檻，伏爾坎不是現在的優先項。",
             "score": -10,
         },
-    }[divine_stage]
+    }
+    # Preserve older saved selections while moving the visible UI to current R4 support checks.
+    divine_options["哪吒覺醒2＋伏爾坎覺醒1"] = divine_options["哪吒R4＋伏爾坎R4支援鏈"]
+    divine_options["只有哪吒"] = divine_options["只有哪吒或伏爾坎"]
+    divine = divine_options[divine_stage]
 
     mode = {
         "短場首領": {
@@ -546,8 +550,8 @@ def diagnose_account(
             "instruction": "讓混沌之力、共鳴、燃燒與虛弱完整疊滿，不用短場配裝硬套。",
         },
         "區域行動": {
-            "build": "區域行動零失誤配置",
-            "instruction": "依詞條切換亡者風衣或永虛戰甲，穩定通關優先於面板數字。",
+            "build": "新版區域行動路線最優解",
+            "instruction": "2026/08/27 新版不帶入局外裝備；先手操小關取得局內 Buff，再以無人機索敵與生存被動挑戰區域首領。",
         },
     }[play_mode]
 
@@ -567,4 +571,459 @@ def diagnose_account(
         "avoid": main["avoid"],
         "switch_condition": main["switch"],
         "next_breakpoint": chaos["next"],
+    }
+
+
+OPTIMIZATION_STRATEGIES: list[dict[str, Any]] = [
+    {
+        "id": "event_roi",
+        "name": "活動免費線＋精準補檔",
+        "label": "活動 ROI",
+        "base": 72,
+        "goals": ("活動獎勵效率",),
+        "modes": ("綜合養成", "短場首領", "長場首領", "區域行動"),
+        "stages": ("尚未紅裝成套", "紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"),
+        "horizons": (7, 30),
+        "risk": 1,
+        "min_minutes": 15,
+        "resource_need": {},
+        "impact": 82,
+        "efficiency": 96,
+        "certainty": 88,
+        "summary": "先吃滿登入、任務與免費票，最後 24 小時才計算是否補到下一個高價值里程碑。",
+        "steps": ("把剩餘免費進度投影到活動結束", "只選一個能立即跨過的帳號斷點", "補到目標後立即停手"),
+        "stop": "補鑽後低於寶石安全線，或成本高於獎勵對帳號的價值上限時停止。",
+        "switch": "活動頁顯示免費可達標，或下一檔獎勵價值突然下降時，切回純免費路線。",
+    },
+    {
+        "id": "survivor_breakpoint",
+        "name": "主位覺醒單點突破",
+        "label": "角色主位",
+        "base": 68,
+        "goals": ("首領傷害上限", "長期帳號成長"),
+        "modes": ("短場首領", "長場首領", "綜合養成"),
+        "stages": ("尚未紅裝成套", "紅裝成套、神器核心不足"),
+        "horizons": (30, 90),
+        "risk": 1,
+        "min_minutes": 20,
+        "resource_need": {"awakening_cores": 6},
+        "impact": 91,
+        "efficiency": 78,
+        "certainty": 76,
+        "summary": "通用角色資源只服務一個完整主位門檻，不做覺醒一半的過渡角色。",
+        "steps": ("先確認基礎暴擊率與主位門檻", "存到可一次完成目標覺醒", "保留必要協同角色後再轉主位"),
+        "stop": "無法同時保留協同門檻，或只能完成低覺醒過渡時不投入。",
+        "switch": "主位門檻完成後，把新增資源轉向神器核心與模式裝備。",
+    },
+    {
+        "id": "relic_breakpoint",
+        "name": "雙生之槍與神器核心斷點",
+        "label": "核心配置",
+        "base": 76,
+        "goals": ("首領傷害上限", "長期帳號成長"),
+        "modes": ("短場首領", "長場首領", "綜合養成"),
+        "stages": ("紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"),
+        "horizons": (30, 90),
+        "risk": 1,
+        "min_minutes": 20,
+        "resource_need": {"relic_cores": 4},
+        "impact": 96,
+        "efficiency": 90,
+        "certainty": 83,
+        "summary": "核心不要平均灑在六個欄位；先完成武器與主模式最有感的完整節點。",
+        "steps": ("先鎖定雙生之槍與主模式裝備", "比較下一個完整 E／V／C 節點", "只移動能立即提升實戰的核心"),
+        "stop": "核心數不足完整節點，或移動後會拆掉現役關鍵效果時先保留。",
+        "switch": "主要武器與裝備斷點完成後，再比較異世寵物與科技諧振的邊際收益。",
+    },
+    {
+        "id": "xeno_pet",
+        "name": "異世寵物覺醒與共鳴",
+        "label": "異寵乘區",
+        "base": 71,
+        "goals": ("首領傷害上限", "長期帳號成長"),
+        "modes": ("短場首領", "長場首領", "綜合養成"),
+        "stages": ("主要裝備斷點已完成", "接近滿配"),
+        "horizons": (30, 90),
+        "risk": 2,
+        "min_minutes": 20,
+        "resource_need": {"xeno_cores": 10},
+        "impact": 94,
+        "efficiency": 84,
+        "certainty": 74,
+        "summary": "裝備骨架成熟後，把異世核心集中到能改變主人乘區的完整覺醒門檻。",
+        "steps": ("確認主戰寵物與主人增傷", "先完成一隻主寵的完整覺醒節點", "助戰技能只服務主寵與主模式"),
+        "stop": "核心不足完整覺醒門檻，或只能提高寵物面板而無法提高主人輸出時停止。",
+        "switch": "主寵門檻完成後，再比較共鳴晶片與下一個神器節點。",
+    },
+    {
+        "id": "tech_resonance",
+        "name": "科技配件諧振／雙生突破",
+        "label": "科技乘區",
+        "base": 70,
+        "goals": ("首領傷害上限", "長期帳號成長"),
+        "modes": ("短場首領", "長場首領", "綜合養成"),
+        "stages": ("主要裝備斷點已完成", "接近滿配"),
+        "horizons": (30, 90),
+        "risk": 2,
+        "min_minutes": 20,
+        "resource_need": {"resonance_chips": 8},
+        "impact": 89,
+        "efficiency": 82,
+        "certainty": 76,
+        "summary": "用主力技能的下一個諧振／雙生節點衡量收益，不把晶片平均分散。",
+        "steps": ("鎖定主力技能與模式", "計算下一級需要的晶片與配件", "一次跨過完整效果再停"),
+        "stop": "下一級只增加面板、沒有改變主力技能乘區時，先轉投其他系統。",
+        "switch": "主力配件跨過節點後，重新比較異寵與收藏套裝。",
+    },
+    {
+        "id": "zone_stability",
+        "name": "區域行動零失誤骨架",
+        "label": "通關穩定",
+        "base": 74,
+        "goals": ("區域行動穩定", "長期帳號成長"),
+        "modes": ("區域行動",),
+        "stages": ("尚未紅裝成套", "紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"),
+        "horizons": (7, 30),
+        "risk": 0,
+        "min_minutes": 25,
+        "resource_need": {},
+        "impact": 86,
+        "efficiency": 91,
+        "certainty": 90,
+        "summary": "依當期詞條切換生存與控制，不用首領最高面板硬闖所有區域。",
+        "steps": ("先讀限制與失敗原因", "用生存骨架拿首次通關", "通關後再逐步換回輸出"),
+        "stop": "連續兩次失敗原因相同時停止硬闖，改一個變數後再測。",
+        "switch": "穩定通關後，把額外時間轉回活動免費線與長期養成。",
+    },
+    {
+        "id": "collection_breakpoint",
+        "name": "收藏套裝最近有效斷點",
+        "label": "收藏補洞",
+        "base": 64,
+        "goals": ("長期帳號成長",),
+        "modes": ("綜合養成", "短場首領", "長場首領", "區域行動"),
+        "stages": ("紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"),
+        "horizons": (30, 90),
+        "risk": 1,
+        "min_minutes": 15,
+        "resource_need": {},
+        "impact": 76,
+        "efficiency": 86,
+        "certainty": 80,
+        "summary": "自選箱只補差一件或差一星的有效套裝與主力技能，不依稀有度平均升星。",
+        "steps": ("列出所有未啟動的下一效果", "比較距離與乘區收益", "只開能立刻跨線的自選箱"),
+        "stop": "沒有任何可立即啟動的效果時保留自選箱。",
+        "switch": "最近套裝啟動後，回到神器、異寵與科技三者的邊際比較。",
+    },
+    {
+        "id": "ab_test",
+        "name": "固定場景 A/B 重算",
+        "label": "實戰驗證",
+        "base": 69,
+        "goals": ("首領傷害上限", "區域行動穩定", "長期帳號成長"),
+        "modes": ("短場首領", "長場首領", "區域行動"),
+        "stages": ("主要裝備斷點已完成", "接近滿配"),
+        "horizons": (7, 30),
+        "risk": 0,
+        "min_minutes": 25,
+        "resource_need": {},
+        "impact": 84,
+        "efficiency": 94,
+        "certainty": 95,
+        "summary": "高端帳號不要再照固定順位；固定首領、時間與技能，只改一項並記錄結果。",
+        "steps": ("建立現役配置基準", "每輪只改一個角色／裝備／配件", "至少三輪取中位數再決定"),
+        "stop": "測試條件不同、技能進化時間差太大，或樣本不足三輪時不下結論。",
+        "switch": "新配置穩定勝出且資源成本可逆時，再正式轉換。",
+    },
+    {
+        "id": "reserve",
+        "name": "屯資源等待完整斷點",
+        "label": "保留選擇權",
+        "base": 60,
+        "goals": ("不確定，自動判斷", "長期帳號成長"),
+        "modes": ("綜合養成", "短場首領", "長場首領", "區域行動"),
+        "stages": ("尚未紅裝成套", "紅裝成套、神器核心不足", "主要裝備斷點已完成", "接近滿配"),
+        "horizons": (7, 30, 90),
+        "risk": 0,
+        "min_minutes": 10,
+        "resource_need": {},
+        "impact": 58,
+        "efficiency": 98,
+        "certainty": 94,
+        "summary": "目前資源無法跨過完整節點時，保留核心、自選箱與寶石比做半套升級更有效。",
+        "steps": ("列出下一個完整斷點", "只拿免費與高效率常駐資源", "達門檻後一次投入"),
+        "stop": "一旦可完成高分策略的完整門檻，就停止屯資源並重新最佳化。",
+        "switch": "任一稀缺資源達到推薦策略需求，或版本推出新系統時重算。",
+    },
+]
+
+
+DAILY_TASKS: list[dict[str, Any]] = [
+    {"name": "登入、郵件與活動免費領取", "minutes": 4, "base": 100, "goals": (), "modes": (), "why": "幾乎零風險取得限時資源，永遠先做。"},
+    {"name": "每日任務與快速巡邏", "minutes": 8, "base": 96, "goals": ("長期帳號成長",), "modes": ("綜合養成",), "why": "穩定轉換體力、經驗與鑰匙，不需要額外寶石。"},
+    {"name": "體力消耗與主線巡邏", "minutes": 5, "base": 82, "goals": ("長期帳號成長",), "modes": ("綜合養成",), "why": "避免體力溢出並提高長期被動收益。"},
+    {"name": "當期活動免費任務／免費票", "minutes": 10, "base": 88, "goals": ("活動獎勵效率",), "modes": (), "why": "先拿免費進度，保留最後一天的補鑽選擇權。"},
+    {"name": "常規挑戰與週期核心來源", "minutes": 12, "base": 84, "goals": ("長期帳號成長",), "modes": ("綜合養成",), "why": "稀缺核心來源應高於低價排名與重複刷分。"},
+    {"name": "末世反響／公會首領有效場次", "minutes": 12, "base": 82, "goals": ("首領傷害上限",), "modes": ("短場首領", "長場首領"), "why": "固定場景同時取得獎勵並驗證配裝。"},
+    {"name": "區域行動／高價值首次通關", "minutes": 15, "base": 82, "goals": ("區域行動穩定",), "modes": ("區域行動",), "why": "首次通關價值通常高於已通關內容的重複刷取。"},
+    {"name": "主線、試煉與一次性進度", "minutes": 18, "base": 72, "goals": ("長期帳號成長",), "modes": ("綜合養成", "區域行動"), "why": "有餘裕時優先解鎖永久收益與後續資源。"},
+    {"name": "固定場景三輪 A/B 實測", "minutes": 24, "base": 68, "goals": ("首領傷害上限", "區域行動穩定"), "modes": ("短場首領", "長場首領", "區域行動"), "why": "高端帳號用實測避免把稀缺核心投到面板幻覺。"},
+]
+
+
+def _resource_label(key: str) -> str:
+    return {
+        "relic_cores": "神器核心",
+        "resonance_chips": "諧振晶片",
+        "xeno_cores": "異世核心",
+        "awakening_cores": "覺醒核心",
+    }[key]
+
+
+def _optimize_daily_schedule(*, minutes: int, goal: str, play_mode: str) -> dict[str, Any]:
+    budget = max(4, min(180, int(minutes)))
+    weighted: list[dict[str, Any]] = []
+    for task in DAILY_TASKS:
+        utility = int(task["base"])
+        if goal in task["goals"]:
+            utility += 30
+        elif not task["goals"]:
+            utility += 10
+        if play_mode in task["modes"]:
+            utility += 20
+        elif not task["modes"]:
+            utility += 5
+        item = dict(task)
+        item["utility"] = utility
+        item["density"] = utility / max(1, int(task["minutes"]))
+        weighted.append(item)
+
+    states: list[tuple[int, list[int]]] = [(0, []) for _ in range(budget + 1)]
+    for index, task in enumerate(weighted):
+        duration = int(task["minutes"])
+        for current in range(budget, duration - 1, -1):
+            previous_score, previous_items = states[current - duration]
+            candidate = previous_score + int(task["utility"])
+            if candidate > states[current][0]:
+                states[current] = (candidate, [*previous_items, index])
+
+    best_minutes = max(range(budget + 1), key=lambda value: states[value][0])
+    chosen_indices = states[best_minutes][1]
+    selected = sorted(
+        (weighted[index] for index in chosen_indices),
+        key=lambda item: (-item["density"], item["minutes"]),
+    )
+    omitted = sorted(
+        (item for index, item in enumerate(weighted) if index not in chosen_indices),
+        key=lambda item: (-item["utility"], item["minutes"]),
+    )
+    return {
+        "budget": budget,
+        "minutes_used": sum(int(item["minutes"]) for item in selected),
+        "tasks": selected,
+        "next_if_more_time": omitted[:2],
+    }
+
+
+def optimize_player_plan(
+    *,
+    goal: str,
+    account_stage: str,
+    play_mode: str,
+    spending_style: str,
+    risk_style: str,
+    horizon_days: int,
+    gems: int,
+    relic_cores: int,
+    resonance_chips: int,
+    xeno_cores: int,
+    awakening_cores: int,
+    daily_minutes: int,
+) -> dict[str, Any]:
+    """Rank account progression paths and build a time-constrained daily plan.
+
+    This is intentionally a transparent rule optimizer rather than a hidden DPS
+    simulator. It favors complete breakpoints, reversible choices, and explicit
+    resource safety lines.
+    """
+
+    reserve = {"無課／只用免費資源": 30000, "微課／可小補寶石": 15000, "課金／只看效率": 5000}.get(spending_style, 20000)
+    spendable_gems = max(0, int(gems) - reserve)
+    resources = {
+        "relic_cores": max(0, int(relic_cores)),
+        "resonance_chips": max(0, int(resonance_chips)),
+        "xeno_cores": max(0, int(xeno_cores)),
+        "awakening_cores": max(0, int(awakening_cores)),
+    }
+    horizon = min((7, 30, 90), key=lambda value: abs(value - int(horizon_days)))
+    ranked: list[dict[str, Any]] = []
+
+    for strategy in OPTIMIZATION_STRATEGIES:
+        reasons: list[str] = []
+
+        if goal in strategy["goals"]:
+            goal_fit = 96
+            reasons.append("直接符合你的核心目標")
+        elif goal == "不確定，自動判斷":
+            goal_fit = 66
+        else:
+            goal_fit = 28
+
+        if play_mode in strategy["modes"]:
+            mode_fit = 94
+            reasons.append("與主要模式一致")
+        elif "綜合養成" in strategy["modes"]:
+            mode_fit = 64
+        else:
+            mode_fit = 30
+
+        if account_stage in strategy["stages"]:
+            stage_fit = 94
+            reasons.append("符合目前帳號階段")
+        else:
+            stage_fit = 28
+
+        if horizon in strategy["horizons"]:
+            horizon_fit = 92
+        else:
+            horizon_fit = 48
+
+        if daily_minutes >= int(strategy["min_minutes"]):
+            time_fit = 94
+        else:
+            shortage = int(strategy["min_minutes"]) - int(daily_minutes)
+            time_fit = max(25, 90 - shortage * 4)
+
+        risk = int(strategy["risk"])
+        if risk_style == "穩定優先":
+            risk_fit = max(25, 98 - risk * 28)
+        elif risk_style == "追求上限":
+            risk_fit = min(98, 58 + risk * 20)
+        else:
+            risk_fit = max(55, 92 - abs(risk - 1) * 20)
+
+        gaps: list[str] = []
+        resource_fits: list[int] = []
+        for key, need in strategy["resource_need"].items():
+            owned = resources[key]
+            if owned >= int(need):
+                resource_fits.append(96)
+                reasons.append(f"{_resource_label(key)}已達可執行量")
+            else:
+                gap = int(need) - owned
+                resource_fits.append(max(8, round(72 * owned / max(1, int(need)))))
+                gaps.append(f"{_resource_label(key)}還差 {gap}")
+        resource_fit = round(sum(resource_fits) / len(resource_fits)) if resource_fits else 92
+
+        if int(gems) < reserve:
+            if strategy["id"] in ("reserve", "event_roi", "ab_test", "zone_stability"):
+                resource_fit = min(98, resource_fit + 4)
+            else:
+                resource_fit = min(resource_fit, 18)
+                gaps.append(f"寶石低於 {reserve:,} 安全線")
+
+        stage_bonus = 0
+        if account_stage == "尚未紅裝成套":
+            stage_bonus = 6 if strategy["id"] == "survivor_breakpoint" else 0
+            stage_bonus -= 6 if strategy["id"] in ("xeno_pet", "tech_resonance") else 0
+        elif account_stage == "紅裝成套、神器核心不足":
+            stage_bonus = 7 if strategy["id"] == "relic_breakpoint" else 0
+        elif account_stage == "主要裝備斷點已完成":
+            stage_bonus = 5 if strategy["id"] in ("xeno_pet", "tech_resonance", "collection_breakpoint") else 0
+        elif account_stage == "接近滿配":
+            stage_bonus = 8 if strategy["id"] == "ab_test" else 0
+
+        objective_bonus = 0
+        if goal == "活動獎勵效率" and strategy["id"] == "event_roi":
+            objective_bonus = 5
+        if goal == "區域行動穩定" and strategy["id"] == "zone_stability":
+            objective_bonus = 5
+        if not gaps:
+            reasons.append("目前資源可直接執行")
+
+        score = (
+            int(strategy["impact"]) * 0.22
+            + goal_fit * 0.20
+            + mode_fit * 0.13
+            + stage_fit * 0.15
+            + resource_fit * 0.15
+            + horizon_fit * 0.05
+            + time_fit * 0.05
+            + risk_fit * 0.05
+            + stage_bonus
+            + objective_bonus
+        )
+        final_score = max(0, min(97, round(score)))
+        item = dict(strategy)
+        item.update(
+            {
+                "score": final_score,
+                "fit": max(0, min(100, round((final_score + int(strategy["certainty"])) / 2))),
+                "reasons": reasons[:3],
+                "gaps": gaps,
+                "feasible": not gaps,
+            }
+        )
+        ranked.append(item)
+
+    ranked.sort(key=lambda item: (item["score"], item["certainty"], item["efficiency"]), reverse=True)
+    top = ranked[0]
+    schedule = _optimize_daily_schedule(minutes=daily_minutes, goal=goal, play_mode=play_mode)
+
+    confidence = 68
+    confidence += 6 if goal != "不確定，自動判斷" else 0
+    confidence += 5 if play_mode != "綜合養成" else 0
+    confidence += 4 if any(resources.values()) else 0
+    confidence += 3 if int(gems) > 0 else 0
+    if account_stage == "接近滿配":
+        confidence -= 8
+    confidence = max(55, min(86, confidence))
+
+    avoided = [item for item in ranked if item["score"] < 55][:3]
+    mode_protocols = {
+        "綜合養成": {
+            "title": "綜合養成：先做不可溢出的免費收益",
+            "opening": "登入、郵件、免費票與體力先清零，避免限時與自然回復資源溢出。",
+            "mid": "再做能提供稀缺核心或永久解鎖的一次性內容。",
+            "finish": "低價排名、重複刷分與外觀追逐放到所有高價值任務之後。",
+            "measure": "每週只看三個數：稀缺核心淨增加、下一斷點距離、寶石安全庫存。",
+        },
+        "短場首領": {
+            "title": "短場首領：進化時間本身就是傷害",
+            "opening": "優先雙生槍、無人機與冷卻；開局技能格不要塞入太多低優先技能。",
+            "mid": "記錄無人機與主武器完成進化的時間，不用滿層理論 DPS 代替短場實戰。",
+            "finish": "固定首領與技能選擇，至少三輪取中位數後才移動神器核心。",
+            "measure": "比較前 60 秒傷害、首次進化秒數與整場中位數，不只看單次最高值。",
+        },
+        "長場首領": {
+            "title": "長場首領：完整疊層與異常覆蓋率優先",
+            "opening": "先確認燃燒、虛弱、冰緩或裂傷有穩定觸發來源，再計算對應增傷。",
+            "mid": "讓混沌、共鳴與寵物乘區進入穩定區間，不把短場進化速度權重照搬。",
+            "finish": "固定戰鬥階段與減益條件做 A/B，避免遠征階段和對戰階段混算。",
+            "measure": "比較穩定段 DPS、異常覆蓋率、同步損失與三輪中位數。",
+        },
+        "區域行動": {
+            "title": "新版區域行動：局內路線比局外面板重要",
+            "opening": "先手操 2～3 個高價值小關拿 Buff；不要把時間平均用在所有支線。",
+            "mid": "無人機先升到自動索敵節點，再補雷電、火箭、哨箭與足球。",
+            "finish": "優先挑戰區域首領取得下方獎勵；清潔戰可跳過，若打則結束時污染必須為 0。",
+            "measure": "記錄失敗原因、剩餘血量與路線 Buff；連敗兩次只更改一個變數。",
+        },
+    }
+    return {
+        "best": top,
+        "ranked": ranked[:5],
+        "alternatives": ranked[1:3],
+        "confidence": confidence,
+        "reserve": reserve,
+        "spendable_gems": spendable_gems,
+        "schedule": schedule,
+        "avoid_now": avoided,
+        "mode_protocol": mode_protocols[play_mode],
+        "recalculate_when": [
+            top["switch"],
+            "任何稀缺核心、自選箱或角色門檻改變時重新計算。",
+            "版本更新、活動獎勵表或主要遊玩模式改變時重新計算。",
+        ],
+        "method": "目標適配＋模式適配＋帳號階段＋資源可行性＋時間限制＋風險偏好",
     }

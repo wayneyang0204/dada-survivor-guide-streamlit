@@ -14,6 +14,7 @@ from data_engine import (
     fetch_source_posts,
     load_collectible_catalog,
     match_event_playbook,
+    optimize_player_plan,
     rank_rewards,
 )
 
@@ -37,8 +38,8 @@ st.set_page_config(
         "標題": "新版區域行動：四大區域與首領戰",
         "日期": "2026/08/27",
         "狀態": "現行",
-        "摘要": "先看區域限制，再決定裝備與技能；通關後強化區域效果，最後投入首領戰。",
-        "行動": ["先讀區域限制", "普通關卡優先拿強化", "首領戰再換純輸出配置"],
+        "摘要": "2026/08/27 新版不帶入局外角色與裝備；先手操 2～3 個小關取得局內 Buff，再挑戰區域首領。",
+        "行動": ["先走高價值小關拿局內 Buff", "無人機至少升到自動索敵節點", "首領通關後直接領取該區下方獎勵"],
         "來源": "https://notalknote.xyz/dadasurvivor-regional-action-update-guide/",
     },
     {
@@ -209,7 +210,7 @@ st.set_page_config(
     {
         "名稱": "短時首領爆發天花板",
         "適用": "末世反響／公會遠征／短場首領",
-        "角色": "維納托覺醒5以上主位｜塔洛莎覺醒4協同｜哪吒覺醒2 → 伏爾坎覺醒1支援鏈",
+        "角色": "維納托覺醒5以上主位｜塔洛莎覺醒4協同保留裂傷觸發｜哪吒／伏爾坎支援以 R4 有效門檻核對",
         "寵物": "幽冥之魂覺醒3以上｜共鳴增益＋共鳴傷害",
         "武器": "雙生之槍｜永恆4、虛空4、混沌2以上、異界轉化",
         "裝備": ["虛空項鍊神鑄3／審判項鍊雙生階", "月痕護腕雙生階｜基礎暴率至少70%", "星塵腰帶雙生階 E3／V2", "冰川戰靴雙生階 E1／V2／C1", "永虛戰甲雙生階 E3起"],
@@ -231,16 +232,20 @@ st.set_page_config(
         "評分": {"清怪": 88, "首領": 99, "生存": 90},
     },
     {
-        "名稱": "區域行動零失誤配置",
-        "適用": "區域行動／341～345章／極端詞條",
-        "角色": "塔洛莎覺醒5穩定主位／維納托覺醒5高投入；詞條關再調整梅塔莉亞協同",
-        "寵物": "幽冥之魂／高星控制型異獸",
-        "武器": "雙生之槍 E4／V4；特殊詞條關可切虛空之力",
-        "裝備": ["虛空項鍊神鑄3", "月痕護腕雙生階／虛空手套神鑄3", "星塵腰帶雙生階 E3／V2", "冰川戰靴雙生階 E1／V2／C1", "亡者風衣神鑄3／永虛甲雙生階 E3"],
-        "技能": ["雙生無人機", "燃油桶", "守衛者", "量子球", "力場", "高爆燃料"],
-        "核心": "不是堆面板，而是針對詞條保證通關；極端怪潮用死神流，禁復活關改永虛甲。",
-        "斷點": "亡者風衣必須神鑄3才值得當核心；禁復活或限制護盾時必須依詞條切換。",
-        "評分": {"清怪": 100, "首領": 90, "生存": 98},
+        "名稱": "新版區域行動路線最優解",
+        "適用": "2026/08/27 新版四區域／區域首領",
+        "角色標籤": "帶入規則",
+        "角色": "局外角色、裝備與寵物不帶入；新版勝負取決於手操、局內技能與路線 Buff。",
+        "寵物標籤": "操作核心",
+        "寵物": "先打 2～3 個高價值小關強化，再挑區域首領；不要把時間平均浪費在所有支線。",
+        "武器標籤": "主動優先",
+        "武器": "無人機升到自動索敵節點後，依序考慮雷電、火箭、哨箭與足球。",
+        "裝備標籤": "被動／路線",
+        "裝備": ["移速鞋：提高走位與任務容錯", "回血、護甲、生命：先確保首次通關", "高爆彈頭、冷卻：輸出與技能循環", "區域首領優先：通關後可領取該區下方獎勵", "清潔戰可跳過；若挑戰，倒數結束時污染必須為 0"],
+        "技能": ["無人機", "雷電", "火箭", "哨箭", "足球", "高爆彈頭／冷卻"],
+        "核心": "新版是局內路線與 Buff 規劃器，不是局外裝備排行；先穩定通關，再追更快路線。",
+        "斷點": "無人機至少升到可自動索敵；連續兩次因同一原因失敗時，只改一個技能或路線再測。",
+        "評分": {"清怪": 94, "首領": 92, "生存": 100},
     },
 ]
 
@@ -548,6 +553,44 @@ st.markdown(
       .安全健檢 span { display:block; margin-top:.18rem; color:rgba(20,40,43,.62); font-size:.7rem; line-height:1.45; }
       .安全徽章 { flex:0 0 auto; padding:.34rem .55rem; border-radius:999px; background:#dff4e7; color:#24734d !important; font-size:.62rem !important; font-weight:900; }
 
+      .最佳結論 { position:relative; overflow:hidden; padding:1.35rem 1.45rem; border:1px solid rgba(16,37,40,.18); border-radius:1.2rem; background:var(--deep); color:#fff; box-shadow:0 18px 46px rgba(16,37,40,.16); }
+      .最佳結論::after { content:""; position:absolute; width:16rem; height:16rem; right:-6rem; top:-8rem; border-radius:50%; background:rgba(145,201,40,.15); filter:blur(20px); }
+      .最佳頂列 { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
+      .最佳頂列 small { color:#dfff8f; font-size:.68rem; font-weight:950; letter-spacing:.1em; }
+      .信心徽章 { padding:.32rem .55rem; border:1px solid rgba(223,255,143,.23); border-radius:999px; background:rgba(223,255,143,.08); color:#dfff8f; font-size:.64rem; font-weight:900; }
+      .最佳結論 h3 { position:relative; z-index:1; margin:.55rem 0 .45rem; color:#fff !important; font-size:clamp(1.35rem,2.6vw,1.9rem); }
+      .最佳結論 p { position:relative; z-index:1; max-width:880px; margin:0; color:rgba(255,255,255,.7); font-size:.86rem; line-height:1.65; }
+      .最佳理由 { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.85rem; }
+      .最佳理由 span { padding:.34rem .5rem; border-radius:.5rem; background:rgba(255,255,255,.07); color:rgba(255,255,255,.77); font-size:.68rem; font-weight:750; }
+      .方案比較格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:.65rem 0 1rem; }
+      .方案卡 { min-height:13.2rem; padding:1rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 10px 26px rgba(27,58,49,.055); }
+      .方案卡.推薦 { border-color:rgba(145,201,40,.42); background:linear-gradient(145deg,#fff,#f4f9e9); box-shadow:0 14px 30px rgba(111,159,18,.1); }
+      .方案排名 { display:flex; justify-content:space-between; align-items:center; gap:.5rem; color:rgba(20,40,43,.48); font-size:.62rem; font-weight:900; letter-spacing:.08em; }
+      .方案分數 { color:var(--lime-strong); }
+      .方案卡 h4 { margin:.55rem 0 .4rem; color:var(--ink); font-size:1rem; line-height:1.35; }
+      .方案卡 p { margin:0; color:rgba(20,40,43,.66); font-size:.74rem; line-height:1.55; }
+      .方案卡 ul { margin:.65rem 0 0; padding-left:1rem; }
+      .方案卡 li { margin:.28rem 0; color:rgba(20,40,43,.62); font-size:.68rem; line-height:1.45; }
+      .可行 { color:#2b8058; }
+      .待補 { color:#a45c0f; }
+      .今日計畫 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; margin:.55rem 0 1rem; }
+      .計畫項 { display:grid; grid-template-columns:auto 1fr auto; gap:.75rem; align-items:center; padding:.82rem .9rem; border:1px solid var(--line); border-radius:.85rem; background:#fff; }
+      .計畫序 { display:grid; place-items:center; width:1.65rem; height:1.65rem; border-radius:.5rem; background:var(--deep); color:#dfff8f; font-size:.68rem; font-weight:950; }
+      .計畫項 strong { display:block; color:var(--ink); font-size:.78rem; }
+      .計畫項 span { color:rgba(20,40,43,.56); font-size:.66rem; line-height:1.4; }
+      .計畫時間 { color:var(--lime-strong) !important; font-weight:900; white-space:nowrap; }
+      .硬停框 { padding:1rem 1.05rem; border:1px solid rgba(184,105,18,.25); border-radius:.95rem; background:#fff7ea; }
+      .硬停框 strong { color:#8b4d0c; font-size:.82rem; }
+      .硬停框 ol { margin:.6rem 0 0; padding-left:1.2rem; }
+      .硬停框 li { margin:.35rem 0; color:#7c4a16; font-size:.72rem; line-height:1.5; }
+      .模式協議 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; margin:.55rem 0 1rem; }
+      .模式步 { padding:.85rem .9rem; border:1px solid var(--line); border-radius:.85rem; background:linear-gradient(145deg,#fff,#f7faf5); }
+      .模式步 small { color:var(--lime-strong); font-size:.62rem; font-weight:950; letter-spacing:.08em; }
+      .模式步 strong { display:block; margin:.28rem 0 .25rem; color:var(--ink); font-size:.78rem; }
+      .模式步 span { color:rgba(20,40,43,.62); font-size:.68rem; line-height:1.5; }
+      .透明條 { display:flex; flex-wrap:wrap; gap:.4rem; margin:.7rem 0; }
+      .透明條 span { padding:.3rem .5rem; border-radius:999px; background:#edf5eb; color:rgba(20,40,43,.64); font-size:.63rem; font-weight:800; }
+
       .配置總覽 { min-height:14rem; padding:1.05rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
       .配置總覽 small { color:#227d82; font-weight:850; }
       .配置總覽 h3 { margin:.45rem 0 .55rem; font-size:1rem; }
@@ -625,6 +668,9 @@ st.markdown(
         .獎勵格 { grid-template-columns:1fr; }
         .優先格 { grid-template-columns:1fr; }
         .價值格 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .方案比較格 { grid-template-columns:1fr; }
+        .方案卡 { min-height:0; }
+        .模式協議 { grid-template-columns:repeat(2,minmax(0,1fr)); }
       }
       @media (max-width: 640px) {
         [data-testid="stHeader"] { height:1.4rem; }
@@ -657,6 +703,10 @@ st.markdown(
         .價值頭 p { margin-top:.45rem; text-align:left; }
         .價值格 { grid-template-columns:1fr 1fr; }
         .價值項 { padding:.78rem; }
+        .今日計畫 { grid-template-columns:1fr; }
+        .模式協議 { grid-template-columns:1fr; }
+        .最佳結論 { padding:1.1rem; }
+        .最佳頂列 { align-items:flex-start; }
       }
     </style>
     """,
@@ -687,7 +737,7 @@ st.markdown(
 if 主頁面 == "活動":
     頁面 = "活動最佳解"
 elif 主頁面 == "養成":
-    頁面 = st.selectbox("選擇養成工具", ["帳號診斷", "終局配裝", "收藏優先級"], key="養成分類")
+    頁面 = st.selectbox("選擇養成工具", ["智能最優解", "帳號診斷", "終局配裝", "收藏優先級"], key="養成分類")
 elif 主頁面 == "資料庫":
     頁面 = st.selectbox("選擇資料內容", ["完整攻略庫", "收藏圖鑑", "最新文章"], key="資料分類")
 else:
@@ -696,6 +746,7 @@ else:
 頁面主視覺 = {
     "首頁": ("SURVIVOR.IO META INTELLIGENCE", "每一顆寶石，<br><span>都有可驗證的理由。</span>", "把活動進度、帳號階段與終局斷點，轉成今天可以直接執行的一個決策。不是照抄榜單，而是依你的狀態算出答案。"),
     "活動最佳解": ("活動決策中心", "先算完免費進度，<br><span>再決定要不要補。</span>", "選活動、填進度，直接得到補鑽上限、寶石安全線與兌換優先級。"),
+    "智能最優解": ("SMART ROUTE OPTIMIZER", "讓系統比較所有路線，<br><span>只留下現在最值得做的。</span>", "同時衡量目標、模式、帳號階段、四種稀缺核心、寶石安全線與每天可玩時間。"),
     "帳號診斷": ("個人化養成路線", "先找到最大缺口，<br><span>再集中跨過斷點。</span>", "依模式、裝備階段與稀缺資源，整理現在最該做的三件事。"),
     "終局配裝": ("終局實戰配置", "不是只有一套神裝，<br><span>模式不同，答案就不同。</span>", "把首領、區域行動與高速清怪拆開判斷，避免用錯配置。"),
     "完整攻略庫": ("完整資料中心", "攻略不只收得多，<br><span>還要知道現在能不能用。</span>", "精選決策卡加上全部來源同步，並標記現行、常駐與需核對內容。"),
@@ -765,7 +816,7 @@ if 頁面 == "首頁":
         with 指揮操作一:
             st.button("立即算我的活動停損線", type="primary", width="stretch", on_click=切換主頁面, args=("活動",))
         with 指揮操作二:
-            st.button("建立我的終局養成路線", width="stretch", on_click=切換主頁面, args=("養成", "帳號診斷"))
+            st.button("找出我的全局最優路線", width="stretch", on_click=切換主頁面, args=("養成", "智能最優解"))
 
     st.header("本期活動完整作戰簡報")
     st.caption("先看結論，再展開 16 項完整依據；真正投入資源前可進入活動頁用帳號數字精算。")
@@ -784,7 +835,7 @@ if 頁面 == "首頁":
         f"""
         <div class="快捷格">
           <div class="快捷卡"><span class="快捷編號">01 · 活動</span><strong>這次活動值不值得追？</strong><p>先算免費進度，再看補鑽上限、寶石安全線與獎勵兌換順序。</p></div>
-          <div class="快捷卡"><span class="快捷編號">02 · 養成</span><strong>下一份資源投在哪？</strong><p>集中帳號診斷、終局配裝與收藏優先級，依模式判斷下一個斷點。</p></div>
+          <div class="快捷卡"><span class="快捷編號">02 · 最佳化</span><strong>下一份資源投在哪？</strong><p>比較角色、神器、異寵、配件與收藏路線，依資源與時間找出最高收益方案。</p></div>
           <div class="快捷卡"><span class="快捷編號">03 · 資料庫</span><strong>需要查完整資料？</strong><p>搜尋 {len(全部文章首頁)} 篇來源文章與 {len(首頁收藏圖鑑)} 件收藏，另有人工整理的精選攻略。</p></div>
         </div>
         """,
@@ -794,7 +845,7 @@ if 頁面 == "首頁":
     with 入口一:
         st.button("開啟活動判斷", width="stretch", on_click=切換主頁面, args=("活動",))
     with 入口二:
-        st.button("進行帳號診斷", width="stretch", on_click=切換主頁面, args=("養成", "帳號診斷"))
+        st.button("執行智能最佳化", width="stretch", on_click=切換主頁面, args=("養成", "智能最優解"))
     with 入口三:
         st.button("搜尋完整資料", width="stretch", on_click=切換主頁面, args=("資料庫", "完整攻略庫"))
 
@@ -958,6 +1009,141 @@ elif 頁面 == "活動最佳解":
     )
     st.markdown(f'<div class="獎勵格">{獎勵卡片}</div>', unsafe_allow_html=True)
 
+elif 頁面 == "智能最優解":
+    st.header("智能最優解：比較所有可行路線，再決定下一份資源")
+    st.caption("這是透明的帳號路線最佳化器，不是假裝還原官方隱藏傷害公式；結果會把策略適配與資料信心分開顯示。")
+
+    o1, o2, o3 = st.columns(3)
+    with o1:
+        最佳化目標 = st.selectbox(
+            "最想最佳化的結果",
+            ["長期帳號成長", "首領傷害上限", "區域行動穩定", "活動獎勵效率", "不確定，自動判斷"],
+        )
+        最佳化模式 = st.selectbox("主要遊玩模式", ["綜合養成", "短場首領", "長場首領", "區域行動"])
+    with o2:
+        最佳化階段 = st.selectbox("帳號階段", ["紅裝成套、神器核心不足", "尚未紅裝成套", "主要裝備斷點已完成", "接近滿配"])
+        最佳化風格 = st.selectbox("決策風格", ["平衡收益", "穩定優先", "追求上限"])
+    with o3:
+        最佳化消費 = st.selectbox("資源投入風格", ["無課／只用免費資源", "微課／可小補寶石", "課金／只看效率"])
+        規劃週期文字 = st.selectbox("規劃週期", ["30 天", "7 天", "90 天"])
+
+    q1, q2 = st.columns(2)
+    with q1:
+        最佳化寶石 = int(st.number_input("目前寶石", min_value=0, value=30000, step=500, key="optimizer_gems"))
+    with q2:
+        每天時間 = int(st.number_input("每天可投入時間（分鐘）", min_value=4, max_value=180, value=30, step=5))
+
+    with st.expander("精準模式：填入四種稀缺核心（不知道可填 0）"):
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            神器核心數 = int(st.number_input("神器核心", min_value=0, value=4, step=1))
+        with k2:
+            諧振晶片數 = int(st.number_input("諧振晶片", min_value=0, value=0, step=1))
+        with k3:
+            異世核心數 = int(st.number_input("異世核心", min_value=0, value=0, step=1))
+        with k4:
+            覺醒核心數 = int(st.number_input("覺醒核心", min_value=0, value=0, step=1))
+
+    最佳化結果 = optimize_player_plan(
+        goal=最佳化目標,
+        account_stage=最佳化階段,
+        play_mode=最佳化模式,
+        spending_style=最佳化消費,
+        risk_style=最佳化風格,
+        horizon_days=int(規劃週期文字.split()[0]),
+        gems=最佳化寶石,
+        relic_cores=神器核心數,
+        resonance_chips=諧振晶片數,
+        xeno_cores=異世核心數,
+        awakening_cores=覺醒核心數,
+        daily_minutes=每天時間,
+    )
+    最佳方案 = 最佳化結果["best"]
+    理由標籤 = "".join(f"<span>{html.escape(str(reason))}</span>" for reason in 最佳方案["reasons"])
+    if 最佳方案["gaps"]:
+        理由標籤 += "".join(f"<span>待補：{html.escape(str(gap))}</span>" for gap in 最佳方案["gaps"])
+    st.markdown(
+        f"""
+        <section class="最佳結論">
+          <div class="最佳頂列"><small>本期最佳路線 · 適配 {最佳方案['score']}/100</small><span class="信心徽章">資料信心 {最佳化結果['confidence']}/100</span></div>
+          <h3>現在最好的選擇：{html.escape(str(最佳方案['name']))}</h3>
+          <p>{html.escape(str(最佳方案['summary']))}</p>
+          <div class="最佳理由">{理由標籤}</div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("策略適配", f"{最佳方案['score']}/100")
+    m2.metric("資料信心", f"{最佳化結果['confidence']}/100")
+    m3.metric("可安全動用寶石", f"{最佳化結果['spendable_gems']:,}")
+    m4.metric("每日最佳行程", f"{最佳化結果['schedule']['minutes_used']} 分")
+    st.progress(最佳化結果["confidence"] / 100, text=f"信心 {最佳化結果['confidence']}%｜高端帳號仍應用固定場景 A/B 實測驗證")
+
+    st.markdown("### 為什麼這條路線勝出")
+    方案卡片 = ""
+    for 排名, 方案 in enumerate(最佳化結果["ranked"][:3], 1):
+        原因清單 = "".join(f"<li>{html.escape(str(item))}</li>" for item in 方案["reasons"])
+        缺口文字 = "目前可直接執行" if 方案["feasible"] else "；".join(方案["gaps"])
+        狀態類別 = "可行" if 方案["feasible"] else "待補"
+        推薦類別 = " 推薦" if 排名 == 1 else ""
+        方案卡片 += (
+            f'<article class="方案卡{推薦類別}"><div class="方案排名"><span>方案 {排名} · {html.escape(str(方案["label"]))}</span>'
+            f'<span class="方案分數">{方案["score"]}/100</span></div><h4>{html.escape(str(方案["name"]))}</h4>'
+            f'<p>{html.escape(str(方案["summary"]))}</p><ul>{原因清單}</ul>'
+            f'<p class="{狀態類別}"><b>{"可執行" if 方案["feasible"] else "先補門檻"}：</b>{html.escape(str(缺口文字))}</p></article>'
+        )
+    st.markdown(f'<div class="方案比較格">{方案卡片}</div>', unsafe_allow_html=True)
+
+    st.markdown("### 今天的最高價值行程")
+    行程卡片 = "".join(
+        f'<article class="計畫項"><span class="計畫序">{index:02d}</span><div><strong>{html.escape(str(task["name"]))}</strong>'
+        f'<span>{html.escape(str(task["why"]))}</span></div><span class="計畫時間">{task["minutes"]} 分</span></article>'
+        for index, task in enumerate(最佳化結果["schedule"]["tasks"], 1)
+    )
+    st.markdown(f'<div class="今日計畫">{行程卡片}</div>', unsafe_allow_html=True)
+    if 最佳化結果["schedule"]["next_if_more_time"]:
+        下個任務 = "、".join(item["name"] for item in 最佳化結果["schedule"]["next_if_more_time"])
+        st.caption(f"若今天多出時間，再依序考慮：{下個任務}。目前已使用 {最佳化結果['schedule']['minutes_used']}/{最佳化結果['schedule']['budget']} 分鐘。")
+
+    模式協議 = 最佳化結果["mode_protocol"]
+    st.markdown(f"### {模式協議['title']}")
+    協議卡片 = "".join(
+        f'<article class="模式步"><small>{label}</small><strong>{title}</strong><span>{html.escape(str(content))}</span></article>'
+        for label, title, content in [
+            ("01 · OPENING", "開局", 模式協議["opening"]),
+            ("02 · MID GAME", "中段", 模式協議["mid"]),
+            ("03 · FINISH", "收尾", 模式協議["finish"]),
+            ("04 · VERIFY", "驗證指標", 模式協議["measure"]),
+        ]
+    )
+    st.markdown(f'<div class="模式協議">{協議卡片}</div>', unsafe_allow_html=True)
+
+    停止條件 = [
+        最佳方案["stop"],
+        f"任何投入會讓寶石低於 {最佳化結果['reserve']:,} 安全線時停止。",
+        "關鍵資料、版本或遊戲內數值與假設不同時，先停止不可逆投入並重新計算。",
+    ]
+    停止清單 = "".join(f"<li>{html.escape(str(item))}</li>" for item in 停止條件)
+    st.markdown(f'<section class="硬停框"><strong>硬停條件｜任何一項觸發就停</strong><ol>{停止清單}</ol></section>', unsafe_allow_html=True)
+
+    st.markdown("### 執行順序")
+    for index, step in enumerate(最佳方案["steps"], 1):
+        st.markdown(f"**{index}. {step}**")
+    st.info(f"切換條件：{最佳方案['switch']}")
+
+    with st.expander("查看模型依據、限制與進階驗證"):
+        st.markdown(f"**評分方法：** {最佳化結果['method']}")
+        st.markdown("**限制：** 目前比較的是帳號路線與稀缺資源投資，不是官方精準 DPS 模擬。高端裝備仍需輸入各槽 E／V／C／X、暴率、技能與異常覆蓋率後驗證。")
+        st.markdown("**新版區域行動：** 2026/08/27 後局外角色與裝備不帶入，應最佳化小關路線、局內 Buff、主動技能與被動生存，而不是套用舊版 AoQ 配置。")
+        st.markdown("**本輪查核來源：** [官方版本紀錄](https://apps.apple.com/tw/app/%E5%99%A0%E5%99%A0%E7%89%B9%E6%94%BB/id1528941310)｜[sIO Tools 情境計算器](https://sio-tools.exp0.dev/)｜[新版區域行動實測](https://www.taptap.cn/moment/842186300982296852?group_id=338134)｜[音樂圓盤實測](https://www.taptap.cn/moment/842881652471365745)")
+        驗證一, 驗證二 = st.columns(2)
+        with 驗證一:
+            st.link_button("進階傷害交叉驗證｜sIO Tools ↗", "https://sio-tools.exp0.dev/", width="stretch")
+        with 驗證二:
+            st.link_button("查看本站完整終局配置", "https://notalknote.xyz/moblegame/survivorio/", width="stretch")
+
 elif 頁面 == "帳號診斷":
     st.header("終局帳號診斷：四個狀態，直接決定下一步")
     st.caption("選項變更後會自動重算；先確認不含場內觸發的基礎暴率，以及角色實際覺醒階級。")
@@ -983,7 +1169,7 @@ elif 頁面 == "帳號診斷":
         遊玩模式 = st.selectbox("③ 目前主要模式", ["短場首領", "長場首領", "區域行動"])
     with col2:
         混沌階段 = st.selectbox("② 混沌之力", ["混沌之力9～17", "混沌之力18以上", "混沌之力未滿9／不確定"])
-        神火階段 = st.selectbox("④ 神火支援鏈", ["都沒有／不確定", "只有哪吒", "哪吒覺醒2＋伏爾坎覺醒1"])
+        神火階段 = st.selectbox("④ SP 支援鏈", ["都沒有／不確定", "只有哪吒或伏爾坎", "哪吒R4＋伏爾坎R4支援鏈"])
 
     診斷 = diagnose_account(main_stage=主位階段, chaos_stage=混沌階段, play_mode=遊玩模式, divine_stage=神火階段)
     st.markdown(
@@ -1020,19 +1206,26 @@ elif 頁面 == "終局配裝":
     選擇配置 = next(build for build in 終局配置 if build["名稱"] == 選擇配置名稱)
     詳情左, 詳情右 = st.columns(2)
     with 詳情左:
+        角色標籤 = 選擇配置.get("角色標籤", "角色")
+        寵物標籤 = 選擇配置.get("寵物標籤", "異獸")
+        武器標籤 = 選擇配置.get("武器標籤", "武器")
         st.markdown(
-            f'<div class="配置詳情"><p><b>角色：</b>{選擇配置["角色"]}</p><p><b>異獸：</b>{選擇配置["寵物"]}</p>'
-            f'<p><b>武器：</b>{選擇配置["武器"]}</p><p><b>關鍵斷點：</b>{選擇配置["斷點"]}</p></div>',
+            f'<div class="配置詳情"><p><b>{角色標籤}：</b>{選擇配置["角色"]}</p><p><b>{寵物標籤}：</b>{選擇配置["寵物"]}</p>'
+            f'<p><b>{武器標籤}：</b>{選擇配置["武器"]}</p><p><b>關鍵斷點：</b>{選擇配置["斷點"]}</p></div>',
             unsafe_allow_html=True,
         )
     with 詳情右:
         裝備清單 = "".join(f"<li>{html.escape(item)}</li>" for item in 選擇配置["裝備"])
         技能文字 = "、".join(選擇配置["技能"])
+        裝備標籤 = 選擇配置.get("裝備標籤", "裝備")
         st.markdown(
-            f'<div class="配置詳情"><p><b>裝備：</b></p><ul>{裝備清單}</ul><p><b>技能：</b>{技能文字}</p></div>',
+            f'<div class="配置詳情"><p><b>{裝備標籤}：</b></p><ul>{裝備清單}</ul><p><b>技能：</b>{技能文字}</p></div>',
             unsafe_allow_html=True,
         )
-    st.warning("縮寫 E／V／C 分別代表永恆／虛空／混沌神鑄。不要用同一套配置同時評估短場、長場與區域行動；跨過門檻後仍需固定場景 A/B 實測。")
+    if 選擇配置.get("角色標籤") == "帶入規則":
+        st.info("新版區域行動不帶入局外裝備，請以局內技能、Buff 路線與實際失敗原因調整；不要套用 2026/08/27 以前的 AoQ／局外裝備攻略。")
+    else:
+        st.warning("縮寫 E／V／C 分別代表永恆／虛空／混沌神鑄。不要用同一套配置同時評估短場與長場；跨過門檻後仍需固定場景 A/B 實測。")
 
 elif 頁面 == "完整攻略庫":
     st.header("完整攻略庫：精選決策＋全部來源自動同步")
