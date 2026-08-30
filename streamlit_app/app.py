@@ -406,17 +406,19 @@ st.markdown(
     <style>
       :root {
         color-scheme: light;
-        --bg: #f7f9f5;
+        --bg: #f7f8f5;
         --panel: #ffffff;
         --panel-2: #f0f6ee;
-        --lime: #87b91c;
-        --lime-strong: #739f12;
-        --lime-soft: #e8f6c8;
-        --ink: #173032;
-        --muted: rgba(23, 48, 50, .68);
-        --line: rgba(29, 73, 63, .14);
+        --lime: #91c928;
+        --lime-strong: #6f9f12;
+        --lime-soft: #eaf7cf;
+        --ink: #14282b;
+        --deep: #102528;
+        --muted: rgba(20, 40, 43, .68);
+        --line: rgba(24, 62, 56, .14);
         --cyan: #227d82;
         --orange: #b86912;
+        --shadow: 0 18px 46px rgba(27, 58, 49, .08);
       }
       html, body, [class*="css"] { font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
       .stApp {
@@ -433,9 +435,14 @@ st.markdown(
       .block-container { max-width: 1220px; padding: 1.1rem 2rem 4rem; }
       footer { display: none; }
 
-      .頂導 { min-height: 3.2rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.25rem 0 .65rem; }
-      .品牌 { display:flex; align-items:center; gap:.7rem; font-size:1rem; font-weight:950; letter-spacing:-.02em; }
-      .品牌記號 { display:grid; place-items:center; width:2.2rem; height:2.2rem; border-radius:.8rem; color:#fff; background:var(--lime); box-shadow:0 10px 24px rgba(115,159,18,.22); }
+      .頂導 { min-height: 3.4rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.2rem 0 .7rem; }
+      .品牌 { display:flex; align-items:center; gap:.72rem; font-size:1rem; font-weight:950; letter-spacing:-.02em; }
+      .品牌文字 { display:flex; flex-direction:column; gap:.05rem; }
+      .品牌文字 small { color:rgba(20,40,43,.46); font-size:.54rem; font-weight:850; letter-spacing:.14em; }
+      .品牌名稱 { display:flex; align-items:center; gap:.42rem; }
+      .專業標 { padding:.13rem .34rem; border-radius:.32rem; background:var(--deep); color:#d9ff83; font-size:.52rem; font-weight:950; letter-spacing:.08em; }
+      .品牌記號 { position:relative; display:grid; place-items:center; width:2.25rem; height:2.25rem; border-radius:.76rem; color:#dfff8f; background:var(--deep); box-shadow:0 10px 24px rgba(16,37,40,.2); }
+      .品牌記號::after { content:""; position:absolute; right:.28rem; top:.28rem; width:.35rem; height:.35rem; border-radius:50%; background:var(--lime); box-shadow:0 0 0 3px rgba(145,201,40,.16); }
       .同步徽章 { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .65rem; border:1px solid rgba(34,125,130,.18); border-radius:999px; background:#eef8f5; color:#246d70; font-size:.72rem; font-weight:850; }
       .同步點 { width:.42rem; height:.42rem; border-radius:50%; background:#2fb678; box-shadow:0 0 10px rgba(47,182,120,.35); }
 
@@ -448,18 +455,49 @@ st.markdown(
       div[role="radiogroup"] label:has(input:checked) { color:#173032; background:#dff49e; box-shadow:0 8px 20px rgba(115,159,18,.12); }
       label[data-testid="stRadioOption"] > div > div > div:first-child { display:none; }
 
-      .主視覺 { position:relative; overflow:hidden; margin:1rem 0 1.25rem; padding:1.45rem 1.7rem; border:1px solid rgba(83,131,63,.18); border-radius:1.4rem; background:linear-gradient(135deg, #ffffff, #f2f8e8 58%, #e9f4e1); box-shadow:0 16px 38px rgba(45,79,58,.08); }
+      .主視覺 { position:relative; overflow:hidden; min-height:245px; display:flex; flex-direction:column; justify-content:center; margin:1rem 0 1.25rem; padding:1.55rem 1.75rem; border:1px solid rgba(83,131,63,.18); border-radius:1.45rem; background:linear-gradient(135deg, #ffffff, #f2f8e9 58%, #e8f4df); box-shadow:var(--shadow); }
       .主視覺::after { content:""; position:absolute; width:20rem; height:20rem; right:-7rem; top:-10rem; border-radius:50%; background:rgba(151,201,61,.16); filter:blur(24px); pointer-events:none; }
       .主標 { position:relative; z-index:1; font-size:clamp(1.85rem, 4vw, 3rem); line-height:1.06; font-weight:950; letter-spacing:-.05em; max-width:920px; margin:.25rem 0 .65rem; text-wrap:balance; }
       .主標 span { color:var(--lime); }
       .說明 { position:relative; z-index:1; margin:0; color:var(--muted); max-width:820px; line-height:1.75; font-size:.95rem; font-weight:560; }
       .小標 { position:relative; z-index:1; color:var(--lime); font-size:.72rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
-      .主視覺徽章 { display:inline-flex; margin-top:.8rem; padding:.34rem .62rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
+      .主視覺徽章 { display:inline-flex; align-self:flex-start; margin-top:.9rem; padding:.38rem .68rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
       [data-testid="stImage"] { height:100%; margin:1rem 0 1.25rem; }
       [data-testid="stImage"] img { width:100%; height:100%; min-height:220px; max-height:245px; object-fit:cover; object-position:68% center; border:1px solid rgba(29,73,63,.14); border-radius:1.4rem; box-shadow:0 16px 38px rgba(45,79,58,.1); }
       .信任列 { display:flex; flex-wrap:wrap; gap:.45rem; margin:-.35rem 0 1.1rem; }
       .信任列 span { display:inline-flex; align-items:center; gap:.35rem; padding:.38rem .62rem; border:1px solid var(--line); border-radius:999px; background:#fff; color:rgba(23,48,50,.64); font-size:.68rem; font-weight:820; }
       .信任列 b { color:#557d08; }
+
+      .決策台 { overflow:hidden; margin:.25rem 0 1.2rem; border:1px solid rgba(16,37,40,.22); border-radius:1.35rem; background:var(--deep); color:#fff; box-shadow:0 22px 52px rgba(16,37,40,.17); }
+      .決策台頭 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; padding:.8rem 1.15rem; border-bottom:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.58); font-size:.62rem; font-weight:900; letter-spacing:.12em; }
+      .決策信心 { display:inline-flex; align-items:center; gap:.35rem; color:#dfff8f; letter-spacing:0; }
+      .決策信心::before { content:""; width:.4rem; height:.4rem; border-radius:50%; background:#a5e23c; box-shadow:0 0 12px rgba(165,226,60,.7); }
+      .決策台格 { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr); }
+      .今日指令 { padding:1.35rem 1.45rem 1.45rem; border-right:1px solid rgba(255,255,255,.1); background:radial-gradient(700px 250px at 20% 0%, rgba(145,201,40,.13), transparent 58%); }
+      .今日指令 small { color:#dfff8f; font-size:.62rem; font-weight:950; letter-spacing:.12em; }
+      .今日指令 h3 { margin:.42rem 0 .45rem; color:#fff !important; font-size:clamp(1.25rem,2.2vw,1.7rem); line-height:1.25; }
+      .今日結論 { margin:.15rem 0 .9rem; color:rgba(255,255,255,.72); font-size:.86rem; line-height:1.6; }
+      .今日步驟 { display:flex; flex-wrap:wrap; gap:.42rem; margin-top:.75rem; }
+      .今日步驟 span { padding:.38rem .55rem; border:1px solid rgba(255,255,255,.1); border-radius:.55rem; background:rgba(255,255,255,.06); color:rgba(255,255,255,.78); font-size:.68rem; font-weight:750; }
+      .決策側欄 { display:grid; grid-template-rows:repeat(3,1fr); }
+      .決策訊號 { padding:.85rem 1rem; border-bottom:1px solid rgba(255,255,255,.1); }
+      .決策訊號:last-child { border-bottom:0; }
+      .決策訊號 small { color:rgba(255,255,255,.45); font-size:.58rem; font-weight:900; letter-spacing:.09em; }
+      .決策訊號 strong { display:block; margin:.22rem 0 .16rem; color:#fff; font-size:.8rem; }
+      .決策訊號 span { color:rgba(255,255,255,.58); font-size:.66rem; line-height:1.45; }
+
+      .價值主張 { margin:1.35rem 0 1.1rem; padding:1.35rem 1.4rem; border:1px solid rgba(20,40,43,.12); border-radius:1.25rem; background:#fff; box-shadow:var(--shadow); }
+      .價值頭 { display:flex; align-items:flex-end; justify-content:space-between; gap:1.2rem; margin-bottom:.95rem; }
+      .價值頭 small { color:var(--lime-strong); font-size:.62rem; font-weight:950; letter-spacing:.13em; }
+      .價值頭 h3 { margin:.28rem 0 0; font-size:clamp(1.15rem,2.4vw,1.55rem); }
+      .價值頭 p { max-width:450px; margin:0; color:var(--muted); font-size:.74rem; line-height:1.55; text-align:right; }
+      .價值格 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; }
+      .價值項 { padding:.9rem; border:1px solid var(--line); border-radius:.85rem; background:#f8faf6; }
+      .價值項 b { display:block; color:var(--ink); font-size:.8rem; }
+      .價值項 strong { display:block; margin:.28rem 0 .24rem; color:var(--lime-strong); font-size:1.12rem; letter-spacing:-.03em; }
+      .價值項 span { color:rgba(20,40,43,.58); font-size:.66rem; line-height:1.5; }
+      .方法條 { display:flex; flex-wrap:wrap; gap:.42rem; margin-top:.72rem; padding-top:.72rem; border-top:1px solid var(--line); }
+      .方法條 span { padding:.28rem .48rem; border-radius:999px; background:#eef6ec; color:rgba(20,40,43,.62); font-size:.62rem; font-weight:800; }
 
       .重點速覽 { padding:1.3rem 1.4rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(145deg,#ffffff,#f5faec); box-shadow:0 12px 30px rgba(39,72,61,.06); }
       .速覽頂列 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; color:rgba(23,48,50,.5); font-size:.68rem; font-weight:800; }
@@ -505,6 +543,10 @@ st.markdown(
       .建議框 > div { padding:.9rem 1rem; border-radius:.9rem; background:#f3f8ed; color:rgba(23,48,50,.74); font-size:.78rem; line-height:1.55; }
       .建議框 > div:last-child { background:#fff5e8; color:#7c470f; }
       .建議框 b { display:block; margin-bottom:.25rem; color:var(--ink); }
+      .安全健檢 { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin:0 0 1rem; padding:.9rem 1rem; border:1px solid rgba(34,125,130,.17); border-radius:.95rem; background:#f1f8f6; }
+      .安全健檢 strong { display:block; color:var(--ink); font-size:.82rem; }
+      .安全健檢 span { display:block; margin-top:.18rem; color:rgba(20,40,43,.62); font-size:.7rem; line-height:1.45; }
+      .安全徽章 { flex:0 0 auto; padding:.34rem .55rem; border-radius:999px; background:#dff4e7; color:#24734d !important; font-size:.62rem !important; font-weight:900; }
 
       .配置總覽 { min-height:14rem; padding:1.05rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
       .配置總覽 small { color:#227d82; font-weight:850; }
@@ -582,6 +624,7 @@ st.markdown(
         .速覽清單 { grid-template-columns:1fr; }
         .獎勵格 { grid-template-columns:1fr; }
         .優先格 { grid-template-columns:1fr; }
+        .價值格 { grid-template-columns:repeat(2,minmax(0,1fr)); }
       }
       @media (max-width: 640px) {
         [data-testid="stHeader"] { height:1.4rem; }
@@ -603,6 +646,17 @@ st.markdown(
         [data-testid="stImage"] { display:none; }
         .建議框 { grid-template-columns:1fr; }
         .配置總覽 { min-height:0; }
+        .安全健檢 { align-items:flex-start; }
+        .決策台格 { grid-template-columns:1fr; }
+        .今日指令 { border-right:0; border-bottom:1px solid rgba(255,255,255,.1); }
+        .決策側欄 { grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+        .決策訊號 { border-right:1px solid rgba(255,255,255,.1); }
+        .決策訊號:nth-child(2) { border-right:0; }
+        .決策訊號:last-child { grid-column:1 / -1; border-top:1px solid rgba(255,255,255,.1); }
+        .價值頭 { display:block; }
+        .價值頭 p { margin-top:.45rem; text-align:left; }
+        .價值格 { grid-template-columns:1fr 1fr; }
+        .價值項 { padding:.78rem; }
       }
     </style>
     """,
@@ -612,7 +666,10 @@ st.markdown(
 st.markdown(
     """
     <div class="頂導">
-      <div class="品牌"><span class="品牌記號">噠</span><span>噠噠攻略站</span></div>
+      <div class="品牌">
+        <span class="品牌記號">噠</span>
+        <span class="品牌文字"><span class="品牌名稱">噠噠攻略站 <b class="專業標">PRO</b></span><small>SURVIVOR.IO DECISION INTELLIGENCE</small></span>
+      </div>
       <div class="同步徽章"><span class="同步點"></span>資料每 15 分鐘自動同步</div>
     </div>
     """,
@@ -637,7 +694,7 @@ else:
     頁面 = "首頁"
 
 頁面主視覺 = {
-    "首頁": ("PRO DECISION HUB", "今天該做什麼，<br><span>三十秒做對決定。</span>", "即時活動、終局養成與完整資料庫集中在同一套決策流程；先看結論，再查完整依據。"),
+    "首頁": ("SURVIVOR.IO META INTELLIGENCE", "每一顆寶石，<br><span>都有可驗證的理由。</span>", "把活動進度、帳號階段與終局斷點，轉成今天可以直接執行的一個決策。不是照抄榜單，而是依你的狀態算出答案。"),
     "活動最佳解": ("活動決策中心", "先算完免費進度，<br><span>再決定要不要補。</span>", "選活動、填進度，直接得到補鑽上限、寶石安全線與兌換優先級。"),
     "帳號診斷": ("個人化養成路線", "先找到最大缺口，<br><span>再集中跨過斷點。</span>", "依模式、裝備階段與稀缺資源，整理現在最該做的三件事。"),
     "終局配裝": ("終局實戰配置", "不是只有一套神裝，<br><span>模式不同，答案就不同。</span>", "把首領、區域行動與高速清怪拆開判斷，避免用錯配置。"),
@@ -652,7 +709,7 @@ else:
       <div class="小標">{視覺小標}</div>
       <div class="主標">{視覺標題}</div>
       <p class="說明">{視覺說明}</p>
-      <span class="主視覺徽章">繁體中文・終局玩家版・每筆資料標記狀態</span>
+      <span class="主視覺徽章">不是 Tier List｜是依版本、模式與帳號斷點計算的決策系統</span>
     </section>
     """
 if 頁面 == "首頁":
@@ -668,18 +725,51 @@ if 頁面 == "首頁":
     全部文章首頁, 首頁即時 = 取得完整文章庫()
     首頁活動文章 = [item for item in 全部文章首頁 if item["category"] == "活動攻略"]
     首頁收藏圖鑑 = 取得收藏圖鑑()
+    首頁活動 = 首頁活動文章[0] if 首頁活動文章 else None
+    首頁活動模型 = match_event_playbook(首頁活動["title"]) if 首頁活動 else None
 
     st.markdown(
         f'<div class="信任列"><span><b>{官方版本資訊["版本"]}</b> 版本追蹤</span>'
         f'<span><b>{len(全部文章首頁)}</b> 篇來源攻略</span><span><b>{len(首頁活動文章)}</b> 篇活動資料</span>'
-        f'<span><b>{len(首頁收藏圖鑑)}</b> 件收藏圖鑑</span><span><b>{"即時" if 首頁即時 else "備援"}</b> 資料模式</span></div>',
+        f'<span><b>{len(首頁收藏圖鑑)}</b> 件收藏圖鑑</span><span><b>{"即時" if 首頁即時 else "備援"}</b> 資料模式</span><span><b>0</b> 密碼需求</span></div>',
         unsafe_allow_html=True,
     )
 
-    st.header("今天只看這裡")
-    if 首頁活動文章:
-        首頁活動 = 首頁活動文章[0]
-        首頁活動模型 = match_event_playbook(首頁活動["title"])
+    if 首頁活動 and 首頁活動模型:
+        今日步驟 = "".join(
+            f'<span>{index:02d}　{html.escape(str(step))}</span>'
+            for index, step in enumerate(首頁活動模型["steps"][:3], 1)
+        )
+        st.markdown(
+            f"""
+            <section class="決策台">
+              <div class="決策台頭"><span>LIVE PLAYER COMMAND CENTER</span><span class="決策信心">來源已同步・版本已標記</span></div>
+              <div class="決策台格">
+                <article class="今日指令">
+                  <small>TODAY'S MOVE・今天只做對這件事</small>
+                  <h3>{html.escape(str(首頁活動['title']))}</h3>
+                  <p class="今日結論">{html.escape(str(首頁活動模型.get('verdict') or 首頁活動模型['free_hint']))}</p>
+                  <div class="今日步驟">{今日步驟}</div>
+                </article>
+                <aside class="決策側欄">
+                  <div class="決策訊號"><small>ACCOUNT ROADMAP</small><strong>四個狀態，一條資源路線</strong><span>主位、混沌、模式、支援鏈一起判斷</span></div>
+                  <div class="決策訊號"><small>BUILD LAB</small><strong>三種模式分開配裝</strong><span>短場、長場與區域行動不再互相誤用</span></div>
+                  <div class="決策訊號"><small>DATA CONFIDENCE</small><strong>{'即時' if 首頁即時 else '備援'}資料・{官方版本資訊['版本']}</strong><span>每筆攻略保留日期、狀態與原始來源</span></div>
+                </aside>
+              </div>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        指揮操作一, 指揮操作二 = st.columns([1.15, 0.85])
+        with 指揮操作一:
+            st.button("立即算我的活動停損線", type="primary", width="stretch", on_click=切換主頁面, args=("活動",))
+        with 指揮操作二:
+            st.button("建立我的終局養成路線", width="stretch", on_click=切換主頁面, args=("養成", "帳號診斷"))
+
+    st.header("本期活動完整作戰簡報")
+    st.caption("先看結論，再展開 16 項完整依據；真正投入資源前可進入活動頁用帳號數字精算。")
+    if 首頁活動 and 首頁活動模型:
         顯示活動重點(首頁活動["title"], 首頁活動["date"], 首頁活動模型, "目前活動 · 30 秒攻略")
         活動操作, 原文操作 = st.columns(2)
         with 活動操作:
@@ -707,6 +797,25 @@ if 頁面 == "首頁":
         st.button("進行帳號診斷", width="stretch", on_click=切換主頁面, args=("養成", "帳號診斷"))
     with 入口三:
         st.button("搜尋完整資料", width="stretch", on_click=切換主頁面, args=("資料庫", "完整攻略庫"))
+
+    st.markdown(
+        f"""
+        <section class="價值主張">
+          <div class="價值頭">
+            <div><small>WHY PLAYERS KEEP IT OPEN</small><h3>玩家需要的不是更多文章，而是更少錯誤決策。</h3></div>
+            <p>每個答案都從同一條路徑產生：先確認版本與帳號狀態，再計算成本，最後給出可停手的明確界線。</p>
+          </div>
+          <div class="價值格">
+            <div class="價值項"><b>活動情報密度</b><strong>16 項重點</strong><span>免費來源、最佳里程碑、操作順序與商店優先級一次看完</span></div>
+            <div class="價值項"><b>個人化停損</b><strong>7 個數字 → 1 結論</strong><span>同時計算免費期末進度、補鑽成本、寶石安全線與獎勵價值</span></div>
+            <div class="價值項"><b>終局情境配置</b><strong>3 套實戰模型</strong><span>首領短場、長場疊層與區域詞條各自獨立判斷</span></div>
+            <div class="價值項"><b>可追溯資料</b><strong>{len(全部文章首頁)}＋{len(首頁收藏圖鑑)}</strong><span>來源攻略與收藏圖鑑集中搜尋，保留日期、版本狀態與原文</span></div>
+          </div>
+          <div class="方法條"><span>免費進度投影</span><span>寶石安全線</span><span>帳號價值上限</span><span>裝備斷點</span><span>模式 A/B 驗證</span><span>版本風險標記</span></div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
     最新區, 版本區 = st.columns([1.35, 0.65])
     with 最新區:
@@ -852,6 +961,19 @@ elif 頁面 == "活動最佳解":
 elif 頁面 == "帳號診斷":
     st.header("終局帳號診斷：四個狀態，直接決定下一步")
     st.caption("選項變更後會自動重算；先確認不含場內觸發的基礎暴率，以及角色實際覺醒階級。")
+    st.markdown(
+        '<section class="安全健檢"><div><strong>完整健檢不需要帳號密碼</strong><span>自行登入遊戲後提供角色／裝備、科技配件、寵物、收藏、核心與寶石頁面即可判斷；不要把登入資料交給任何攻略服務。</span></div><span class="安全徽章">PRIVACY FIRST</span></section>',
+        unsafe_allow_html=True,
+    )
+    with st.expander("深度帳號健檢：建議準備的 6 組截圖"):
+        st.markdown(
+            "1. **角色與主位**：角色列表、主力角色覺醒階級、基礎暴擊率\n"
+            "2. **裝備與神器**：六個裝備欄、神鑄／雙生階級、剩餘神器核心\n"
+            "3. **科技配件**：三攻三防、諧振與雙生配件階級\n"
+            "4. **寵物系統**：主戰、助戰、覺醒與共鳴技能\n"
+            "5. **收藏系統**：套裝進度、傳奇收藏、自選箱與碎片\n"
+            "6. **資源與目標**：寶石、鑰匙、通用碎片，以及最想突破的模式"
+        )
     col1, col2 = st.columns(2)
     with col1:
         主位階段 = st.selectbox(
