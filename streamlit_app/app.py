@@ -306,6 +306,47 @@ def 顯示攻略卡片(item: dict) -> None:
         st.link_button("核對原始文章", item["來源"], use_container_width=True)
 
 
+def 取得活動重點(活動模型: dict) -> list[tuple[str, str]]:
+    if 活動模型.get("highlights"):
+        return [(str(label), str(content)) for label, content in 活動模型["highlights"]]
+
+    目標 = int(活動模型.get("target", 0))
+    單位 = str(活動模型.get("unit", "活動進度"))
+    推薦進度 = f"先以 {目標:,} {單位}作為主要停損點，達標後先停手。" if 目標 > 0 else "先做完免費任務，最後一天再依獎勵價值決定是否補差額。"
+    步驟 = [str(step) for step in 活動模型.get("steps", [])]
+    操作順序 = " → ".join(步驟[:2]) if 步驟 else "先拿免費資源，再比較目標缺口。"
+    收尾策略 = 步驟[-1] if 步驟 else str(活動模型.get("avoid", "達標後停手。"))
+    return [
+        ("免費資源", str(活動模型.get("free_hint", "先完成所有免費任務。"))),
+        ("推薦進度", 推薦進度),
+        ("操作順序", 操作順序),
+        ("收尾策略", 收尾策略),
+    ]
+
+
+def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str = "30 秒攻略") -> None:
+    重點項目 = "".join(
+        f'<div class="速覽項"><span class="速覽號">{index}</span><div><strong>{html.escape(label)}</strong><p>{html.escape(content)}</p></div></div>'
+        for index, (label, content) in enumerate(取得活動重點(活動模型), 1)
+    )
+    結論 = str(
+        活動模型.get("verdict")
+        or (f"先把免費進度跑完，只補到 {int(活動模型['target']):,} {活動模型['unit']}。" if int(活動模型.get("target", 0)) > 0 else "先做完免費任務，最後一天再決定是否投入。")
+    )
+    st.markdown(
+        f"""
+        <section class="重點速覽">
+          <div class="速覽頂列"><span class="速覽徽章">{html.escape(狀態)}</span><span>{html.escape(日期)}</span></div>
+          <h3>{html.escape(標題)}</h3>
+          <p class="速覽結論"><b>結論</b>{html.escape(結論)}</p>
+          <div class="速覽清單">{重點項目}</div>
+          <p class="速覽停損"><b>停損提醒</b>{html.escape(str(活動模型['avoid']))}</p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 st.markdown(
     """
     <style>
@@ -360,12 +401,19 @@ st.markdown(
       .小標 { position:relative; z-index:1; color:var(--lime); font-size:.72rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
       .主視覺徽章 { display:inline-flex; margin-top:.8rem; padding:.34rem .62rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
 
-      .首頁焦點 { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(230px,.65fr); gap:1rem; padding:1.35rem 1.45rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(135deg,#ffffff,#f3f9e8); box-shadow:0 12px 30px rgba(39,72,61,.06); }
-      .首頁焦點 h3 { margin:.35rem 0 .5rem; font-size:1.35rem; line-height:1.35; }
-      .首頁焦點 p { margin:0; max-width:760px; font-size:.86rem; line-height:1.65; }
-      .焦點步驟 { display:grid; align-content:center; gap:.45rem; }
-      .焦點步驟 span { display:flex; gap:.55rem; align-items:center; padding:.55rem .65rem; border-radius:.75rem; background:rgba(255,255,255,.82); color:rgba(23,48,50,.75); font-size:.76rem; font-weight:760; }
-      .焦點步驟 b { display:grid; place-items:center; flex:0 0 auto; width:1.15rem; height:1.15rem; border-radius:50%; background:var(--lime); color:#fff; font-size:.62rem; }
+      .重點速覽 { padding:1.3rem 1.4rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(145deg,#ffffff,#f5faec); box-shadow:0 12px 30px rgba(39,72,61,.06); }
+      .速覽頂列 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; color:rgba(23,48,50,.5); font-size:.68rem; font-weight:800; }
+      .速覽徽章 { padding:.28rem .55rem; border-radius:999px; background:var(--lime); color:#fff; letter-spacing:.08em; }
+      .重點速覽 h3 { margin:.65rem 0 .7rem; font-size:clamp(1.15rem,2.5vw,1.55rem); line-height:1.38; }
+      .速覽結論 { display:flex; gap:.65rem; align-items:flex-start; margin:0 0 .9rem; padding:.75rem .85rem; border-radius:.8rem; background:#edf7d8; color:#31530e; font-size:.86rem; line-height:1.55; }
+      .速覽結論 b, .速覽停損 b { flex:0 0 auto; color:#557d08; }
+      .速覽清單 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
+      .速覽項 { display:grid; grid-template-columns:auto 1fr; gap:.7rem; align-items:flex-start; min-height:5.5rem; padding:.85rem; border:1px solid var(--line); border-radius:.9rem; background:#fff; }
+      .速覽號 { display:grid; place-items:center; width:1.55rem; height:1.55rem; border-radius:.5rem; background:#227d82; color:#fff; font-size:.72rem; font-weight:950; box-shadow:0 7px 14px rgba(34,125,130,.16); }
+      .速覽項 strong { display:block; margin:.05rem 0 .25rem; color:var(--ink); font-size:.8rem; }
+      .速覽項 p { margin:0; color:rgba(23,48,50,.68); font-size:.76rem; line-height:1.55; }
+      .速覽停損 { display:flex; gap:.65rem; margin:.8rem 0 0; padding-top:.8rem; border-top:1px solid var(--line); color:#8a510f; font-size:.76rem; line-height:1.5; }
+      .速覽停損 b { color:#a65c0b; }
       .快捷格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin:.65rem 0 1.2rem; }
       .快捷卡 { min-height:8.4rem; padding:1rem 1.05rem; border:1px solid var(--line); border-radius:1rem; background:#ffffff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
       .快捷卡 strong { display:block; margin:.25rem 0 .45rem; color:var(--ink); font-size:1.02rem; }
@@ -445,7 +493,7 @@ st.markdown(
         .block-container { padding:1rem 1rem 3rem; }
         .主視覺 { padding:1.3rem 1.25rem; border-radius:1.2rem; }
         .主標 { font-size:clamp(1.8rem, 7vw, 2.6rem); }
-        .首頁焦點 { grid-template-columns:1fr; }
+        .速覽清單 { grid-template-columns:1fr; }
         .策略卡 { grid-template-columns:1fr; }
         .步驟列 { grid-template-columns:1fr; }
         .獎勵格 { grid-template-columns:1fr; }
@@ -459,6 +507,10 @@ st.markdown(
         div[role="radiogroup"] label { min-width:0; padding:.55rem .35rem; font-size:.7rem; }
         .主視覺 { margin:1rem 0; }
         .說明 { font-size:.84rem; }
+        .重點速覽 { padding:1rem; }
+        .速覽項 { min-height:0; }
+        .速覽結論, .速覽停損 { display:block; }
+        .速覽結論 b, .速覽停損 b { display:block; margin-bottom:.25rem; }
         .快捷格 { grid-template-columns:1fr; }
         .快捷卡 { min-height:0; }
       }
@@ -526,23 +578,7 @@ if 頁面 == "首頁":
     if 首頁活動文章:
         首頁活動 = 首頁活動文章[0]
         首頁活動模型 = match_event_playbook(首頁活動["title"])
-        首頁步驟 = "".join(
-            f'<span><b>{index}</b>{html.escape(str(step))}</span>'
-            for index, step in enumerate(首頁活動模型["steps"][:3], 1)
-        )
-        st.markdown(
-            f"""
-            <article class="首頁焦點">
-              <div>
-                <div class="資料標籤">{html.escape(str(首頁活動['date']))}　·　目前優先活動</div>
-                <h3>{html.escape(str(首頁活動['title']))}</h3>
-                <p>{html.escape(str(首頁活動.get('excerpt') or 首頁活動模型['mechanic']))}</p>
-              </div>
-              <div class="焦點步驟">{首頁步驟}</div>
-            </article>
-            """,
-            unsafe_allow_html=True,
-        )
+        顯示活動重點(首頁活動["title"], 首頁活動["date"], 首頁活動模型, "目前活動 · 30 秒攻略")
         st.link_button("閱讀目前活動攻略", 首頁活動["link"])
     else:
         st.info("活動來源暫時無法連線；活動試算與既有攻略仍可正常使用。")
@@ -599,44 +635,25 @@ elif 頁面 == "活動最佳解":
         }
     活動模型 = match_event_playbook(已選活動["title"])
 
-    info1, info2, info3 = st.columns(3)
-    info1.metric("同步攻略", f"{len(全部文章)} 篇" if 文章即時 else "備援模式")
-    info2.metric("偵測活動攻略", f"{len(活動文章)} 篇")
-    info3.metric("套用模型", 活動模型["name"])
-    活動標題安全 = html.escape(str(已選活動["title"]))
-    活動日期安全 = html.escape(str(已選活動["date"]))
-    活動狀態安全 = html.escape(str(已選活動.get("freshness", "待核對")))
-    活動摘要安全 = html.escape(str(已選活動.get("excerpt") or 活動模型["mechanic"]))
-    st.markdown(
-        f"""
-        <article class="活動焦點">
-          <div class="資料標籤">{活動日期安全}　·　{活動狀態安全}</div>
-          <h3>{活動標題安全}</h3>
-          <p>{活動摘要安全}</p>
-        </article>
-        """,
-        unsafe_allow_html=True,
+    顯示活動重點(
+        str(已選活動["title"]),
+        str(已選活動["date"]),
+        活動模型,
+        f"{已選活動.get('freshness', '待核對')} · 30 秒攻略",
+    )
+    st.caption(
+        f"已同步 {len(全部文章)} 篇來源攻略｜其中 {len(活動文章)} 篇活動攻略｜自動套用：{活動模型['name']}"
+        if 文章即時
+        else f"來源目前使用備援模式｜自動套用：{活動模型['name']}"
     )
     st.link_button("核對原始活動攻略 ↗", 已選活動["link"])
 
-    st.markdown("### 自動策略")
-    機制安全 = html.escape(str(活動模型["mechanic"]))
-    停損安全 = html.escape(str(活動模型["avoid"]))
-    st.markdown(
-        f"""
-        <div class="策略卡">
-          <div class="策略主體"><strong>核心機制</strong><p>{機制安全}</p></div>
-          <div class="停損卡"><strong>停損提醒</strong><p>{停損安全}</p></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    步驟內容 = "".join(
-        f'<div class="步驟"><b>{index}</b><span>{html.escape(str(step))}</span></div>'
-        for index, step in enumerate(活動模型["steps"], 1)
-    )
-    st.markdown(f'<div class="步驟列">{步驟內容}</div>', unsafe_allow_html=True)
-    st.caption(活動模型["free_hint"])
+    with st.expander("展開詳細玩法與判斷依據"):
+        st.markdown(f"**核心機制：** {活動模型['mechanic']}")
+        for index, step in enumerate(活動模型["steps"], 1):
+            st.markdown(f"{index}. {step}")
+        st.markdown(f"**免費資源依據：** {活動模型['free_hint']}")
+        st.markdown(f"**停損提醒：** {活動模型['avoid']}")
 
     st.markdown("### 用你的帳號數字精算")
     a1, a2, a3 = st.columns(3)
