@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import importlib
 import json
 from datetime import datetime
 from urllib.request import Request, urlopen
@@ -8,15 +9,20 @@ from zoneinfo import ZoneInfo
 
 import streamlit as st
 
-from data_engine import (
-    assess_event_plan,
-    diagnose_account,
-    fetch_source_posts,
-    load_collectible_catalog,
-    match_event_playbook,
-    optimize_player_plan,
-    rank_rewards,
-)
+import data_engine as _data_engine
+
+
+# Streamlit Cloud can hot-reload app.py before a changed helper module. Reloading
+# the helper explicitly prevents a stale module cache from hiding newly deployed
+# functions during that short deployment window.
+_data_engine = importlib.reload(_data_engine)
+assess_event_plan = _data_engine.assess_event_plan
+diagnose_account = _data_engine.diagnose_account
+fetch_source_posts = _data_engine.fetch_source_posts
+load_collectible_catalog = _data_engine.load_collectible_catalog
+match_event_playbook = _data_engine.match_event_playbook
+optimize_player_plan = _data_engine.optimize_player_plan
+rank_rewards = _data_engine.rank_rewards
 
 
 st.set_page_config(
