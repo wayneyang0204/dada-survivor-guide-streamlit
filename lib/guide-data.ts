@@ -35,7 +35,7 @@ export type Guide = {
 
 export const OFFICIAL_UPDATE = {
   version: '5.1.0',
-  checkedAt: '2026-08-29 09:00',
+  checkedAt: '2026-09-01 12:30',
   headline: '四週年慶典持續進行中',
   summary:
     '官方商店版本資訊已加入主線 341–345 章與挑戰章節，足球模式「量子奈米機器人」共鳴超載即將登場。',

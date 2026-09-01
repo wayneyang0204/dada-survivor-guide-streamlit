@@ -25,6 +25,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'music-disc-clash',
+    category: '關卡活動',
+    title: '音樂圓盤大作戰：九百八十進度停損線',
+    updated: '2026/08/30',
+    status: '現行',
+    summary: '本期活動到 9 月 3 日結束。社群實測約可取得九百張免費麥克風，盤面返還會放大實際進度；先跑免費資源，九百八十進度是目前最平衡的停損點。',
+    actions: ['先完成登入、每日任務與免費麥克風', '寶箱先開二百至三百箱，最後一天再補差額', '商店優先換傳奇收藏品自選箱、萬能神火特工碎片與高級收藏之心'],
+    sourceUrl: 'https://notalknote.xyz/survivor-io-music-disc-clash-guide/',
+  },
+  {
     id: 'regional-action-rework',
     category: '最新系統',
     title: '新版區域行動：四大區域與首領戰',
@@ -218,6 +228,11 @@ export const SOURCE_GUIDES: SourceGuide[] = [
 
 export const LATEST_SOURCE_FALLBACK = [
   {
+    title: '音樂圓盤大作戰攻略',
+    date: '2026/08/30',
+    link: 'https://notalknote.xyz/survivor-io-music-disc-clash-guide/',
+  },
+  {
     title: '4週年活動總結與資源投入心得',
     date: '2026/08/28',
     link: 'https://notalknote.xyz/dadasurvivor-4th-anniversary-event-review/',
@@ -241,10 +256,5 @@ export const LATEST_SOURCE_FALLBACK = [
     title: '4週年彩虹礦攻略',
     date: '2026/08/18',
     link: 'https://notalknote.xyz/survivor-io-4th-anniversary-rainbow-mine-event-guide/',
-  },
-  {
-    title: '4週年彩虹棋補償解析',
-    date: '2026/08/16',
-    link: 'https://notalknote.xyz/survivor-io-4th-anniversary-rainbow-chess-400-tickets-pity-compensation-guide/',
   },
 ];
