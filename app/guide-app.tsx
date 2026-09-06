@@ -634,7 +634,7 @@ export default function GuideApp() {
           </div>
           <div className="mt-7 flex flex-col gap-3 rounded-2xl border-2 border-[#0b1f1e]/10 bg-[#f8ffe1]/70 p-4 text-xs font-semibold sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-2xl leading-5 opacity-70">
-              後期帳號請用雙生槍 E4V4、混沌27／36／45、異界轉化與收藏加成做 A/B；神鑄3虛空手套只留給還沒達月痕門檻的過渡。
+              項鍊現在穿破壞者徽記就對了。審判項鍊是混沌36之後、雙生階成形才拿來 A/B，現在換通常會變弱。
             </p>
             <div className="flex flex-wrap gap-2">
               <a

@@ -266,7 +266,7 @@ export default function AccountAdvisor() {
       '27-plus': {
         label: '現在點武器',
         title: '神器核心全部拿去堆混沌36',
-        detail: '打開混沌融合之力，用神器核心點到36（能量雙刀）就停。還沒到36以前：不要改項鍊、腰帶、手套，也不要把神器核心拿去點苦無。',
+        detail: '打開混沌融合之力，用神器核心點到36（能量雙刀）就停。還沒到36以前：項鍊繼續穿破壞者徽記，不要換成審判項鍊，也不要改腰帶、手套。',
         next: '混沌36',
         spend: '神器核心',
         stop: '混沌36',
@@ -274,7 +274,7 @@ export default function AccountAdvisor() {
       '18-26': {
         label: '現在點武器',
         title: '神器核心全部拿去堆混沌27',
-        detail: '打開混沌融合之力，點到27（切月鐮刀）就停。還沒到27以前：不要改項鍊、腰帶。',
+        detail: '打開混沌融合之力，點到27（切月鐮刀）就停。還沒到27以前：項鍊繼續穿破壞者徽記，不要改腰帶。',
         next: '混沌27',
         spend: '神器核心',
         stop: '混沌27',
@@ -339,7 +339,7 @@ export default function AccountAdvisor() {
       },
       long: {
         label: '長場頭目',
-        instruction: '讓混沌27、共鳴、燃燒／虛弱／裂傷完整疊滿；項鍊腰帶只做雙生階 A/B，不退回神鑄3單系。',
+        instruction: '讓混沌27、共鳴、燃燒／虛弱／裂傷完整疊滿；項鍊繼續穿破壞者徽記，等混沌36與審判項鍊雙生階成形再 A/B。',
       },
       zone: {
         label: '區域行動',
@@ -368,7 +368,11 @@ export default function AccountAdvisor() {
     ];
 
     const gear = GEAR_ADVICE[playMode].map((item) => {
-      if (chaosStage !== '27-plus' && (item.slot === '項鍊' || item.slot === '手套' || item.slot === '腰帶')) {
+      if (chaosStage === '27-plus') return item;
+      if (item.slot === '項鍊') {
+        return { ...item, spend: '先不動', freeze: `繼續穿破壞者徽記。混沌${chaos.next}以前不要換成審判項鍊` };
+      }
+      if (item.slot === '手套' || item.slot === '腰帶') {
         return { ...item, spend: '先不動', freeze: `混沌${chaos.next}以前不要改這格` };
       }
       return item;
@@ -533,7 +537,7 @@ export default function AccountAdvisor() {
 
           <div id="gear-plan" className="mt-4 scroll-mt-24 rounded-2xl border border-[#0b1f1e]/12 bg-white/60 p-4 sm:p-5">
             <p className="text-sm font-black">現在穿這六格</p>
-            <p className="mt-1 text-xs font-semibold opacity-50">每一格只寫：現在穿什麼、核心拿去點什麼、沒到以前不要改什麼。</p>
+            <p className="mt-1 text-xs font-semibold opacity-50">項鍊現在穿破壞者徽記就對了。審判項鍊是之後才拿來比的，不是現在該換的。</p>
             <div className="mt-3 overflow-x-auto">
               <table className="w-full min-w-[520px] text-left text-xs">
                 <thead>

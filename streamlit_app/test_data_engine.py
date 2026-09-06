@@ -115,6 +115,7 @@ def test_account_diagnosis_covers_late_weapon_and_systems() -> None:
     assert "手套" in result["priorities"][2]["detail"]
     assert "覺醒5" in result["priorities"][2]["detail"]
     assert result["gear"][0]["slot"] == "武器"
+    assert result["gear"][1]["wear"].startswith("破壞者徽記")
     assert len(result["gear"]) == 6
     assert result["collectibles"][0]["name"] == "星際躍遷矩陣圖紙"
     assert result["collectibles"][0]["stop"] == "紅3"
