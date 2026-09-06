@@ -46,27 +46,27 @@ const mainOptions: { value: MainStage; label: string; hint: string }[] = [
   {
     value: 'venato-a7',
     label: '維納托覺醒7階以上＋塔洛莎覺醒4階協同',
-    hint: '後期帳號：下一刀是覺醒8與協同',
+    hint: '現在該點：維納托覺醒8',
   },
   {
     value: 'venato',
     label: '維納托覺醒5～6階＋塔洛莎覺醒4階以上',
-    hint: '已轉主位，下一刀是覺醒7',
+    hint: '現在該點：維納托覺醒7',
   },
   {
     value: 'taloxa-r5',
     label: '塔洛莎覺醒5階以上、基礎暴率70%以上',
-    hint: '還沒轉維納托的成熟帳號',
+    hint: '現在先存，不要半套轉職',
   },
   {
     value: 'taloxa-building',
     label: '塔洛莎覺醒1至4階／暴率未滿70%',
-    hint: '還在建立第一個主位門檻',
+    hint: '現在該點：塔洛莎覺醒5',
   },
   {
     value: 'unsure',
     label: '都未達／我不確定',
-    hint: '採用保守投資路線',
+    hint: '先對三個數字再花資源',
   },
 ];
 
@@ -74,30 +74,30 @@ const weaponOptions: { value: WeaponStage; label: string; hint: string }[] = [
   {
     value: 'e4-xt',
     label: '雙生槍永恆4＋虛空4，已開異界轉化',
-    hint: '後期武器骨架',
+    hint: '雙生槍夠了，神器核心改堆混沌',
   },
   {
     value: 'e3v2',
     label: '雙生槍永恆3＋虛空2以上，未滿 E4V4',
-    hint: '下一刀是異界轉化',
+    hint: '現在該點：永恆4＋虛空4',
   },
   {
     value: 'e1v2',
     label: '雙生槍永恆1＋虛空2 骨架',
-    hint: '只解決進化速度',
+    hint: '現在該點：永恆3＋虛空2',
   },
   {
     value: 'pre',
     label: '還在用苦無／虛空之力／未達雙生槍',
-    hint: '武器線仍在開荒',
+    hint: '現在先做出雙生槍',
   },
 ];
 
 const chaosOptions: { value: ChaosStage; label: string; hint: string }[] = [
-  { value: '27-plus', label: '27以上（切月鐮刀）', hint: '後期武器進化線' },
-  { value: '18-26', label: '18至26（神罰之斧）', hint: '下一刀是27' },
-  { value: '9-17', label: '9至17（混沌之風）', hint: '下一站是18' },
-  { value: 'below-9', label: '未滿9／不確定', hint: '先補基本門檻' },
+  { value: '27-plus', label: '27以上（切月鐮刀）', hint: '現在該點：混沌36' },
+  { value: '18-26', label: '18至26（神罰之斧）', hint: '現在該點：混沌27' },
+  { value: '9-17', label: '9至17（混沌之風）', hint: '現在該點：混沌18' },
+  { value: 'below-9', label: '未滿9／不確定', hint: '現在該點：混沌9' },
 ];
 
 const modeOptions: { value: PlayMode; label: string; hint: string }[] = [
@@ -110,10 +110,10 @@ const divineOptions: { value: DivineStage; label: string; hint: string }[] = [
   {
     value: 'complete',
     label: '哪吒覺醒2階以上＋伏爾坎覺醒1階以上',
-    hint: '神火支援鏈完整',
+    hint: '神火先維持，核心不要改投',
   },
-  { value: 'nezha', label: '只有哪吒', hint: '伏爾坎排在主位門檻之後' },
-  { value: 'none', label: '都沒有／不確定', hint: '先跳過神火投資' },
+  { value: 'nezha', label: '只有哪吒', hint: '伏爾坎先不要點' },
+  { value: 'none', label: '都沒有／不確定', hint: '神火這條先跳過' },
 ];
 
 function ChoiceGroup<T extends string>({
@@ -184,122 +184,153 @@ export default function AccountAdvisor() {
 
     const main = {
       'venato-a7': {
-        phase: '覺醒8與協同成形期',
-        title: '維納托已過覺醒7，改推覺醒8與協同乘區',
-        reason: '首領傷害+60%已經到手。角色計畫若還停在覺醒5轉職或塔洛莎養成，會把後期帳號拉回前期。',
-        actionTitle: '推維納托覺醒8，並補滿現役協同',
-        action: '覺醒8解鎖第四連攜槽與每層額外6%傷害。左協同優先梅塔莉亞覺醒1以上，右協同楊大師覺醒1以上；塔洛莎維持覺醒4以上提供裂傷。',
-        avoid: '不要把通用覺醒核心再砸進第二個主位，也不要為了同調等級拆掉塔洛莎裂傷門檻。',
-        switchCondition: '覺醒8完成後，角色主線改比協同紅星與連攜被動，不再回頭練過渡主位。',
+        phase: '現在只做三件事',
+        title: '覺醒核心點維納托到8，神器核心點混沌到36',
+        reason: '一次只追一個數字。角色停在覺醒8、武器停在混沌36、異寵停在幽冥覺醒5。沒到這三個數字以前，不要改裝備，也不要練第二個主位。',
+        actionTitle: '覺醒核心全部拿去點維納托覺醒8',
+        stop: '維納托覺醒8',
+        action: '打開維納托，把覺醒核心一直點到畫面顯示覺醒8。還沒到8以前：不要點梅塔莉亞、不要點楊大師、不要開第二主位、不要拆塔洛莎覺醒4。',
+        avoid: '不要把覺醒核心分給其他角色，也不要為了同調拆掉塔洛莎覺醒4。',
+        switchCondition: '維納托覺醒8點上後，剩下的覺醒核心才拿去點左協同梅塔莉亞覺醒1、右協同楊大師覺醒1。',
       },
       venato: {
-        phase: '轉主位後的覺醒7斷點',
-        title: '維納托主位已成立，下一刀是覺醒7',
-        reason: '覺醒5只是轉換門檻，還不是後期天花板。覺醒7才會拿到首領+60%，並把強化腎上腺素初始等級拉到5。',
-        actionTitle: '先把維納托推到覺醒7',
-        action: '通用角色資源只服務維納托覺醒7；塔洛莎維持覺醒4以上，不要拆掉裂傷協同。',
+        phase: '現在只追一個數字',
+        title: '覺醒核心只點維納托，點到覺醒7停',
+        reason: '覺醒5只代表可以轉主位。現在唯一要做的是把維納托點到覺醒7。',
+        actionTitle: '覺醒核心全部拿去點維納托覺醒7',
+        stop: '維納托覺醒7',
+        action: '打開維納托，點到覺醒7就停。還沒到7以前：不要點別人、不要拆塔洛莎覺醒4。',
         avoid: '不要在覺醒7以前改練第二主位，也不要把覺醒核心平均分給不上場角色。',
-        switchCondition: '覺醒7完成後，角色計畫改成覺醒8、左協同梅塔莉亞與右協同楊大師。',
+        switchCondition: '覺醒7點上後，下一檔才是維納托覺醒8。',
       },
       'taloxa-r5': {
-        phase: '轉職準備期',
-        title: '塔洛莎繼續主位，暫時不要轉維納托',
-        reason: '低覺醒維納托不會自動更強；現在轉換會同時失去成熟主位與高階協同。',
-        actionTitle: '維持塔洛莎主位',
-        action: '先存到能一次完成覺醒5階維納托，並同時保留覺醒4階塔洛莎，再一次轉換。',
+        phase: '現在先存，不要轉',
+        title: '繼續用塔洛莎，先存滿維納托覺醒5',
+        reason: '半套轉職會變弱。存到能一次點完維納托覺醒5，並且塔洛莎還留得住覺醒4，再轉。',
+        actionTitle: '先存轉換包，不要半套轉職',
+        stop: '存滿維納托覺醒5',
+        action: '塔洛莎繼續上場。覺醒核心與通用碎片先囤著，等到「維納托能一次點完覺醒5、塔洛莎還留得住覺醒4」再轉。',
         avoid: '不要做覺醒1至4階維納托過渡，也不要把通用角色資源平均分配。',
-        switchCondition: '覺醒5階維納托＋覺醒4階塔洛莎同時成立後再轉。',
+        switchCondition: '兩人門檻同時夠了再轉，不要先轉再補。',
       },
       'taloxa-building': {
-        phase: '主位養成期',
-        title: '塔洛莎主位，第一目標是覺醒5階',
-        reason: '目前還沒跨過塔洛莎的主要爆發門檻，分資源給其他主位只會延後成形。',
-        actionTitle: '先完成塔洛莎門檻',
-        action: '基礎暴率補到70%左右，接著把塔洛莎推到覺醒5階。',
-        avoid: '先不投維納托，也不要為伏爾坎延後塔洛莎突破。',
-        switchCondition: '先完成塔洛莎覺醒5階；維納托轉換仍是更後面的階段。',
+        phase: '現在只做塔洛莎',
+        title: '先把暴率補到70%，再點塔洛莎覺醒5',
+        reason: '現在還在第一個主位。分資源給維納托或伏爾坎，只會更慢成形。',
+        actionTitle: '先補暴率70%，再點塔洛莎覺醒5',
+        stop: '塔洛莎覺醒5',
+        action: '不含場內觸發的基礎暴率先到約70%，然後把塔洛莎點到覺醒5。這兩件事沒好以前不要談轉職。',
+        avoid: '先不投維納托，也不要為伏爾坎延後塔洛莎。',
+        switchCondition: '塔洛莎覺醒5完成後，才開始存維納托轉換包。',
       },
       unsure: {
-        phase: '資料確認期',
-        title: '維持現有最強主位，資源先不要分散',
-        reason: '主位與暴率資料不完整時，任何大額轉換都可能讓帳號實際變弱。',
-        actionTitle: '先完成帳號盤點',
-        action: '確認塔洛莎、維納托突破與不含場內觸發的基礎暴率，再決定轉換。',
+        phase: '先對三個數字',
+        title: '先看畫面數字，再花稀缺資源',
+        reason: '主位與暴率沒對上時，大額轉換很容易變弱。',
+        actionTitle: '先核對三個數字再花資源',
+        stop: '核對完三個數字',
+        action: '打開角色頁與屬性頁，記下塔洛莎覺醒、維納托覺醒、不含場內觸發的基礎暴率。對完再回來改左側選項。',
         avoid: '不要因新角色推出就開選擇箱或消耗通用突破資源。',
-        switchCondition: '確認角色突破與基礎暴率後，再依上方選項重新診斷。',
+        switchCondition: '三個數字確認後，改左側選項，清單會重算。',
       },
     }[mainStage];
 
     const weapon = {
       'e4-xt': {
-        title: '雙生槍改追混沌27與異界觸發',
-        detail: 'E4V4與異界轉化已是後期骨架，不是終點。下一刀把混沌之力堆到27切月鐮刀，異界轉發條件用固定首領做 A/B。',
+        title: '神器核心拿去堆下一個混沌檔',
+        detail: '雙生槍已經夠用。神器核心不要再點苦無，全部拿去把混沌之力點到下一檔。',
+        spend: '神器核心',
+        stop: '下一檔混沌',
       },
       e3v2: {
-        title: '雙生槍先推到 E4V4',
-        detail: 'E3V2 只能開混沌融合，還解不了異界轉化。神器核心先補永恆4與虛空4，再開異界轉化1。',
+        title: '神器核心先把雙生槍補到永恆4＋虛空4',
+        detail: '打開雙生槍，點到永恆4與虛空4就停，再開異界轉化1。還沒到以前：不要先堆混沌36，也不要換其他主武器。',
+        spend: '神器核心',
+        stop: '雙生槍E4V4',
       },
       e1v2: {
-        title: '雙生槍先補到 E3V2',
-        detail: '永恆1只解決進化速度，不是後期武器計畫。接著把永恆與虛空補到 E3V2，再開混沌融合。',
+        title: '神器核心先把雙生槍補到永恆3＋虛空2',
+        detail: '打開雙生槍，點到永恆3與虛空2就停。還沒到以前不要換苦無。',
+        spend: '神器核心',
+        stop: '雙生槍E3V2',
       },
       pre: {
-        title: '先換成雙生槍並立刻永恆1',
-        detail: '苦無與虛空之力不再當後期主武器。做出雙生槍當天就把永恆神鑄1點上，不要繼續練開荒武器。',
+        title: '先做出雙生槍，當天點永恆1',
+        detail: '苦無與虛空之力現在不要再當主武器。做出雙生槍的當天，用1個神器核心點永恆神鑄1。',
+        spend: '神器核心',
+        stop: '雙生槍＋永恆1',
       },
     }[weaponStage];
 
     const chaos = {
       '27-plus': {
-        label: '武器進化線',
-        title: '比較混沌36／45與 SS 裝',
-        detail: '切月鐮刀已解。下一刀比較混沌36能量雙刀、45終極聖劍，以及審判項鍊／星塵腰帶雙生階；不要退回神鑄3虛空手套。',
-        next: '混沌36／45',
+        label: '現在點武器',
+        title: '神器核心全部拿去堆混沌36',
+        detail: '打開混沌融合之力，用神器核心點到36（能量雙刀）就停。還沒到36以前：不要改項鍊、腰帶、手套，也不要把神器核心拿去點苦無。',
+        next: '混沌36',
+        spend: '神器核心',
+        stop: '混沌36',
       },
       '18-26': {
-        label: '下一進化',
-        title: '混沌之力推到27切月鐮刀',
-        detail: '神罰之斧已解，這不是武器終點。先把全體 SS 混沌星堆到27，再微調項鍊與腰帶。',
-        next: '混沌之力27',
+        label: '現在點武器',
+        title: '神器核心全部拿去堆混沌27',
+        detail: '打開混沌融合之力，點到27（切月鐮刀）就停。還沒到27以前：不要改項鍊、腰帶。',
+        next: '混沌27',
+        spend: '神器核心',
+        stop: '混沌27',
       },
       '9-17': {
-        label: '下一斷點',
-        title: '混沌之力推到18神罰之斧',
-        detail: '混沌之風已能用；18以前不要頻繁更換腰帶與項鍊，也不要回頭用苦無。',
-        next: '混沌之力18',
+        label: '現在點武器',
+        title: '神器核心全部拿去堆混沌18',
+        detail: '打開混沌融合之力，點到18（神罰之斧）就停。還沒到18以前：不要換腰帶項鍊，也不要回頭用苦無。',
+        next: '混沌18',
+        spend: '神器核心',
+        stop: '混沌18',
       },
       'below-9': {
-        label: '第一斷點',
-        title: '混沌之力先補到9',
-        detail: '未滿9時先完成混沌之風門檻，不要直接照抄混沌27的切月鐮刀配置。',
-        next: '混沌之力9',
+        label: '現在點武器',
+        title: '神器核心先把混沌之力補到9',
+        detail: '打開混沌融合之力，先點到9（混沌之風）就停。沒到9以前，不要照抄切月鐮刀或永恆4配置。',
+        next: '混沌9',
+        spend: '神器核心',
+        stop: '混沌9',
       },
     }[chaosStage];
 
-    const divine = {
-      complete: {
-        title: '維持完整神火支援鏈',
-        detail: '哪吒放協同被動並獲得伏爾坎加成；兩者都不改成主位。',
-      },
-      nezha: {
-        title: '先保留哪吒，再補伏爾坎',
-        detail: '主位覺醒7以前不要為伏爾坎延後維納托；達標後再把伏爾坎補到覺醒1階。',
-      },
-      none: {
-        title: '暫時跳過神火投資',
-        detail: '通用資源先放主位覺醒與協同裂傷，伏爾坎不是現在的優先項。',
-      },
-    }[divineStage];
-
     const lateSupport = {
-      title: '連攜被動只服務現役三人',
-      detail: '覺醒6／8多出來的連攜槽，優先放塔洛莎裂傷、梅塔莉亞異常或楊大師易傷；不要塞不上場角色。',
+      title: '連攜槽只給現在這三人',
+      detail: '多出來的連攜槽依序放：塔洛莎、梅塔莉亞、楊大師。不要放不上場的角色。',
+      spend: '連攜槽',
+      stop: '三人連攜就好',
     };
 
     const lateSystems = {
-      title: '異寵、科技與 SS 裝一起補',
-      detail: '幽冥之魂優先覺醒5；科技先雙生無人機諧振。星塵腰帶至少永恆3，月痕護腕要基礎暴率70%以上才當後期手套，不要退回神鑄3虛空手套。',
+      title: '異世核心全部拿去點幽冥之魂覺醒5',
+      detail: '打開異寵幽冥之魂，點到覺醒5就停。還沒到覺醒5以前：晶片不要先給雙生無人機，腰帶、手套、項鍊先別動。',
+      spend: '異世核心',
+      stop: '幽冥之魂覺醒5',
     };
+
+    const divine = {
+      complete: {
+        title: '哪吒與伏爾坎先維持，不要改主位',
+        detail: '這兩人只當神火支援。覺醒核心先給維納托，不要拿去把他們改成主位。',
+        spend: '先不動',
+        stop: '先不動神火',
+      },
+      nezha: {
+        title: '伏爾坎先不要點',
+        detail: '維納托覺醒7以前，覺醒核心不要分給伏爾坎。主位過關後再補伏爾坎覺醒1。',
+        spend: '先不動',
+        stop: '先不動伏爾坎',
+      },
+      none: {
+        title: '神火這條先跳過',
+        detail: '現在的覺醒核心給主位。哪吒、伏爾坎都還沒有就先不要追。',
+        spend: '先不動',
+        stop: '先跳過神火',
+      },
+    }[divineStage];
 
     const mode = {
       short: {
@@ -331,9 +362,9 @@ export default function AccountAdvisor() {
           : lateSupport
         : divine;
     const priorities = [
-      { id: 'main', title: main.actionTitle, detail: main.action },
-      { id: 'loadout', title: loadout.title, detail: loadout.detail },
-      { id: 'support', title: third.title, detail: third.detail },
+      { id: 'main', spend: '覺醒核心', stop: main.stop, title: main.actionTitle, detail: main.action },
+      { id: 'loadout', spend: loadout.spend ?? '神器核心', stop: loadout.stop, title: loadout.title, detail: loadout.detail },
+      { id: 'support', spend: third.spend ?? '其餘資源', stop: third.stop, title: third.title, detail: third.detail },
     ];
 
     return { build, main, chaos, support: third, mode, completeness, priorities };
@@ -386,7 +417,7 @@ export default function AccountAdvisor() {
                 高端帳號決策中心
               </p>
               <h2 id="advisor-title" className="text-xl font-black text-white sm:text-2xl">
-                先診斷，再照優先順序執行
+                現在該點哪個數字
               </h2>
             </div>
           </div>
@@ -412,7 +443,7 @@ export default function AccountAdvisor() {
           <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#d8ff57]/15 bg-[#d8ff57]/8 p-3">
             <Gauge className="mt-0.5 size-4 shrink-0 text-[#d8ff57]" />
             <p className="text-xs font-semibold leading-5 text-white/55">
-              已套用後期常見狀態：維納托覺醒7以上、雙生槍 E4V4＋異界轉化、混沌之力27、神火支援鏈完整。若還沒到這裡，改左側選項後會立刻重算。
+              已套用後期常見狀態。右側三個數字就是現在要點到的停點；沒點到以前，不要改裝備、不要練第二主位。若還沒到這裡，改左側選項後會立刻重算。
             </p>
           </div>
 
@@ -442,9 +473,9 @@ export default function AccountAdvisor() {
 
           <div className="mt-5 grid gap-2 sm:grid-cols-3">
             {[
-              ['主要模式', recommendation.mode.label],
-              [recommendation.chaos.label, recommendation.chaos.next],
-              ['資料完整度', `${recommendation.completeness}%`],
+              ['現在點角色', recommendation.priorities[0].stop],
+              ['現在點武器', recommendation.priorities[1].stop],
+              ['現在點異寵', recommendation.priorities[2].stop],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#0b1f1e]/10 bg-white/55 p-3">
                 <p className="text-[10px] font-black tracking-wider opacity-45">{label}</p>
@@ -457,9 +488,9 @@ export default function AccountAdvisor() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="flex items-center gap-2 text-sm font-black">
-                  <Target className="size-4" /> 你的三步行動清單
+                  <Target className="size-4" /> 照這個順序做，點到數字就停
                 </p>
-                <p className="mt-1 text-xs font-semibold opacity-50">依序完成，不要同時分散資源。</p>
+                <p className="mt-1 text-xs font-semibold opacity-50">每條線只用一種核心。沒點到停點以前，不要開始下一項。</p>
               </div>
               <span className="text-xs font-black opacity-55">{completed.length}／3</span>
             </div>
@@ -475,9 +506,13 @@ export default function AccountAdvisor() {
                   <label key={item.id} className={`flex cursor-pointer gap-3 rounded-xl border p-3.5 transition ${checked ? 'border-emerald-700/15 bg-emerald-700/8 opacity-60' : 'border-[#0b1f1e]/10 bg-[#f8ffe1] hover:border-[#0b1f1e]/25'}`}>
                     <Checkbox checked={checked} onCheckedChange={(next) => toggleCompleted(item.id, Boolean(next))} aria-label={`完成第${index + 1}項：${item.title}`} className="mt-0.5 border-[#0b1f1e]/25 data-checked:border-[#0b1f1e] data-checked:bg-[#0b1f1e]" />
                     <span className="min-w-0">
-                      <span className="flex items-center gap-2 text-xs font-black">
+                      <span className="flex flex-wrap items-center gap-2 text-xs font-black">
                         <span className="grid size-5 place-items-center rounded-full bg-[#0b1f1e] text-[10px] text-[#d8ff57]">{index + 1}</span>
+                        <span className="rounded-full bg-[#0b1f1e] px-2 py-0.5 text-[10px] font-black text-[#d8ff57]">{item.spend}</span>
                         {item.title}
+                      </span>
+                      <span className="mt-1.5 inline-flex rounded-full bg-[#d8ff57] px-2 py-0.5 text-[10px] font-black text-[#0b1f1e]">
+                        做到這裡就停：{item.stop}
                       </span>
                       <span className="mt-1.5 block text-xs font-semibold leading-5 opacity-60">{item.detail}</span>
                     </span>
@@ -489,11 +524,11 @@ export default function AccountAdvisor() {
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-xl border border-red-950/10 bg-red-950/[0.06] p-4">
-              <p className="flex items-center gap-2 text-xs font-black text-red-950/80"><LockKeyhole className="size-4" /> 資源凍結清單</p>
+              <p className="flex items-center gap-2 text-xs font-black text-red-950/80"><LockKeyhole className="size-4" /> 還沒點到以前，不要做這些</p>
               <p className="mt-2 text-xs font-bold leading-5 text-red-950/60">{recommendation.main.avoid}</p>
             </div>
             <div className="rounded-xl border border-[#0b1f1e]/10 bg-[#d8ff57]/55 p-4">
-              <p className="flex items-center gap-2 text-xs font-black"><Route className="size-4" /> 何時才能切換</p>
+              <p className="flex items-center gap-2 text-xs font-black"><Route className="size-4" /> 點到以後才可以做</p>
               <p className="mt-2 text-xs font-bold leading-5 opacity-65">{recommendation.main.switchCondition}</p>
             </div>
           </div>

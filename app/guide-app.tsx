@@ -193,18 +193,18 @@ export default function GuideApp() {
               {OFFICIAL_UPDATE.version} 後期版 · 2026/09/07 更新
             </span>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl">
-              先知道現在該做什麼，
+              先知道現在該點哪個數字，
               <span className="text-primary">再追求真正天花板。</span>
             </h1>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
-              這不是單純排行表。輸入四個帳號狀態，直接取得主位結論、三步行動清單、資源凍結項目與下一個轉換門檻。
+              這不是排行表。選完帳號狀態後，會直接告訴你：哪種核心花在誰身上、點到哪一階停、沒到以前不要動什麼。
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black sm:min-w-[360px]">
             {[
-              ['1', '選目前門檻'],
-              ['2', '取得行動排序'],
-              ['3', '逐項完成'],
+              ['1', '選目前數字'],
+              ['2', '看三個停點'],
+              ['3', '點到就停'],
             ].map(([step, label]) => (
               <div key={step} className="rounded-xl border border-white/8 bg-white/[0.04] px-3 py-3">
                 <span className="mx-auto grid size-5 place-items-center rounded-full bg-primary text-[10px] text-primary-foreground">
@@ -725,7 +725,7 @@ export default function GuideApp() {
               <p className="text-xs font-bold uppercase tracking-[.16em] text-primary">
                 後期帳號檢查
               </p>
-              <h2 className="text-xl font-black">後期全系統計畫，先確認這四項</h2>
+              <h2 className="text-xl font-black">後期計畫，先核對這四句</h2>
             </div>
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">

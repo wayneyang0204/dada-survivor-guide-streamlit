@@ -66,9 +66,9 @@ def test_account_diagnosis_returns_mode_specific_plan() -> None:
         play_mode="長場首領",
         divine_stage="只有哪吒",
     )
-    assert result["phase"] == "轉職準備期"
+    assert result["phase"] == "現在先存，不要轉"
     assert result["build"] == "長戰疊層傷害極限"
-    assert result["next_breakpoint"] == "混沌之力18"
+    assert result["next_breakpoint"] == "混沌18"
     assert len(result["priorities"]) == 3
 
     zone = diagnose_account(
@@ -88,11 +88,14 @@ def test_account_diagnosis_covers_post_a7_character_plan() -> None:
         play_mode="短場首領",
         divine_stage="哪吒R4＋伏爾坎R4支援鏈",
     )
-    assert result["phase"] == "覺醒8與協同成形期"
+    assert result["phase"] == "現在只做三件事"
+    assert result["priorities"][0]["title"] == "覺醒核心全部拿去點維納托覺醒8"
+    assert result["priorities"][0]["stop"] == "維納托覺醒8"
     assert "覺醒8" in result["priorities"][0]["detail"]
     assert "梅塔莉亞" in result["priorities"][0]["detail"]
-    assert "切月鐮刀" in result["priorities"][1]["title"]
-    assert result["priorities"][2]["title"] == "異寵、科技與 SS 裝一起補"
+    assert result["priorities"][1]["title"] == "神器核心全部拿去堆混沌27"
+    assert "切月鐮刀" in result["priorities"][1]["detail"]
+    assert result["priorities"][2]["title"] == "異世核心全部拿去點幽冥之魂覺醒5"
     assert "苦無" not in result["priorities"][1]["title"]
     assert "存到能一次完成" not in result["priorities"][0]["detail"]
     assert result["readiness"] == 100
@@ -106,8 +109,10 @@ def test_account_diagnosis_covers_late_weapon_and_systems() -> None:
         divine_stage="哪吒R4＋伏爾坎R4支援鏈",
         weapon_stage="雙生槍E4V4＋異界轉化",
     )
-    assert result["next_breakpoint"] == "混沌36／45"
-    assert "虛空手套" in result["priorities"][2]["detail"]
+    assert result["next_breakpoint"] == "混沌36"
+    assert result["priorities"][1]["stop"] == "混沌36"
+    assert result["priorities"][2]["stop"] == "幽冥之魂覺醒5"
+    assert "手套" in result["priorities"][2]["detail"]
     assert "覺醒5" in result["priorities"][2]["detail"]
     assert result["mode_instruction"].startswith("雙生槍已是後期主武器")
 

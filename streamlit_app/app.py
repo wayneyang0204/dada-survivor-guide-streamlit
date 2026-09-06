@@ -1165,8 +1165,8 @@ elif 頁面 == "智能最優解":
             st.link_button("查看本站完整終局配置", "https://notalknote.xyz/moblegame/survivorio/", width="stretch")
 
 elif 頁面 == "帳號診斷":
-    st.header("終局帳號診斷：四個狀態，直接決定下一步")
-    st.caption("選項變更後會自動重算；先確認不含場內觸發的基礎暴率，以及角色實際覺醒階級。")
+    st.header("現在該點哪個數字")
+    st.caption("選完會直接告訴你：哪種核心花在誰身上、點到哪一階停、沒到以前不要動什麼。")
     st.markdown(
         '<section class="安全健檢"><div><strong>完整健檢不需要帳號密碼</strong><span>自行登入遊戲後提供角色／裝備、科技配件、寵物、收藏、核心與寶石頁面即可判斷；不要把登入資料交給任何攻略服務。</span></div><span class="安全徽章">PRIVACY FIRST</span></section>',
         unsafe_allow_html=True,
@@ -1207,19 +1207,19 @@ elif 頁面 == "帳號診斷":
         f'<h3>{診斷["title"]}</h3><p>{診斷["reason"]}</p></section>',
         unsafe_allow_html=True,
     )
-    st.progress(診斷["readiness"] / 100, text=f"終局準備度 {診斷['readiness']}%｜下一個斷點：{診斷['next_breakpoint']}")
+    st.progress(診斷["readiness"] / 100, text=f"終局準備度 {診斷['readiness']}%｜現在停點：{診斷['next_breakpoint']}")
 
     優先卡片 = "".join(
-        f'<article class="優先項"><small>0{index} · {html.escape(item["label"])}</small><strong>{html.escape(item["title"])}</strong><p>{html.escape(item["detail"])}</p></article>'
+        f'<article class="優先項"><small>0{index} · {html.escape(item["label"])}｜做到這裡就停：{html.escape(item.get("stop", ""))}</small><strong>{html.escape(item["title"])}</strong><p>{html.escape(item["detail"])}</p></article>'
         for index, item in enumerate(診斷["priorities"], 1)
     )
     st.markdown(f'<div class="優先格">{優先卡片}</div>', unsafe_allow_html=True)
     st.markdown(
         f'<div class="建議框"><div><b>模式配置｜{診斷["build"]}</b>{診斷["mode_instruction"]}</div>'
-        f'<div><b>現在不要做</b>{診斷["avoid"]}</div></div>',
+        f'<div><b>還沒點到以前，不要做這些</b>{診斷["avoid"]}</div></div>',
         unsafe_allow_html=True,
     )
-    st.info(f"轉換條件：{診斷['switch_condition']}")
+    st.info(f"點到以後才可以做：{診斷['switch_condition']}")
     st.button("依這個結果查看完整配裝", type="primary", width="stretch", on_click=切換主頁面, args=("養成", "終局配裝"))
 
 elif 頁面 == "終局配裝":
