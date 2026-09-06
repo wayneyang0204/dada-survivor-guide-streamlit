@@ -640,6 +640,45 @@ def diagnose_account(
         },
     }[play_mode]
 
+    gear_by_mode = {
+        "短場首領": [
+            {"slot": "武器", "wear": "雙生槍 永恆4＋虛空4", "spend": "神器核心堆混沌36", "freeze": "不要換苦無"},
+            {"slot": "項鍊", "wear": "審判項鍊（雙生階）", "spend": "先不動", "freeze": "混沌36以前不要改；沒雙生階才暫用虛空項鍊神鑄3"},
+            {"slot": "手套", "wear": "月痕護腕（雙生階）", "spend": "先不動", "freeze": "暴率沒到70%才暫留虛空手套，不要當終點"},
+            {"slot": "腰帶", "wear": "星塵腰帶（雙生階）", "spend": "幽冥覺醒5之後才點永恆3", "freeze": "現在不要換扭曲腰帶"},
+            {"slot": "鞋子", "wear": "冰川戰靴（雙生階）", "spend": "排最後：永恆1／虛空2／混沌1", "freeze": "不要為了鞋子拆混沌36"},
+            {"slot": "衣服", "wear": "永虛戰甲（雙生階、永恆3起）", "spend": "腰帶永恆3之後再補", "freeze": "短場不要穿亡者風衣"},
+        ],
+        "長場首領": [
+            {"slot": "武器", "wear": "雙生槍 永恆4＋虛空4＋異界轉化", "spend": "神器核心堆混沌36／45", "freeze": "不要換苦無"},
+            {"slot": "項鍊", "wear": "審判項鍊（雙生階、高暴率）", "spend": "先不動", "freeze": "混沌36以前不要改"},
+            {"slot": "手套", "wear": "月痕護腕（雙生階、永恆1／虛空2）", "spend": "先不動", "freeze": "不要退回神鑄3虛空手套"},
+            {"slot": "腰帶", "wear": "星塵腰帶（雙生階、永恆3）", "spend": "幽冥覺醒5與紅3收藏之後，才跟扭曲腰帶做 A/B", "freeze": "沒到永恆3以前不要換腰帶"},
+            {"slot": "鞋子", "wear": "冰川戰靴（雙生階）", "spend": "排最後：永恆1／虛空2／混沌1", "freeze": "不要為了鞋子拆混沌36"},
+            {"slot": "衣服", "wear": "永虛戰甲（雙生階、永恆3／虛空2／混沌2）", "spend": "腰帶永恆3之後再補", "freeze": "不要穿短場過渡裝"},
+        ],
+        "區域行動": [
+            {"slot": "武器", "wear": "雙生槍 E4V4＋異界轉化", "spend": "神器核心仍堆混沌36", "freeze": "特殊詞條關才切虛空之力"},
+            {"slot": "項鍊", "wear": "審判項鍊（雙生階）", "spend": "先不動", "freeze": "沒雙生階才用虛空項鍊神鑄3"},
+            {"slot": "手套", "wear": "月痕護腕（雙生階）", "spend": "先不動", "freeze": "暴率沒到70%才暫留虛空手套"},
+            {"slot": "腰帶", "wear": "星塵腰帶（雙生階、永恆3／虛空2）", "spend": "幽冥覺醒5之後才點", "freeze": "現在不要換扭曲腰帶"},
+            {"slot": "鞋子", "wear": "冰川戰靴（雙生階）", "spend": "排最後", "freeze": "不要為了鞋子拆混沌36"},
+            {"slot": "衣服", "wear": "新版區域行動不帶入局外裝備", "spend": "舊章節／詞條關才切亡者風衣神鑄3", "freeze": "不要套 8/27 以前的局外裝備攻略"},
+        ],
+    }
+    gear = gear_by_mode[play_mode]
+    if chaos["next"] != "混沌36":
+        for item in gear:
+            if item["slot"] in ("項鍊", "手套", "腰帶"):
+                item["spend"] = "先不動"
+                item["freeze"] = f"{chaos['next']}以前不要改這格"
+
+    collectibles = [
+        {"spend": "自選箱／收藏之心", "name": "星際躍遷矩陣圖紙", "stop": "紅3", "why": "無人機主力。紅3還加暴擊率10%。缺這件就用自選箱補它。"},
+        {"spend": "自選箱／收藏之心", "name": "水動推力腳蹼", "stop": "紅3", "why": "史詩比較便宜，一樣補無人機與暴擊率。圖紙紅3之後立刻點它。"},
+        {"spend": "自選箱／收藏之心", "name": "暗物質傀儡", "stop": "黃5", "why": "雙生無人機長期核心。前兩件紅3之後才點它；黃5以前不要追紅星。"},
+    ]
+
     readiness = max(15, min(100, main["score"] + chaos["score"] + divine["score"] + weapon["score"]))
     return {
         "phase": main["phase"],
@@ -656,6 +695,9 @@ def diagnose_account(
         "avoid": main["avoid"],
         "switch_condition": main["switch"],
         "next_breakpoint": chaos["next"],
+        "gear": gear,
+        "collectibles": collectibles,
+        "collectible_freeze": "追光者、混亂之劍、平均升星、先開空欄位硬塞，全部先不要。",
     }
 
 

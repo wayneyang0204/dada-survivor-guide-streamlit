@@ -29,6 +29,7 @@ import {
   PRIORITY_COLLECTIBLES,
   type CollectibleQuality,
 } from '@/lib/collectibles-data';
+import { COLLECTIBLE_ADVICE, COLLECTIBLE_FREEZE } from '@/lib/guide-data';
 
 const views = ['投資順序', '完整圖鑑', '套組決策'] as const;
 type View = (typeof views)[number];
@@ -43,29 +44,6 @@ const qualityStyles: Record<CollectibleQuality, string> = {
 };
 
 const PAGE_SIZE = 24;
-
-const actionOrder = [
-  {
-    number: '01',
-    title: '先盤點暴擊率',
-    detail: '把所有能在紅3提供暴擊率的史詩收藏列出，缺哪一件就集中換哪一件。',
-  },
-  {
-    number: '02',
-    title: '無人機先到關鍵星級',
-    detail: '星際躍遷矩陣圖紙與水動推力腳蹼優先；雙生無人機成形後再追暗物質傀儡。',
-  },
-  {
-    number: '03',
-    title: '自訂收藏先開欄位',
-    detail: '欄位數量至少要能放下現有高星傳奇收藏品，再把收藏之心用於碎片。',
-  },
-  {
-    number: '04',
-    title: '最後補模式專精',
-    detail: '足球、雷電、燃燒、特定武器，只投資你每週實際會用的模式。',
-  },
-];
 
 export default function CollectiblesDatabase() {
   const [view, setView] = useState<View>('投資順序');
@@ -111,11 +89,11 @@ export default function CollectiblesDatabase() {
               <p className="text-xs font-bold tracking-[.18em]">收藏品資料中心</p>
             </div>
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-              不只告訴你有什麼，
-              <span className="text-primary">直接告訴你下一件升誰。</span>
+              現在只升這三件，
+              <span className="text-primary">其他收藏先不要動。</span>
             </h2>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground">
-              已建立目前 290 件收藏品的完整中文索引，涵蓋第 1～10 期、5 種品質、圖片與逐件數值入口；另外整理高階帳號真正需要的黃3、黃5、紅3與紅5斷點。
+              自選箱或缺件用收藏之心：星際躍遷矩陣圖紙紅3 → 水動推力腳蹼紅3 → 暗物質傀儡黃5。追光者、混亂之劍、平均升星全部先不要。
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:min-w-[440px]">
@@ -154,20 +132,26 @@ export default function CollectiblesDatabase() {
 
         {view === '投資順序' && (
           <div className="mt-7">
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-              {actionOrder.map((action) => (
-                <article key={action.number} className="rounded-2xl border border-primary/15 bg-primary/[0.055] p-5">
-                  <span className="text-xs font-black tracking-widest text-primary">{action.number}</span>
-                  <h3 className="mt-3 text-base font-black">{action.title}</h3>
-                  <p className="mt-2 text-xs font-semibold leading-5 text-muted-foreground">{action.detail}</p>
+            <div className="grid gap-3 lg:grid-cols-3">
+              {COLLECTIBLE_ADVICE.map((item, index) => (
+                <article key={item.name} className="rounded-2xl border border-primary/20 bg-primary/[0.07] p-5">
+                  <span className="text-xs font-black tracking-widest text-primary">0{index + 1} · {item.spend}</span>
+                  <h3 className="mt-3 text-lg font-black">{item.name}</h3>
+                  <p className="mt-2 inline-flex rounded-full bg-primary px-2 py-0.5 text-[10px] font-black text-primary-foreground">
+                    做到這裡就停：{item.stop}
+                  </p>
+                  <p className="mt-3 text-xs font-semibold leading-5 text-muted-foreground">{item.why}</p>
                 </article>
               ))}
             </div>
+            <p className="mt-3 rounded-xl border border-red-300/20 bg-red-300/8 px-4 py-3 text-xs font-bold leading-5 text-red-100">
+              {COLLECTIBLE_FREEZE}
+            </p>
 
             <div className="mt-8 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
               <div>
                 <p className="text-xs font-bold tracking-[.16em] text-primary">終局優先表</p>
-                <h3 className="mt-2 text-2xl font-black">先看斷點，再決定要不要換碎片</h3>
+                <h3 className="mt-2 text-2xl font-black">做完上面三件，才看這些</h3>
               </div>
               <p className="max-w-xl text-xs font-semibold leading-5 text-muted-foreground">
                 核心原則：全域暴擊與主力科技零件優先；只強化舊武器或冷門技能的收藏品延後。

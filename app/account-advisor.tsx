@@ -26,7 +26,7 @@ import {
   ProgressLabel,
   ProgressValue,
 } from '@/components/ui/progress';
-import { BUILDS } from '@/lib/guide-data';
+import { BUILDS, COLLECTIBLE_ADVICE, COLLECTIBLE_FREEZE, GEAR_ADVICE } from '@/lib/guide-data';
 
 type MainStage = 'venato-a7' | 'venato' | 'taloxa-r5' | 'taloxa-building' | 'unsure';
 type WeaponStage = 'e4-xt' | 'e3v2' | 'e1v2' | 'pre';
@@ -130,15 +130,15 @@ function ChoiceGroup<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <fieldset className="rounded-2xl border border-white/8 bg-white/[0.035] p-4">
+    <fieldset className="rounded-xl border border-white/8 bg-white/[0.035] p-3">
       <legend className="sr-only">{label}</legend>
-      <div className="mb-3 flex items-center gap-2">
-        <span className="grid size-6 place-items-center rounded-full bg-[#d8ff57] text-[11px] font-black text-[#0b1f1e]">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="grid size-5 place-items-center rounded-full bg-[#d8ff57] text-[10px] font-black text-[#0b1f1e]">
           {step}
         </span>
-        <p className="text-sm font-black text-white">{label}</p>
+        <p className="text-xs font-black text-white">{label}</p>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2" role="group" aria-label={label}>
+      <div className="grid gap-1.5 sm:grid-cols-2" role="group" aria-label={label}>
         {options.map((option) => {
           const active = value === option.value;
           return (
@@ -148,7 +148,7 @@ function ChoiceGroup<T extends string>({
               variant="outline"
               aria-pressed={active}
               onClick={() => onChange(option.value)}
-              className={`h-auto min-h-12 justify-start whitespace-normal rounded-xl px-3 py-2.5 text-left ${
+              className={`h-auto min-h-10 justify-start whitespace-normal rounded-lg px-2.5 py-2 text-left ${
                 active
                   ? 'border-[#d8ff57] bg-[#d8ff57] text-[#0b1f1e] hover:bg-[#d8ff57]/90'
                   : 'border-white/10 bg-transparent text-white hover:border-white/20 hover:bg-white/[0.06]'
@@ -367,7 +367,15 @@ export default function AccountAdvisor() {
       { id: 'support', spend: third.spend ?? '其餘資源', stop: third.stop, title: third.title, detail: third.detail },
     ];
 
-    return { build, main, chaos, support: third, mode, completeness, priorities };
+    const gear = GEAR_ADVICE[playMode].map((item) => {
+      if (chaosStage !== '27-plus' && (item.slot === '項鍊' || item.slot === '手套' || item.slot === '腰帶')) {
+        return { ...item, spend: '先不動', freeze: `混沌${chaos.next}以前不要改這格` };
+      }
+      return item;
+    });
+    const collectibles = COLLECTIBLE_ADVICE;
+
+    return { build, main, chaos, support: third, mode, completeness, priorities, gear, collectibles };
   }, [chaosStage, divineStage, mainStage, playMode, weaponStage]);
 
   function clearProgress() {
@@ -443,7 +451,7 @@ export default function AccountAdvisor() {
           <div className="mb-4 flex items-start gap-3 rounded-xl border border-[#d8ff57]/15 bg-[#d8ff57]/8 p-3">
             <Gauge className="mt-0.5 size-4 shrink-0 text-[#d8ff57]" />
             <p className="text-xs font-semibold leading-5 text-white/55">
-              已套用後期常見狀態。右側三個數字就是現在要點到的停點；沒點到以前，不要改裝備、不要練第二主位。若還沒到這裡，改左側選項後會立刻重算。
+              右側先看四個停點，再往下看六格裝備與三件收藏。沒點到以前，不要改裝備、不要練第二主位。若還沒到這裡，改左側選項後會立刻重算。
             </p>
           </div>
 
@@ -471,11 +479,12 @@ export default function AccountAdvisor() {
             {recommendation.main.reason}
           </p>
 
-          <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {[
               ['現在點角色', recommendation.priorities[0].stop],
               ['現在點武器', recommendation.priorities[1].stop],
               ['現在點異寵', recommendation.priorities[2].stop],
+              ['現在升收藏', `${recommendation.collectibles[0].name} ${recommendation.collectibles[0].stop}`],
             ].map(([label, value]) => (
               <div key={label} className="rounded-xl border border-[#0b1f1e]/10 bg-white/55 p-3">
                 <p className="text-[10px] font-black tracking-wider opacity-45">{label}</p>
@@ -522,6 +531,54 @@ export default function AccountAdvisor() {
             </div>
           </div>
 
+          <div id="gear-plan" className="mt-4 scroll-mt-24 rounded-2xl border border-[#0b1f1e]/12 bg-white/60 p-4 sm:p-5">
+            <p className="text-sm font-black">現在穿這六格</p>
+            <p className="mt-1 text-xs font-semibold opacity-50">每一格只寫：現在穿什麼、核心拿去點什麼、沒到以前不要改什麼。</p>
+            <div className="mt-3 overflow-x-auto">
+              <table className="w-full min-w-[520px] text-left text-xs">
+                <thead>
+                  <tr className="border-b border-[#0b1f1e]/10 text-[10px] font-black tracking-wider opacity-45">
+                    <th className="py-2 pr-3">槽位</th>
+                    <th className="py-2 pr-3">現在穿</th>
+                    <th className="py-2 pr-3">核心拿去</th>
+                    <th className="py-2">沒好以前不要</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recommendation.gear.map((item) => (
+                    <tr key={item.slot} className="border-b border-[#0b1f1e]/8 align-top">
+                      <td className="py-2.5 pr-3 font-black">{item.slot}</td>
+                      <td className="py-2.5 pr-3 font-bold leading-5">{item.wear}</td>
+                      <td className="py-2.5 pr-3 font-black text-[#0b1f1e]">{item.spend}</td>
+                      <td className="py-2.5 font-semibold leading-5 opacity-60">{item.freeze}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="collectible-plan" className="mt-4 scroll-mt-24 rounded-2xl border border-[#0b1f1e]/12 bg-white/60 p-4 sm:p-5">
+            <p className="text-sm font-black">現在只升這三件收藏</p>
+            <p className="mt-1 text-xs font-semibold opacity-50">用自選箱或收藏之心。缺哪件補哪件，不要平均升星。</p>
+            <div className="mt-3 space-y-2">
+              {recommendation.collectibles.map((item, index) => (
+                <div key={item.name} className="rounded-xl border border-[#0b1f1e]/10 bg-[#f8ffe1] p-3">
+                  <p className="flex flex-wrap items-center gap-2 text-xs font-black">
+                    <span className="grid size-5 place-items-center rounded-full bg-[#0b1f1e] text-[10px] text-[#d8ff57]">{index + 1}</span>
+                    <span className="rounded-full bg-[#0b1f1e] px-2 py-0.5 text-[10px] font-black text-[#d8ff57]">{item.spend}</span>
+                    {item.name}
+                  </p>
+                  <span className="mt-1.5 inline-flex rounded-full bg-[#d8ff57] px-2 py-0.5 text-[10px] font-black text-[#0b1f1e]">
+                    做到這裡就停：{item.stop}
+                  </span>
+                  <p className="mt-1.5 text-xs font-semibold leading-5 opacity-60">{item.why}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs font-bold leading-5 text-red-950/70">{COLLECTIBLE_FREEZE}</p>
+          </div>
+
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <div className="rounded-xl border border-red-950/10 bg-red-950/[0.06] p-4">
               <p className="flex items-center gap-2 text-xs font-black text-red-950/80"><LockKeyhole className="size-4" /> 還沒點到以前，不要做這些</p>
@@ -547,7 +604,7 @@ export default function AccountAdvisor() {
               <p className="rounded-lg bg-white/[0.06] p-3 text-xs font-bold leading-5"><Flame className="mr-1.5 inline size-3.5 text-[#d8ff57]" />{recommendation.support.detail}</p>
             </div>
             <a href="#builds" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-[#d8ff57] px-3 py-2 text-xs font-black text-[#0b1f1e] transition hover:bg-[#d8ff57]/85">
-              查看完整裝備與技能 <ArrowDown className="size-3.5" />
+              三套模式的完整技能 <ArrowDown className="size-3.5" />
             </a>
           </div>
 

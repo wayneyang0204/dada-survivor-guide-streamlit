@@ -228,7 +228,7 @@ st.set_page_config(
         "角色": "維納托覺醒7～8主位｜塔洛莎覺醒4協同保留裂傷觸發｜梅塔莉亞／楊大師覺醒1協同｜哪吒／伏爾坎支援以 R4 有效門檻核對",
         "寵物": "幽冥之魂覺醒5｜共鳴增益＋共鳴傷害",
         "武器": "雙生之槍｜永恆4、虛空4、混沌2以上、異界轉化1起",
-        "裝備": ["審判項鍊雙生階／虛空項鍊神鑄3僅過渡", "月痕護腕雙生階｜基礎暴率至少70%，不要退回神鑄3虛空手套", "星塵腰帶雙生階 E3／V2", "冰川戰靴雙生階 E1／V2／C1以上", "永虛戰甲雙生階 E3起"],
+        "裝備": ["武器｜雙生槍永恆4＋虛空4，神器核心堆混沌36", "項鍊｜審判項鍊雙生階，混沌36以前不要改", "手套｜月痕護腕雙生階，暴率沒70%才暫留虛空手套", "腰帶｜星塵腰帶雙生階，幽冥覺醒5後才點永恆3", "鞋子｜冰川戰靴雙生階，排最後", "衣服｜永虛戰甲雙生階永恆3起，短場不要穿亡者風衣"],
         "技能": ["雙生槍", "雙生無人機", "燃燒瓶", "足球", "鑽頭", "雷電"],
         "核心": "短場用 E4 起手等級與異界轉化壓縮進化；不要再用永恆1或苦無當武器終點。",
         "斷點": "雙生槍 E4V4＋異界轉化、混沌之力27切月鐮刀、基礎暴率70%以上才用月痕護腕。",
@@ -240,7 +240,7 @@ st.set_page_config(
         "角色": "維納托覺醒7～8主位｜塔洛莎覺醒4＋梅塔莉亞／楊大師覺醒1協同",
         "寵物": "幽冥之魂覺醒5｜保護＋共鳴增益＋共鳴傷害",
         "武器": "雙生之槍｜永恆4、虛空4、異界轉化；混沌之力27／36／45",
-        "裝備": ["審判項鍊雙生階／虛空項鍊神鑄3僅過渡", "月痕護腕雙生階 E1／V2以上", "星塵腰帶雙生階 E3；收藏滿門檻才 A/B 扭曲腰帶", "冰川戰靴雙生階 E1／V2／C1以上", "永虛戰甲雙生階 E3／V2／C2"],
+        "裝備": ["武器｜雙生槍永恆4＋虛空4＋異界轉化", "項鍊｜審判項鍊雙生階，混沌36以前不要改", "手套｜月痕護腕雙生階，不要退回虛空手套", "腰帶｜星塵腰帶永恆3後才 A/B 扭曲腰帶", "鞋子｜冰川戰靴排最後", "衣服｜永虛戰甲永恆3／虛空2／混沌2"],
         "技能": ["雙生槍", "雙生無人機", "燃油桶", "量子球", "永恆鑽頭", "超級雷暴"],
         "核心": "讓混沌27、寵物共鳴與裂傷／虛弱完整疊滿；不要用短場永恆1配置硬套。",
         "斷點": "混沌27切月鐮刀起跳；18只是神罰之斧。永虛甲至少永恆3，星塵腰帶永恆3後再 A/B 腰帶。",
@@ -265,11 +265,10 @@ st.set_page_config(
 ]
 
 收藏優先順序 = [
-    "先啟動能立即生效的收藏套裝",
-    "再補主力技能與終局裝備對應收藏",
-    "傳奇收藏優先暴擊傷害、技能傷害與異常增傷斷點",
-    "自選箱留給差一件或差一星就能跨過的斷點",
-    "解構前確認套裝、共鳴與自訂典藏館不會退級",
+    "自選箱／收藏之心先把星際躍遷矩陣圖紙點到紅3就停",
+    "接著把水動推力腳蹼點到紅3就停",
+    "第三件才是暗物質傀儡，點到黃5就停",
+    "追光者、混亂之劍、平均升星、先開空欄位硬塞，全部先不要",
 ]
 
 
@@ -1214,6 +1213,19 @@ elif 頁面 == "帳號診斷":
         for index, item in enumerate(診斷["priorities"], 1)
     )
     st.markdown(f'<div class="優先格">{優先卡片}</div>', unsafe_allow_html=True)
+
+    裝備列 = "".join(
+        f'<article class="優先項"><small>{html.escape(item["slot"])}｜核心拿去：{html.escape(item["spend"])}</small><strong>現在穿：{html.escape(item["wear"])}</strong><p>沒好以前不要：{html.escape(item["freeze"])}</p></article>'
+        for item in 診斷["gear"]
+    )
+    st.markdown(f'<p style="margin:1rem 0 .4rem;font-weight:800;">現在穿這六格</p><div class="優先格">{裝備列}</div>', unsafe_allow_html=True)
+
+    收藏列 = "".join(
+        f'<article class="優先項"><small>0{index} · {html.escape(item["spend"])}｜做到這裡就停：{html.escape(item["stop"])}</small><strong>{html.escape(item["name"])}</strong><p>{html.escape(item["why"])}</p></article>'
+        for index, item in enumerate(診斷["collectibles"], 1)
+    )
+    st.markdown(f'<p style="margin:1rem 0 .4rem;font-weight:800;">現在只升這三件收藏</p><div class="優先格">{收藏列}</div>', unsafe_allow_html=True)
+    st.warning(診斷["collectible_freeze"])
     st.markdown(
         f'<div class="建議框"><div><b>模式配置｜{診斷["build"]}</b>{診斷["mode_instruction"]}</div>'
         f'<div><b>還沒點到以前，不要做這些</b>{診斷["avoid"]}</div></div>',
@@ -1365,19 +1377,20 @@ elif 頁面 == "收藏圖鑑":
     )
 
 elif 頁面 == "收藏優先級":
-    st.header("收藏品不是全收，先跨有效斷點")
+    st.header("現在只升這三件收藏，其他先不要動")
     left, right = st.columns([1.1, 1])
     with left:
         for index, item in enumerate(收藏優先順序, 1):
             st.markdown(f"### {index:02d}　{item}")
     with right:
         st.markdown(
-            '<div class="提醒"><b>最常見的錯誤</b><br>平均升星、只看稀有度、為了開槽過早分解，以及沒有先確認套裝下一個效果。</div>',
+            '<div class="提醒"><b>現在不要做</b><br>追光者、混亂之劍、平均升星、先開空欄位硬塞。</div>',
             unsafe_allow_html=True,
         )
         st.divider()
-        st.metric("已整理收藏主題", "4 類")
-        st.metric("收藏決策核心", "套裝＋技能＋乘區")
+        st.metric("現在停點", "圖紙紅3")
+        st.metric("第二件", "腳蹼紅3")
+        st.metric("第三件", "傀儡黃5")
 
 elif 頁面 == "最新文章":
     st.header("最新來源動態")

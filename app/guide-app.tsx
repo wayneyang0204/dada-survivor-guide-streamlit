@@ -35,29 +35,6 @@ const characterIndex = new Map(
 const categories = ['全部', '武器', '技能', '角色', '關卡', '收藏'] as const;
 type Category = (typeof categories)[number];
 
-const decisionPrinciples = [
-  {
-    icon: Target,
-    title: '先對齊主位斷點',
-    hint: '覺醒5只是轉職線；覺醒7／8才是後期角色計畫。',
-  },
-  {
-    icon: Zap,
-    title: '再補武器斷點',
-    hint: '雙生槍 E4V4、異界轉化與混沌27，才是後期武器線。',
-  },
-  {
-    icon: Swords,
-    title: '依模式換配裝',
-    hint: '短場、長場與區域行動不共用同一套答案。',
-  },
-  {
-    icon: ShieldCheck,
-    title: '後期改推協同',
-    hint: '塔洛莎裂傷、梅塔莉亞異常與楊大師易傷，比再開第二主位更有感。',
-  },
-];
-
 const categoryStyles: Record<GuideCategory, string> = {
   武器: 'border-orange-300/20 bg-orange-300/10 text-orange-200',
   技能: 'border-cyan-300/20 bg-cyan-300/10 text-cyan-200',
@@ -153,25 +130,16 @@ export default function GuideApp() {
             aria-label="主要導覽"
           >
             <a className="transition-colors hover:text-foreground" href="#advisor">
-              帳號診斷
+              現在該做
             </a>
-            <a className="transition-colors hover:text-foreground" href="#action-plan">
-              行動清單
+            <a className="transition-colors hover:text-foreground" href="#gear-plan">
+              裝備
             </a>
-            <a className="transition-colors hover:text-foreground" href="#builds">
-              完整配裝
+            <a className="transition-colors hover:text-foreground" href="#collectible-plan">
+              收藏
             </a>
             <a className="transition-colors hover:text-foreground" href="#characters">
-              角色定位
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#collectibles">
-              收藏資料
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#systems">
-              系統大全
-            </a>
-            <a className="transition-colors hover:text-foreground" href="#latest">
-              版本情報
+              角色
             </a>
           </nav>
           <span className="inline-flex h-5 items-center justify-center gap-1 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2 text-xs font-medium text-emerald-200">
@@ -197,7 +165,7 @@ export default function GuideApp() {
               <span className="text-primary">再追求真正天花板。</span>
             </h1>
             <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-muted-foreground sm:text-base">
-              這不是排行表。選完帳號狀態後，會直接告訴你：哪種核心花在誰身上、點到哪一階停、沒到以前不要動什麼。
+              選完帳號狀態後，右邊會直接寫：角色點到哪、武器點到哪、六格穿什麼、三件收藏升到哪。
             </p>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-black sm:min-w-[360px]">
@@ -219,35 +187,10 @@ export default function GuideApp() {
         <AccountAdvisor />
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-18 lg:px-8">
-        <div className="mb-5 max-w-2xl">
-          <p className="text-xs font-bold tracking-[.18em] text-primary">
-            專業判斷框架
-          </p>
-          <h2 className="mt-2 text-2xl font-black">不只告訴你穿什麼，也告訴你為什麼</h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            所有推薦都按同一套順序判斷，避免因新角色或新裝備推出就浪費資源。
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {decisionPrinciples.map(({ icon: Icon, title, hint }, index) => (
-            <article
-              key={title}
-              className="relative overflow-hidden rounded-2xl border border-white/8 bg-card p-5"
-            >
-              <span className="absolute right-4 top-3 text-3xl font-black text-white/[0.035]">
-                0{index + 1}
-              </span>
-              <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Icon className="size-4" />
-              </span>
-              <h3 className="mt-4 text-sm font-black">{title}</h3>
-              <p className="mt-2 text-xs font-semibold leading-5 text-muted-foreground">
-                {hint}
-              </p>
-            </article>
-          ))}
-        </div>
+      <section className="mx-auto max-w-7xl px-5 pb-10 lg:px-8">
+        <p className="rounded-2xl border border-white/8 bg-card px-5 py-4 text-sm font-semibold leading-6 text-muted-foreground">
+          上面診斷已經含角色、武器、六格裝備與三件收藏。下面只是同一套答案的完整圖鑑，不用再重新判斷。
+        </p>
       </section>
 
       <CollectiblesDatabase />
@@ -631,9 +574,9 @@ export default function GuideApp() {
                 <p className="mt-5 rounded-xl border border-[#0b1f1e]/12 bg-[#0b1f1e] px-3 py-2.5 text-xs font-bold leading-5 text-[#d8ff57]">
                   {build.breakpoint}
                 </p>
-                <details className="guide-details mt-4 rounded-xl border border-[#0b1f1e]/15 bg-white/35">
+                <details className="guide-details mt-4 rounded-xl border border-[#0b1f1e]/15 bg-white/35" open>
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-3 text-xs font-black">
-                    完整裝備、技能與評分
+                    六格裝備、技能與評分
                     <ChevronRight className="size-4 transition-transform" />
                   </summary>
                   <div className="border-t border-[#0b1f1e]/10 px-3 pb-4 pt-3">
@@ -821,9 +764,9 @@ export default function GuideApp() {
       <nav className="fixed inset-x-4 bottom-4 z-40 flex items-center justify-around rounded-2xl border border-white/10 bg-[#0a1d1e]/92 p-2 shadow-2xl backdrop-blur-xl md:hidden" aria-label="行動版導覽">
         {[
           { label: '診斷', icon: Target, href: '#advisor', action: undefined },
-          { label: '行動', icon: ShieldCheck, href: '#action-plan', action: undefined },
-          { label: '配裝', icon: Swords, href: '#builds', action: undefined },
-          { label: '收藏', icon: RefreshCw, href: '#collectibles', action: undefined },
+          { label: '裝備', icon: Swords, href: '#gear-plan', action: undefined },
+          { label: '收藏', icon: RefreshCw, href: '#collectible-plan', action: undefined },
+          { label: '角色', icon: ShieldCheck, href: '#characters', action: undefined },
         ].map((item) => {
           const Icon = item.icon;
           const content = (
