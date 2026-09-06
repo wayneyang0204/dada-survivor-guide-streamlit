@@ -454,19 +454,29 @@ def diagnose_account(
     chaos_stage: str,
     play_mode: str,
     divine_stage: str,
+    weapon_stage: str = "雙生槍E4V4＋異界轉化",
 ) -> dict[str, Any]:
     main = {
+        "維納托覺醒7以上": {
+            "phase": "覺醒8與協同成形期",
+            "title": "維納托已過覺醒7，改推覺醒8與協同乘區",
+            "reason": "首領傷害+60%已經到手。角色計畫若還停在覺醒5轉職或塔洛莎養成，會把後期帳號拉回前期。",
+            "action": "覺醒8解鎖第四連攜槽與每層額外6%傷害。左協同優先梅塔莉亞覺醒1以上，右協同楊大師覺醒1以上；塔洛莎維持覺醒4以上提供裂傷。",
+            "avoid": "不要把通用覺醒核心再砸進第二個主位，也不要為了同調等級拆掉塔洛莎裂傷門檻。",
+            "switch": "覺醒8完成後，角色主線改比協同紅星與連攜被動，不再回頭練過渡主位。",
+            "score": 100,
+        },
         "維納托覺醒5＋塔洛莎覺醒4": {
-            "phase": "真終局主位期",
-            "title": "維納托主位，塔洛莎保留協同",
-            "reason": "角色組合已跨過主位轉換門檻，維納托現在才有條件穩定超過塔洛莎。",
-            "action": "維納托由覺醒5繼續升到7；塔洛莎維持覺醒4以上，不要拆掉協同。",
-            "avoid": "不要分解塔洛莎，也不要為短期面板把她降出協同門檻。",
-            "switch": "已達主位轉換條件，後續集中強化維納托與終局裝備。",
-            "score": 95,
+            "phase": "轉主位後的覺醒7斷點",
+            "title": "維納托主位已成立，下一刀是覺醒7",
+            "reason": "覺醒5只是轉換門檻，還不是後期天花板。覺醒7才會拿到首領+60%，並把強化腎上腺素初始等級拉到5。",
+            "action": "通用角色資源只服務維納托覺醒7；塔洛莎維持覺醒4以上，不要拆掉裂傷協同。",
+            "avoid": "不要在覺醒7以前改練第二主位，也不要把覺醒核心平均分給不上場角色。",
+            "switch": "覺醒7完成後，角色計畫改成覺醒8、左協同梅塔莉亞與右協同楊大師。",
+            "score": 90,
         },
         "塔洛莎覺醒5＋暴率70%": {
-            "phase": "高端成熟期",
+            "phase": "轉職準備期",
             "title": "塔洛莎繼續主位，暫時不要轉維納托",
             "reason": "低覺醒維納托不會自動更強；現在轉換會同時失去成熟主位與高階協同。",
             "action": "存到能一次完成維納托覺醒5，並同時保留塔洛莎覺醒4，再一次轉換。",
@@ -495,28 +505,61 @@ def diagnose_account(
     }[main_stage]
 
     chaos = {
-        "混沌之力18以上": {
-            "label": "高階重算",
-            "title": "重新比較項鍊與腰帶",
-            "detail": "混沌之力18已達重算點；長場可開始比較雙生階與神鑄3單系裝備。",
-            "next": "固定首領、固定時間做 A/B 實測",
-            "score": 5,
+        "混沌之力27以上": {
+            "label": "武器進化線",
+            "title": "比較混沌36／45與 SS 裝",
+            "detail": "切月鐮刀已解。下一刀比較混沌36能量雙刀、45終極聖劍，以及審判項鍊／星塵腰帶雙生階；不要退回神鑄3虛空手套。",
+            "next": "混沌36／45",
+            "score": 6,
+        },
+        "混沌之力18～26": {
+            "label": "下一進化",
+            "title": "混沌之力推到27切月鐮刀",
+            "detail": "神罰之斧已解，這不是武器終點。先把全體 SS 混沌星堆到27，再微調項鍊與腰帶。",
+            "next": "混沌之力27",
+            "score": 3,
         },
         "混沌之力9～17": {
             "label": "下一斷點",
-            "title": "混沌之力推到18",
-            "detail": "目前已能使用終局骨架；在18以前，不要頻繁更換腰帶與項鍊。",
+            "title": "混沌之力推到18神罰之斧",
+            "detail": "混沌之風已能用；18以前不要頻繁更換腰帶與項鍊，也不要回頭用苦無。",
             "next": "混沌之力18",
             "score": 0,
         },
         "混沌之力未滿9／不確定": {
             "label": "第一斷點",
             "title": "混沌之力先補到9",
-            "detail": "未滿9時先完成基本門檻，不要直接照抄混沌之力18的長場配置。",
+            "detail": "未滿9時先完成混沌之風門檻，不要直接照抄混沌27的切月鐮刀配置。",
             "next": "混沌之力9",
             "score": -10,
         },
-    }[chaos_stage]
+    }
+    chaos["混沌之力18以上"] = chaos["混沌之力18～26"]
+    chaos = chaos[chaos_stage]
+
+    weapon_options = {
+        "雙生槍E4V4＋異界轉化": {
+            "title": "雙生槍改追混沌27與異界觸發",
+            "detail": "E4V4與異界轉化已是後期骨架，不是終點。下一刀把混沌之力堆到27切月鐮刀，異界轉發條件用固定首領做 A/B。",
+            "score": 0,
+        },
+        "雙生槍E3V2以上未滿E4V4": {
+            "title": "雙生槍先推到 E4V4",
+            "detail": "E3V2 只能開混沌融合，還解不了異界轉化。神器核心先補永恆4與虛空4，再開異界轉化1。",
+            "score": -4,
+        },
+        "雙生槍E1V2骨架": {
+            "title": "雙生槍先補到 E3V2",
+            "detail": "永恆1只解決進化速度，不是後期武器計畫。接著把永恆與虛空補到 E3V2，再開混沌融合。",
+            "score": -8,
+        },
+        "苦無／虛空／未達雙生槍": {
+            "title": "先換成雙生槍並立刻永恆1",
+            "detail": "苦無與虛空之力不再當後期主武器。做出雙生槍當天就把永恆神鑄1點上。",
+            "score": -15,
+        },
+    }
+    weapon = weapon_options[weapon_stage]
 
     divine_options = {
         "哪吒R4＋伏爾坎R4支援鏈": {
@@ -539,15 +582,34 @@ def diagnose_account(
     divine_options["哪吒覺醒2＋伏爾坎覺醒1"] = divine_options["哪吒R4＋伏爾坎R4支援鏈"]
     divine_options["只有哪吒"] = divine_options["只有哪吒或伏爾坎"]
     divine = divine_options[divine_stage]
+    late_support = {
+        "title": "連攜被動只服務現役三人",
+        "detail": "覺醒6／8多出來的連攜槽，優先放塔洛莎裂傷、梅塔莉亞異常或楊大師易傷；不要塞不上場角色。",
+    }
+    late_systems = {
+        "title": "異寵、科技與 SS 裝一起補",
+        "detail": "幽冥之魂優先覺醒5；科技先雙生無人機諧振。星塵腰帶至少永恆3，月痕護腕要基礎暴率70%以上才當後期手套，不要退回神鑄3虛空手套。",
+    }
+    loadout = chaos if weapon_stage == "雙生槍E4V4＋異界轉化" else weapon
+    third = (
+        late_systems
+        if main_stage == "維納托覺醒7以上"
+        and divine_stage in ("哪吒R4＋伏爾坎R4支援鏈", "哪吒覺醒2＋伏爾坎覺醒1")
+        and weapon_stage == "雙生槍E4V4＋異界轉化"
+        else late_support
+        if main_stage == "維納托覺醒7以上"
+        and divine_stage in ("哪吒R4＋伏爾坎R4支援鏈", "哪吒覺醒2＋伏爾坎覺醒1")
+        else divine
+    )
 
     mode = {
         "短場首領": {
             "build": "短時首領爆發天花板",
-            "instruction": "先讓雙生之槍進化，技能優先無人機與冷卻，追求最短時間爆發。",
+            "instruction": "雙生槍已是後期主武器；進化交給 E4 與異界轉化，技能格優先雙生無人機與冷卻，不要再練苦無。",
         },
         "長場首領": {
             "build": "長戰疊層傷害極限",
-            "instruction": "讓混沌之力、共鳴、燃燒與虛弱完整疊滿，不用短場配裝硬套。",
+            "instruction": "讓混沌27、共鳴、燃燒／虛弱／裂傷完整疊滿；項鍊腰帶只做雙生階 A/B，不退回神鑄3單系。",
         },
         "區域行動": {
             "build": "新版區域行動路線最優解",
@@ -555,7 +617,7 @@ def diagnose_account(
         },
     }[play_mode]
 
-    readiness = max(15, min(100, main["score"] + chaos["score"] + divine["score"]))
+    readiness = max(15, min(100, main["score"] + chaos["score"] + divine["score"] + weapon["score"]))
     return {
         "phase": main["phase"],
         "title": main["title"],
@@ -565,8 +627,8 @@ def diagnose_account(
         "mode_instruction": mode["instruction"],
         "priorities": [
             {"label": "主位第一順位", "title": main["title"], "detail": main["action"]},
-            {"label": chaos["label"], "title": chaos["title"], "detail": chaos["detail"]},
-            {"label": "支援鏈", "title": divine["title"], "detail": divine["detail"]},
+            {"label": chaos["label"] if loadout is chaos else "武器神鑄", "title": loadout["title"], "detail": loadout["detail"]},
+            {"label": "全系統", "title": third["title"], "detail": third["detail"]},
         ],
         "avoid": main["avoid"],
         "switch_condition": main["switch"],

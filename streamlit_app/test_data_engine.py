@@ -66,7 +66,7 @@ def test_account_diagnosis_returns_mode_specific_plan() -> None:
         play_mode="長場首領",
         divine_stage="只有哪吒",
     )
-    assert result["phase"] == "高端成熟期"
+    assert result["phase"] == "轉職準備期"
     assert result["build"] == "長戰疊層傷害極限"
     assert result["next_breakpoint"] == "混沌之力18"
     assert len(result["priorities"]) == 3
@@ -79,6 +79,37 @@ def test_account_diagnosis_returns_mode_specific_plan() -> None:
     )
     assert zone["build"] == "新版區域行動路線最優解"
     assert "不帶入局外裝備" in zone["mode_instruction"]
+
+
+def test_account_diagnosis_covers_post_a7_character_plan() -> None:
+    result = diagnose_account(
+        main_stage="維納托覺醒7以上",
+        chaos_stage="混沌之力18以上",
+        play_mode="短場首領",
+        divine_stage="哪吒R4＋伏爾坎R4支援鏈",
+    )
+    assert result["phase"] == "覺醒8與協同成形期"
+    assert "覺醒8" in result["priorities"][0]["detail"]
+    assert "梅塔莉亞" in result["priorities"][0]["detail"]
+    assert "切月鐮刀" in result["priorities"][1]["title"]
+    assert result["priorities"][2]["title"] == "異寵、科技與 SS 裝一起補"
+    assert "苦無" not in result["priorities"][1]["title"]
+    assert "存到能一次完成" not in result["priorities"][0]["detail"]
+    assert result["readiness"] == 100
+
+
+def test_account_diagnosis_covers_late_weapon_and_systems() -> None:
+    result = diagnose_account(
+        main_stage="維納托覺醒7以上",
+        chaos_stage="混沌之力27以上",
+        play_mode="短場首領",
+        divine_stage="哪吒R4＋伏爾坎R4支援鏈",
+        weapon_stage="雙生槍E4V4＋異界轉化",
+    )
+    assert result["next_breakpoint"] == "混沌36／45"
+    assert "虛空手套" in result["priorities"][2]["detail"]
+    assert "覺醒5" in result["priorities"][2]["detail"]
+    assert result["mode_instruction"].startswith("雙生槍已是後期主武器")
 
 
 def _optimize(**overrides):

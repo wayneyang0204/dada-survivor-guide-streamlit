@@ -38,13 +38,13 @@ type Category = (typeof categories)[number];
 const decisionPrinciples = [
   {
     icon: Target,
-    title: '先鎖定主位',
-    hint: '角色未達轉換門檻，就不為排行榜分散資源。',
+    title: '先對齊主位斷點',
+    hint: '覺醒5只是轉職線；覺醒7／8才是後期角色計畫。',
   },
   {
     icon: Zap,
-    title: '再補關鍵斷點',
-    hint: '以混沌之力9與18為重算點，不做無效換裝。',
+    title: '再補武器斷點',
+    hint: '雙生槍 E4V4、異界轉化與混沌27，才是後期武器線。',
   },
   {
     icon: Swords,
@@ -53,8 +53,8 @@ const decisionPrinciples = [
   },
   {
     icon: ShieldCheck,
-    title: '最後補支援鏈',
-    hint: '哪吒與伏爾坎是支援，不搶主位養成資源。',
+    title: '後期改推協同',
+    hint: '塔洛莎裂傷、梅塔莉亞異常與楊大師易傷，比再開第二主位更有感。',
   },
 ];
 
@@ -190,7 +190,7 @@ export default function GuideApp() {
         <div className="relative z-10 mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <span className="mb-4 inline-flex h-6 w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
-              {OFFICIAL_UPDATE.version} 終局版 · 2026/08/29 更新
+              {OFFICIAL_UPDATE.version} 後期版 · 2026/09/07 更新
             </span>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl">
               先知道現在該做什麼，
@@ -565,10 +565,10 @@ export default function GuideApp() {
 
             <div className="mt-5 grid gap-3 text-xs font-bold sm:grid-cols-3">
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
-                <span className="text-[#d8ff57]">真正主位：</span>維納托／塔洛莎
+                <span className="text-[#d8ff57]">真正主位：</span>維納托覺醒7～8
               </p>
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
-                <span className="text-[#d8ff57]">神火支援鏈：</span>哪吒 → 伏爾坎
+                <span className="text-[#d8ff57]">後期協同：</span>塔洛莎裂傷 ＋ 梅塔莉亞／楊大師
               </p>
               <p className="rounded-xl bg-white/[0.06] p-3 text-white/65">
                 <span className="text-[#d8ff57]">不是角色：</span>幽冥之魂是異獸
@@ -691,7 +691,7 @@ export default function GuideApp() {
           </div>
           <div className="mt-7 flex flex-col gap-3 rounded-2xl border-2 border-[#0b1f1e]/10 bg-[#f8ffe1]/70 p-4 text-xs font-semibold sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-2xl leading-5 opacity-70">
-              終局玩家請把自己的基礎暴率、遺物核心、混沌之力與收藏加成丟進計算器；同一件雙生階裝備在未達門檻時，可能輸給神鑄3的單系裝備。
+              後期帳號請用雙生槍 E4V4、混沌27／36／45、異界轉化與收藏加成做 A/B；神鑄3虛空手套只留給還沒達月痕門檻的過渡。
             </p>
             <div className="flex flex-wrap gap-2">
               <a
@@ -723,9 +723,9 @@ export default function GuideApp() {
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-[.16em] text-primary">
-                終局帳號檢查
+                後期帳號檢查
               </p>
-              <h2 className="text-xl font-black">給建議前，先確認這四項</h2>
+              <h2 className="text-xl font-black">後期全系統計畫，先確認這四項</h2>
             </div>
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
