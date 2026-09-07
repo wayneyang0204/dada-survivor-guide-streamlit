@@ -152,6 +152,41 @@ button[kind="primary"]:hover {background:#193bbd;border-color:#193bbd;}
 [class*="st-key-source_article_"], [class*="st-key-latest_article_"] {border-top:1px solid var(--line);padding:1rem 0;}
 .site-footer {border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem;color:var(--muted);font-size:.875rem;line-height:1.75;}
 
+/* Reading-first guide home and articles use the same paper/ink palette. */
+.st-key-guide_search {max-width:760px;}
+.st-key-topic_directory {border-bottom:1px solid var(--line);padding:.3rem 0 1.1rem;}
+.st-key-topic_directory button {text-align:left;justify-content:flex-start;border:0;border-left:2px solid var(--accent);border-radius:0;background:var(--wash);}
+.st-key-guide_frontpage {padding:.8rem 0 1rem;border-bottom:1px solid var(--line);}
+.frontpage-feature {padding:.6rem 0;}
+.guide-kicker {font-size:.875rem;font-weight:700;color:var(--accent);margin-bottom:.8rem;}
+.frontpage-feature h2 {font-size:clamp(1.5rem,3vw,1.9rem);line-height:1.5;margin:0 0 .8rem;}
+.frontpage-feature p {margin:0 0 1rem;}
+.feature-bottom {display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;color:var(--muted);font-size:.875rem;border-top:1px solid var(--line);padding-top:.8rem;}
+.st-key-frontpage_quick {border-left:1px solid var(--line);padding-left:1.5rem;}
+.st-key-frontpage_quick button[kind="tertiary"] {justify-content:flex-start;text-align:left;padding:.4rem 0;}
+[class*="st-key-guide_row_"] {border-top:1px solid var(--line);padding:1rem 0 .7rem;}
+.guide-meta {font-size:.875rem;font-weight:650;color:var(--accent);}
+.guide-meta span {color:var(--muted);font-weight:400;}
+[class*="st-key-guide_row_"] [data-testid="stButton"] button {padding:.2rem 0;justify-content:flex-start;text-align:left;}
+[class*="st-key-guide_row_"] [data-testid="stButton"] button p {font-size:1.125rem;font-weight:750;line-height:1.6;}
+[class*="st-key-guide_row_"] [data-testid="stButton"] button:hover p {color:var(--accent);text-decoration:underline;text-underline-offset:.2em;}
+.st-key-guide_standards {border-top:1px solid var(--line);padding-top:1rem;margin-top:.5rem;}
+.guide-verdict {border-top:3px solid var(--accent);background:var(--wash);padding:1.2rem 1.3rem;margin:.5rem 0 1.5rem;}
+.guide-verdict h2 {font-size:1rem;margin:0 0 .5rem;color:var(--accent);}
+.guide-verdict p {margin:0;}
+.article-section {font-size:1.4rem;padding-top:.6rem;margin:1.5rem 0 .8rem;scroll-margin-top:1rem;}
+.guide-table-scroll {max-width:100%;overflow-x:auto;margin:.8rem 0 1rem;}
+.guide-table-scroll:focus-visible {outline:2px solid var(--accent);outline-offset:2px;}
+.guide-table {width:100%;border-collapse:collapse;font-size:1rem;line-height:1.65;}
+.guide-table th {font-size:.875rem;font-weight:700;text-align:left;background:var(--wash);padding:.75rem;border-top:2px solid var(--ink);}
+.guide-table td {padding:.75rem;vertical-align:top;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;}
+.st-key-article_rail {border-left:1px solid var(--line);padding:1rem 0 0 1.5rem;}
+.article-toc {margin-bottom:1.2rem;}
+.article-toc strong {display:block;font-size:.875rem;letter-spacing:.06em;margin-bottom:.5rem;}
+.article-toc a {display:block;color:var(--muted);font-size:.9375rem;line-height:1.6;padding:.55rem 0;text-decoration:none;}
+.article-toc a:hover {color:var(--accent);text-decoration:underline;}
+.mobile-toc {display:none;}
+
 @media(max-width:760px) {
   .block-container {padding:1rem 1rem 3rem;}
   .masthead {padding:.3rem 0 1rem;}.masthead-edition {display:none;}
@@ -166,6 +201,16 @@ button[kind="primary"]:hover {background:#193bbd;border-color:#193bbd;}
   .st-key-profile_nav [role="radiogroup"] {display:flex;flex-direction:row;flex-wrap:wrap;gap:.25rem;}
   .st-key-profile_nav label[data-testid="stRadioOption"] {padding:.5rem .6rem;}
   .速覽清單 {grid-template-columns:1fr;gap:.5rem;}
+  .st-key-main_nav label p {font-size:.875rem;}
+  .st-key-guide_frontpage > [data-testid="stHorizontalBlock"],
+  .st-key-guide_article_layout > [data-testid="stHorizontalBlock"] {flex-direction:column;}
+  .st-key-guide_frontpage > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+  .st-key-guide_article_layout > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {width:100%!important;flex:1 1 100%;min-width:0;}
+  .st-key-frontpage_quick, .st-key-article_rail {border-left:0;border-top:1px solid var(--line);padding:1rem 0 0;}
+  .st-key-article_rail .article-toc {display:none;}
+  .mobile-toc {display:block;border-bottom:1px solid var(--line);padding-bottom:.8rem;}
+  .mobile-toc summary {min-height:44px;font-size:1rem;font-weight:650;cursor:pointer;}
+  .guide-table {min-width:27rem;}
 }
 @media(max-width:480px) {
   .decision-facts {grid-template-columns:1fr;}

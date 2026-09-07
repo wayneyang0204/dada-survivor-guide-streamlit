@@ -1,11 +1,27 @@
-# 升級決策版
+# 攻略網站與升級工具
 
 Streamlit entry point: `streamlit_app/app.py`. Deploy using the existing GitHub
 `main` branch connected to Streamlit Community Cloud. The `.openai` manifest at
 the repository root belongs to the separate earlier Sites build; this Python
 application is not a Cloudflare Worker.
 
-## Primary flow
+## Guide website
+
+- New visitors open `攻略首頁`, not an account form. Home and the guide index
+  read a local, source-labelled catalog and remain usable without source APIs.
+- Six cornerstone articles have conclusions, conditions, tables, cautions,
+  FAQs, source dates and related reading. Existing summaries are explicitly
+  labelled as references awaiting re-verification, not newly verified guides.
+- `?guide=<stable-slug>` addresses each article without any account data in the
+  URL. Invalid slugs only perform a local lookup and offer an index return.
+- Category and full-text search share `guide_content.py`. `guide_ui.py` owns
+  reading views and connects articles to the appropriate planner resource.
+- In-app navigation preserves session profiles. Reloading a direct article
+  link starts a new session as usual; article links are not profile backups.
+- The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
+  collectible catalog, event calculator, and profile editor remain available.
+
+## Planner flow
 
 1. 下一步: a three-field initial profile, then a single primary recommendation.
 2. 我的帳號: edit one system at a time; saving returns to the recalculated result.

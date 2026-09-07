@@ -8,8 +8,10 @@ sys.path.insert(0, str(Path(__file__).parent))
 APP = str(Path(__file__).with_name("app.py"))
 
 
-def boot():
-    return AppTest.from_file(APP).run(timeout=15)
+def boot(page="下一步"):
+    app = AppTest.from_file(APP)
+    app.session_state["主導覽"] = page
+    return app.run(timeout=15)
 
 
 def by_label(elements, label):
@@ -19,7 +21,7 @@ def by_label(elements, label):
 def test_first_visit_is_a_short_setup_not_an_article_feed():
     a = boot()
     assert not a.exception
-    assert a.radio[0].options == ["下一步", "我的帳號", "活動", "資料庫"]
+    assert a.radio[0].options == ["攻略首頁", "下一步", "我的帳號", "活動", "資料庫"]
     assert len(a.get("form")) == 1
     assert len(a.number_input) == 1
     assert not any("本期活動完整作戰簡報" in x.value for x in a.markdown)

@@ -13,10 +13,14 @@ import data_engine as _data_engine
 import next_step as _next_step
 import decision_ui as _decision_ui
 import ui_theme as _ui_theme
+import guide_content as _guide_content
+import guide_ui as _guide_ui
 
 _next_step = importlib.reload(_next_step)
 _decision_ui = importlib.reload(_decision_ui)
 _ui_theme = importlib.reload(_ui_theme)
+_guide_content = importlib.reload(_guide_content)
+_guide_ui = importlib.reload(_guide_ui)
 
 
 # Streamlit Cloud can hot-reload app.py before a changed helper module. Reloading
@@ -31,13 +35,6 @@ match_event_playbook = _data_engine.match_event_playbook
 optimize_player_plan = _data_engine.optimize_player_plan
 rank_rewards = _data_engine.rank_rewards
 
-
-st.set_page_config(
-    page_title="噠噠攻略手冊 · 升級路線",
-    page_icon="📖",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
 
 來源分類網址 = "https://notalknote.xyz/moblegame/survivorio/"
 來源介面網址 = (
@@ -432,8 +429,17 @@ def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str
     )
 
 
+標題攻略 = _guide_content.get_guide(st.query_params.get("guide", ""), _guide_content.all_guides(攻略資料))
+st.set_page_config(
+    page_title=f"{標題攻略['title']}｜噠噠攻略站" if 標題攻略 else "噠噠特攻攻略站 · 養成與活動攻略",
+    page_icon="📖",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 st.markdown(_ui_theme.STYLE, unsafe_allow_html=True)
 
+_guide_ui.sync_query()
+st.session_state.setdefault("主導覽", "攻略首頁")
 # Migrate older navigation state without carrying its conflicting recommendation pages.
 if st.session_state.get("主導覽") in ("首頁", "養成"):
     st.session_state["主導覽"] = "下一步"
@@ -447,7 +453,7 @@ st.markdown(
     <div class="masthead">
       <div class="masthead-brand">
         <span class="brand-mark" aria-hidden="true">噠</span>
-        <div><span class="brand-title">噠噠攻略手冊</span><span class="brand-subtitle">Survivor.io · 玩家養成筆記</span></div>
+        <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
       <div class="masthead-edition">升級路線 / 活動試算 / 攻略索引</div>
     </div>
@@ -458,23 +464,33 @@ st.markdown(
 with st.container(key="main_nav"):
     主頁面 = st.radio(
         "選擇功能",
-        ["下一步", "我的帳號", "活動", "資料庫"],
+        ["攻略首頁", "下一步", "我的帳號", "活動", "資料庫"],
         horizontal=True,
         label_visibility="collapsed",
         key="主導覽",
+        on_change=_guide_ui.clear_article,
     )
 
 if 主頁面 == "活動":
     頁面 = "活動最佳解"
 elif 主頁面 == "資料庫":
-    _decision_ui.page_heading("攻略索引", "查門檻、查機制。個人投資順序請看「下一步」。")
-    頁面 = st.selectbox("要查什麼", ["完整攻略庫", "收藏圖鑑", "最新文章", "配裝參考"], key="資料分類")
+    if st.session_state.get("article_slug"):
+        頁面 = "閱讀攻略"
+    else:
+        _decision_ui.page_heading("攻略索引", "按系統或關鍵字查找；升級路線、機制門檻與來源分開標示。")
+        頁面 = st.selectbox("要查什麼", ["本站攻略", "完整攻略庫", "收藏圖鑑", "最新文章", "配裝參考"], key="資料分類")
     if 頁面 == "配裝參考":
         頁面 = "終局配裝"
 else:
     頁面 = 主頁面
 
-if 頁面 == "下一步":
+if 頁面 == "攻略首頁":
+    _guide_ui.render_home(攻略資料)
+elif 頁面 == "本站攻略":
+    _guide_ui.render_index(攻略資料)
+elif 頁面 == "閱讀攻略":
+    _guide_ui.render_article(st.session_state["article_slug"], 攻略資料)
+elif 頁面 == "下一步":
     _decision_ui.render_home()
 elif 頁面 == "我的帳號":
     _decision_ui.render_profile()
@@ -748,6 +764,6 @@ elif 頁面 == "最新文章":
             st.link_button("閱讀原始文章", item["網址"])
     st.link_button("查看完整文章分類", 來源分類網址)
 
-st.markdown('<div class="site-footer">噠噠攻略手冊 · 2026.09.08 · 白底手冊版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
+st.markdown('<div class="site-footer">噠噠攻略站 · 2026.09.08 · 攻略網站版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
 台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
 st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")
