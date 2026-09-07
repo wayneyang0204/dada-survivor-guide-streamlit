@@ -35,7 +35,7 @@ def test_onboarding_contextual_edit_save_navigation_and_completion():
     assert any("維納托 R6 → R7" in x.value for x in a.markdown)
     by_label(a.button, "補上這一步的資料").click().run()
     assert a.radio[0].value == "我的帳號"
-    assert by_label(a.selectbox, "這次更新哪一項").value == "角色與模式"
+    assert by_label(a.radio, "這次更新哪一項").value == "角色與模式"
     by_label(a.number_input, "現有覺醒核心").set_value(30)
     by_label(a.number_input, "可用於主位的S特工碎片").set_value(550)
     by_label(a.selectbox, "量子碎片是否足夠升主位下一階").set_value(True)
@@ -56,7 +56,7 @@ def test_profile_survives_switching_sections_and_pages():
     a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6, "hearts": 12345}
     a.radio[0].set_value("我的帳號").run()
     for section in ("普通典藏館", "進階典藏館", "收藏品", "裝備與科技", "角色與模式"):
-        by_label(a.selectbox, "這次更新哪一項").select(section).run()
+        by_label(a.radio, "這次更新哪一項").set_value(section).run()
         assert not a.exception
     a.radio[0].set_value("下一步").run()
     assert a.session_state["player_profile"]["hearts"] == 12345
@@ -67,7 +67,7 @@ def test_invalid_star_input_shows_error_and_preserves_profile():
     a = boot()
     a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6}
     a.radio[0].set_value("我的帳號").run()
-    by_label(a.selectbox, "這次更新哪一項").select("進階典藏館").run()
+    by_label(a.radio, "這次更新哪一項").set_value("進階典藏館").run()
     by_label(a.text_input, "第二套預定放入的傳奇收藏星數（最多8件）").set_value("紅6")
     by_label(a.button, "儲存並重新排序").click().run()
     assert a.error
@@ -168,7 +168,7 @@ def test_resource_scope_routes_missing_advanced_data_to_correct_form():
     by_label(a.button, "只填進階典藏館").click().run()
     assert not a.exception
     assert a.radio[0].value == "我的帳號"
-    assert by_label(a.selectbox, "這次更新哪一項").value == "進階典藏館"
+    assert by_label(a.radio, "這次更新哪一項").value == "進階典藏館"
 
 
 def test_unlocking_a_collectible_also_updates_distinct_owned_count():
@@ -186,7 +186,7 @@ def test_unlocking_a_collectible_also_updates_distinct_owned_count():
 def test_backup_restore_is_visible_on_first_visit_and_home():
     a = boot()
     assert by_label(a.button, "套用匯入紀錄").disabled
-    assert any(x.label == "接續上次紀錄" for x in a.expander)
+    assert any(x.proto.popover.label == "接續上次紀錄" for x in a.get("popover"))
     a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 8}
     a.run()
     assert not a.exception
@@ -230,7 +230,7 @@ def test_editing_one_estimated_balance_preserves_other_resource_provenance():
     a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6,
         "hearts": 1000, "awakening_cores": 20, "estimated_balances": ["hearts", "awakening_cores"]}
     a.radio[0].set_value("我的帳號").run()
-    by_label(a.selectbox, "這次更新哪一項").select("普通典藏館").run()
+    by_label(a.radio, "這次更新哪一項").set_value("普通典藏館").run()
     by_label(a.number_input, "現有收藏之心").set_value(1200)
     by_label(a.button, "儲存並重新排序").click().run()
     assert not a.exception
@@ -291,4 +291,4 @@ def test_missing_stars_do_not_open_an_irrelevant_material_form():
     assert any("資料未齊" in x.value for x in a.markdown)
     assert not a.get("form")
     by_label(a.button, "補上這一步的資料").click().run()
-    assert by_label(a.selectbox, "這次更新哪一項").value == "進階典藏館"
+    assert by_label(a.radio, "這次更新哪一項").value == "進階典藏館"

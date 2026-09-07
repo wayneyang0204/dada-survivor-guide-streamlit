@@ -12,9 +12,11 @@ import streamlit as st
 import data_engine as _data_engine
 import next_step as _next_step
 import decision_ui as _decision_ui
+import ui_theme as _ui_theme
 
 _next_step = importlib.reload(_next_step)
 _decision_ui = importlib.reload(_decision_ui)
+_ui_theme = importlib.reload(_ui_theme)
 
 
 # Streamlit Cloud can hot-reload app.py before a changed helper module. Reloading
@@ -31,8 +33,8 @@ rank_rewards = _data_engine.rank_rewards
 
 
 st.set_page_config(
-    page_title="噠噠特攻終局攻略",
-    page_icon="⚡",
+    page_title="噠噠攻略手冊 · 升級路線",
+    page_icon="📖",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -350,13 +352,13 @@ def 切換主頁面(主要: str, 次要: str | None = None) -> None:
 
 
 def 顯示攻略卡片(item: dict) -> None:
-    狀態色 = {"現行": "#5f860b", "常駐": "#187178", "需版本核對": "#a85a08"}.get(item["狀態"], "#735b45")
+    狀態色 = {"現行": "#176446", "常駐": "#2449d8", "需版本核對": "#805510"}.get(item["狀態"], "#606873")
     st.markdown(
         f"""
         <div class="攻略卡">
           <div class="卡片頂列">
             <span class="分類">{item['分類']}</span>
-            <span class="狀態" style="color:{狀態色};border-color:{狀態色}55;background:{狀態色}12">{item['狀態']}</span>
+            <span class="狀態" style="color:{狀態色}">{item['狀態']}</span>
           </div>
           <h3>{item['標題']}</h3>
           <p>{item['摘要']}</p>
@@ -430,314 +432,7 @@ def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str
     )
 
 
-st.markdown(
-    """
-    <style>
-      :root {
-        color-scheme: light;
-        --bg: #f7f8f5;
-        --panel: #ffffff;
-        --panel-2: #f0f6ee;
-        --lime: #91c928;
-        --lime-strong: #6f9f12;
-        --lime-soft: #eaf7cf;
-        --ink: #14282b;
-        --deep: #102528;
-        --muted: rgba(20, 40, 43, .68);
-        --line: rgba(24, 62, 56, .14);
-        --cyan: #227d82;
-        --orange: #b86912;
-        --shadow: 0 18px 46px rgba(27, 58, 49, .08);
-      }
-      html, body, [class*="css"] { font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; }
-      .stApp {
-        color: var(--ink);
-        background:
-          radial-gradient(900px 520px at 8% 10%, rgba(151, 201, 61, .11), transparent 62%),
-          radial-gradient(700px 420px at 92% 30%, rgba(73, 187, 181, .08), transparent 60%),
-          var(--bg);
-      }
-      [data-testid="stHeader"] { height: 1.2rem; background: transparent; }
-      [data-testid="stToolbar"], [data-testid="stDecoration"] { display:none; }
-      [data-testid="stSidebar"], [data-testid="collapsedControl"] { display: none; }
-      [data-testid="stAppViewContainer"] > .main { overflow: visible; }
-      .block-container { max-width: 1220px; padding: 1.1rem 2rem 4rem; }
-      footer { display: none; }
-
-      .頂導 { min-height: 3.4rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.2rem 0 .7rem; }
-      .品牌 { display:flex; align-items:center; gap:.72rem; font-size:1rem; font-weight:950; letter-spacing:-.02em; }
-      .品牌文字 { display:flex; flex-direction:column; gap:.05rem; }
-      .品牌文字 small { color:rgba(20,40,43,.46); font-size:.54rem; font-weight:850; letter-spacing:.14em; }
-      .品牌名稱 { display:flex; align-items:center; gap:.42rem; }
-      .專業標 { padding:.13rem .34rem; border-radius:.32rem; background:var(--deep); color:#d9ff83; font-size:.52rem; font-weight:950; letter-spacing:.08em; }
-      .品牌記號 { position:relative; display:grid; place-items:center; width:2.25rem; height:2.25rem; border-radius:.76rem; color:#dfff8f; background:var(--deep); box-shadow:0 10px 24px rgba(16,37,40,.2); }
-      .品牌記號::after { content:""; position:absolute; right:.28rem; top:.28rem; width:.35rem; height:.35rem; border-radius:50%; background:var(--lime); box-shadow:0 0 0 3px rgba(145,201,40,.16); }
-      .同步徽章 { display:inline-flex; align-items:center; gap:.45rem; padding:.35rem .65rem; border:1px solid rgba(34,125,130,.18); border-radius:999px; background:#eef8f5; color:#246d70; font-size:.72rem; font-weight:850; }
-      .同步點 { width:.42rem; height:.42rem; border-radius:50%; background:#2fb678; box-shadow:0 0 10px rgba(47,182,120,.35); }
-
-      [data-testid="stRadio"] { position:sticky; top:.45rem; z-index:999; width:100%; }
-      [data-testid="stRadio"] > div { width:100%; }
-      div[role="radiogroup"] { display:flex; flex-wrap:wrap; gap:.35rem; width:100%; padding:.35rem; border:1px solid var(--line); border-radius:1rem; background:rgba(255,255,255,.92); box-shadow:0 12px 32px rgba(39,72,61,.08); }
-      div[role="radiogroup"] label { flex:1 1 auto; min-width:max-content; justify-content:center; padding:.62rem .78rem; border-radius:.72rem; color:rgba(23,48,50,.65); font-size:.78rem; font-weight:850; cursor:pointer; transition:all .18s ease; }
-      div[role="radiogroup"] label p { color:inherit !important; }
-      div[role="radiogroup"] label:hover { color:var(--ink); background:#f0f5ee; }
-      div[role="radiogroup"] label:has(input:checked) { color:#173032; background:#dff49e; box-shadow:0 8px 20px rgba(115,159,18,.12); }
-      label[data-testid="stRadioOption"] > div > div > div:first-child { display:none; }
-
-      .主視覺 { position:relative; overflow:hidden; min-height:245px; display:flex; flex-direction:column; justify-content:center; margin:1rem 0 1.25rem; padding:1.55rem 1.75rem; border:1px solid rgba(83,131,63,.18); border-radius:1.45rem; background:linear-gradient(135deg, #ffffff, #f2f8e9 58%, #e8f4df); box-shadow:var(--shadow); }
-      .主視覺::after { content:""; position:absolute; width:20rem; height:20rem; right:-7rem; top:-10rem; border-radius:50%; background:rgba(151,201,61,.16); filter:blur(24px); pointer-events:none; }
-      .主標 { position:relative; z-index:1; font-size:clamp(1.85rem, 4vw, 3rem); line-height:1.06; font-weight:950; letter-spacing:-.05em; max-width:920px; margin:.25rem 0 .65rem; text-wrap:balance; }
-      .主標 span { color:var(--lime); }
-      .說明 { position:relative; z-index:1; margin:0; color:var(--muted); max-width:820px; line-height:1.75; font-size:.95rem; font-weight:560; }
-      .小標 { position:relative; z-index:1; color:var(--lime); font-size:.72rem; font-weight:950; letter-spacing:.16em; text-transform:uppercase; }
-      .主視覺徽章 { display:inline-flex; align-self:flex-start; margin-top:.9rem; padding:.38rem .68rem; border:1px solid rgba(115,159,18,.22); border-radius:999px; background:#edf7d8; color:#557d08; font-size:.68rem; font-weight:850; }
-      [data-testid="stImage"] { height:100%; margin:1rem 0 1.25rem; }
-      [data-testid="stImage"] img { width:100%; height:100%; min-height:220px; max-height:245px; object-fit:cover; object-position:68% center; border:1px solid rgba(29,73,63,.14); border-radius:1.4rem; box-shadow:0 16px 38px rgba(45,79,58,.1); }
-      .信任列 { display:flex; flex-wrap:wrap; gap:.45rem; margin:-.35rem 0 1.1rem; }
-      .信任列 span { display:inline-flex; align-items:center; gap:.35rem; padding:.38rem .62rem; border:1px solid var(--line); border-radius:999px; background:#fff; color:rgba(23,48,50,.64); font-size:.68rem; font-weight:820; }
-      .信任列 b { color:#557d08; }
-
-      .決策台 { overflow:hidden; margin:.25rem 0 1.2rem; border:1px solid rgba(16,37,40,.22); border-radius:1.35rem; background:var(--deep); color:#fff; box-shadow:0 22px 52px rgba(16,37,40,.17); }
-      .決策台頭 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; padding:.8rem 1.15rem; border-bottom:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.58); font-size:.62rem; font-weight:900; letter-spacing:.12em; }
-      .決策信心 { display:inline-flex; align-items:center; gap:.35rem; color:#dfff8f; letter-spacing:0; }
-      .決策信心::before { content:""; width:.4rem; height:.4rem; border-radius:50%; background:#a5e23c; box-shadow:0 0 12px rgba(165,226,60,.7); }
-      .決策台格 { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr); }
-      .今日指令 { padding:1.35rem 1.45rem 1.45rem; border-right:1px solid rgba(255,255,255,.1); background:radial-gradient(700px 250px at 20% 0%, rgba(145,201,40,.13), transparent 58%); }
-      .今日指令 small { color:#dfff8f; font-size:.62rem; font-weight:950; letter-spacing:.12em; }
-      .今日指令 h3 { margin:.42rem 0 .45rem; color:#fff !important; font-size:clamp(1.25rem,2.2vw,1.7rem); line-height:1.25; }
-      .今日結論 { margin:.15rem 0 .9rem; color:rgba(255,255,255,.72); font-size:.86rem; line-height:1.6; }
-      .今日步驟 { display:flex; flex-wrap:wrap; gap:.42rem; margin-top:.75rem; }
-      .今日步驟 span { padding:.38rem .55rem; border:1px solid rgba(255,255,255,.1); border-radius:.55rem; background:rgba(255,255,255,.06); color:rgba(255,255,255,.78); font-size:.68rem; font-weight:750; }
-      .決策側欄 { display:grid; grid-template-rows:repeat(3,1fr); }
-      .決策訊號 { padding:.85rem 1rem; border-bottom:1px solid rgba(255,255,255,.1); }
-      .決策訊號:last-child { border-bottom:0; }
-      .決策訊號 small { color:rgba(255,255,255,.45); font-size:.58rem; font-weight:900; letter-spacing:.09em; }
-      .決策訊號 strong { display:block; margin:.22rem 0 .16rem; color:#fff; font-size:.8rem; }
-      .決策訊號 span { color:rgba(255,255,255,.58); font-size:.66rem; line-height:1.45; }
-
-      .價值主張 { margin:1.35rem 0 1.1rem; padding:1.35rem 1.4rem; border:1px solid rgba(20,40,43,.12); border-radius:1.25rem; background:#fff; box-shadow:var(--shadow); }
-      .價值頭 { display:flex; align-items:flex-end; justify-content:space-between; gap:1.2rem; margin-bottom:.95rem; }
-      .價值頭 small { color:var(--lime-strong); font-size:.62rem; font-weight:950; letter-spacing:.13em; }
-      .價值頭 h3 { margin:.28rem 0 0; font-size:clamp(1.15rem,2.4vw,1.55rem); }
-      .價值頭 p { max-width:450px; margin:0; color:var(--muted); font-size:.74rem; line-height:1.55; text-align:right; }
-      .價值格 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; }
-      .價值項 { padding:.9rem; border:1px solid var(--line); border-radius:.85rem; background:#f8faf6; }
-      .價值項 b { display:block; color:var(--ink); font-size:.8rem; }
-      .價值項 strong { display:block; margin:.28rem 0 .24rem; color:var(--lime-strong); font-size:1.12rem; letter-spacing:-.03em; }
-      .價值項 span { color:rgba(20,40,43,.58); font-size:.66rem; line-height:1.5; }
-      .方法條 { display:flex; flex-wrap:wrap; gap:.42rem; margin-top:.72rem; padding-top:.72rem; border-top:1px solid var(--line); }
-      .方法條 span { padding:.28rem .48rem; border-radius:999px; background:#eef6ec; color:rgba(20,40,43,.62); font-size:.62rem; font-weight:800; }
-
-      .重點速覽 { padding:1.3rem 1.4rem; border:1px solid rgba(115,159,18,.24); border-radius:1.25rem; background:linear-gradient(145deg,#ffffff,#f5faec); box-shadow:0 12px 30px rgba(39,72,61,.06); }
-      .速覽頂列 { display:flex; align-items:center; justify-content:space-between; gap:.8rem; color:rgba(23,48,50,.5); font-size:.68rem; font-weight:800; }
-      .速覽徽章 { padding:.28rem .55rem; border-radius:999px; background:var(--lime); color:#fff; letter-spacing:.08em; }
-      .重點速覽 h3 { margin:.65rem 0 .7rem; font-size:clamp(1.15rem,2.5vw,1.55rem); line-height:1.38; }
-      .速覽標籤列 { display:flex; flex-wrap:wrap; gap:.35rem; margin:-.2rem 0 .8rem; }
-      .速覽標籤列 span { padding:.28rem .5rem; border-radius:999px; background:#eef8f5; color:#227d82; font-size:.66rem; font-weight:850; }
-      .速覽結論 { display:flex; gap:.65rem; align-items:flex-start; margin:0 0 .9rem; padding:.75rem .85rem; border-radius:.8rem; background:#edf7d8; color:#31530e; font-size:.86rem; line-height:1.55; }
-      .速覽結論 b, .速覽停損 b { flex:0 0 auto; color:#557d08; }
-      .速覽清單 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; }
-      .速覽區塊 { min-height:12rem; padding:.95rem 1rem; border:1px solid rgba(34,125,130,.2); border-radius:.95rem; background:#fff; box-shadow:0 8px 20px rgba(39,72,61,.035); }
-      .速覽區塊:nth-child(2) { border-color:rgba(184,105,18,.24); }
-      .速覽區塊:nth-child(3) { border-color:rgba(115,159,18,.28); }
-      .速覽區塊:nth-child(4) { border-color:rgba(164,68,127,.22); }
-      .速覽區塊標題 { display:flex; gap:.6rem; align-items:center; margin-bottom:.55rem; }
-      .速覽區塊標題 strong { color:var(--ink); font-size:.88rem; }
-      .速覽號 { display:grid; place-items:center; width:1.55rem; height:1.55rem; border-radius:.5rem; background:#227d82; color:#fff; font-size:.72rem; font-weight:950; box-shadow:0 7px 14px rgba(34,125,130,.16); }
-      .速覽區塊:nth-child(2) .速覽號 { background:#b86912; }
-      .速覽區塊:nth-child(3) .速覽號 { background:#739f12; }
-      .速覽區塊:nth-child(4) .速覽號 { background:#9e467e; }
-      .速覽區塊 ul { margin:0; padding-left:1.1rem; }
-      .速覽區塊 li { margin:.36rem 0; color:rgba(23,48,50,.69); font-size:.78rem; line-height:1.58; }
-      .速覽區塊 li::marker { color:var(--lime); }
-      .速覽區塊 li b { color:var(--ink); font-weight:900; }
-      .速覽停損 { display:flex; gap:.65rem; margin:.8rem 0 0; padding-top:.8rem; border-top:1px solid var(--line); color:#8a510f; font-size:.76rem; line-height:1.5; }
-      .速覽停損 b { color:#a65c0b; }
-      .快捷格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin:.65rem 0 1.2rem; }
-      .快捷卡 { min-height:8.4rem; padding:1rem 1.05rem; border:1px solid var(--line); border-radius:1rem; background:#ffffff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
-      .快捷卡 strong { display:block; margin:.25rem 0 .45rem; color:var(--ink); font-size:1.02rem; }
-      .快捷卡 p { margin:0; font-size:.78rem; line-height:1.55; }
-      .快捷編號 { color:var(--lime); font-size:.66rem; font-weight:950; letter-spacing:.1em; }
-
-      .診斷結論 { padding:1.3rem 1.4rem; border:1px solid rgba(34,125,130,.22); border-radius:1.2rem; background:linear-gradient(135deg,#eef8f5,#ffffff); box-shadow:0 12px 30px rgba(39,72,61,.06); }
-      .診斷標籤 { color:#227d82; font-size:.68rem; font-weight:950; letter-spacing:.11em; }
-      .診斷結論 h3 { margin:.4rem 0 .45rem; font-size:1.45rem; }
-      .診斷結論 p { margin:0; max-width:900px; font-size:.86rem; line-height:1.65; }
-      .優先格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:.8rem 0; }
-      .優先項 { padding:1rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 8px 20px rgba(39,72,61,.04); }
-      .優先項 small { color:var(--lime); font-size:.65rem; font-weight:950; letter-spacing:.08em; }
-      .優先項 strong { display:block; margin:.32rem 0 .38rem; color:var(--ink); font-size:.92rem; }
-      .優先項 p { margin:0; font-size:.76rem; line-height:1.55; }
-      .建議框 { display:grid; grid-template-columns:1fr 1fr; gap:.65rem; margin:.7rem 0 1rem; }
-      .建議框 > div { padding:.9rem 1rem; border-radius:.9rem; background:#f3f8ed; color:rgba(23,48,50,.74); font-size:.78rem; line-height:1.55; }
-      .建議框 > div:last-child { background:#fff5e8; color:#7c470f; }
-      .建議框 b { display:block; margin-bottom:.25rem; color:var(--ink); }
-      .安全健檢 { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin:0 0 1rem; padding:.9rem 1rem; border:1px solid rgba(34,125,130,.17); border-radius:.95rem; background:#f1f8f6; }
-      .安全健檢 strong { display:block; color:var(--ink); font-size:.82rem; }
-      .安全健檢 span { display:block; margin-top:.18rem; color:rgba(20,40,43,.62); font-size:.7rem; line-height:1.45; }
-      .安全徽章 { flex:0 0 auto; padding:.34rem .55rem; border-radius:999px; background:#dff4e7; color:#24734d !important; font-size:.62rem !important; font-weight:900; }
-
-      .最佳結論 { position:relative; overflow:hidden; padding:1.35rem 1.45rem; border:1px solid rgba(16,37,40,.18); border-radius:1.2rem; background:var(--deep); color:#fff; box-shadow:0 18px 46px rgba(16,37,40,.16); }
-      .最佳結論::after { content:""; position:absolute; width:16rem; height:16rem; right:-6rem; top:-8rem; border-radius:50%; background:rgba(145,201,40,.15); filter:blur(20px); }
-      .最佳頂列 { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
-      .最佳頂列 small { color:#dfff8f; font-size:.68rem; font-weight:950; letter-spacing:.1em; }
-      .信心徽章 { padding:.32rem .55rem; border:1px solid rgba(223,255,143,.23); border-radius:999px; background:rgba(223,255,143,.08); color:#dfff8f; font-size:.64rem; font-weight:900; }
-      .最佳結論 h3 { position:relative; z-index:1; margin:.55rem 0 .45rem; color:#fff !important; font-size:clamp(1.35rem,2.6vw,1.9rem); }
-      .最佳結論 p { position:relative; z-index:1; max-width:880px; margin:0; color:rgba(255,255,255,.7); font-size:.86rem; line-height:1.65; }
-      .最佳理由 { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.85rem; }
-      .最佳理由 span { padding:.34rem .5rem; border-radius:.5rem; background:rgba(255,255,255,.07); color:rgba(255,255,255,.77); font-size:.68rem; font-weight:750; }
-      .方案比較格 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.65rem; margin:.65rem 0 1rem; }
-      .方案卡 { min-height:13.2rem; padding:1rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 10px 26px rgba(27,58,49,.055); }
-      .方案卡.推薦 { border-color:rgba(145,201,40,.42); background:linear-gradient(145deg,#fff,#f4f9e9); box-shadow:0 14px 30px rgba(111,159,18,.1); }
-      .方案排名 { display:flex; justify-content:space-between; align-items:center; gap:.5rem; color:rgba(20,40,43,.48); font-size:.62rem; font-weight:900; letter-spacing:.08em; }
-      .方案分數 { color:var(--lime-strong); }
-      .方案卡 h4 { margin:.55rem 0 .4rem; color:var(--ink); font-size:1rem; line-height:1.35; }
-      .方案卡 p { margin:0; color:rgba(20,40,43,.66); font-size:.74rem; line-height:1.55; }
-      .方案卡 ul { margin:.65rem 0 0; padding-left:1rem; }
-      .方案卡 li { margin:.28rem 0; color:rgba(20,40,43,.62); font-size:.68rem; line-height:1.45; }
-      .可行 { color:#2b8058; }
-      .待補 { color:#a45c0f; }
-      .今日計畫 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; margin:.55rem 0 1rem; }
-      .計畫項 { display:grid; grid-template-columns:auto 1fr auto; gap:.75rem; align-items:center; padding:.82rem .9rem; border:1px solid var(--line); border-radius:.85rem; background:#fff; }
-      .計畫序 { display:grid; place-items:center; width:1.65rem; height:1.65rem; border-radius:.5rem; background:var(--deep); color:#dfff8f; font-size:.68rem; font-weight:950; }
-      .計畫項 strong { display:block; color:var(--ink); font-size:.78rem; }
-      .計畫項 span { color:rgba(20,40,43,.56); font-size:.66rem; line-height:1.4; }
-      .計畫時間 { color:var(--lime-strong) !important; font-weight:900; white-space:nowrap; }
-      .硬停框 { padding:1rem 1.05rem; border:1px solid rgba(184,105,18,.25); border-radius:.95rem; background:#fff7ea; }
-      .硬停框 strong { color:#8b4d0c; font-size:.82rem; }
-      .硬停框 ol { margin:.6rem 0 0; padding-left:1.2rem; }
-      .硬停框 li { margin:.35rem 0; color:#7c4a16; font-size:.72rem; line-height:1.5; }
-      .模式協議 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.55rem; margin:.55rem 0 1rem; }
-      .模式步 { padding:.85rem .9rem; border:1px solid var(--line); border-radius:.85rem; background:linear-gradient(145deg,#fff,#f7faf5); }
-      .模式步 small { color:var(--lime-strong); font-size:.62rem; font-weight:950; letter-spacing:.08em; }
-      .模式步 strong { display:block; margin:.28rem 0 .25rem; color:var(--ink); font-size:.78rem; }
-      .模式步 span { color:rgba(20,40,43,.62); font-size:.68rem; line-height:1.5; }
-      .透明條 { display:flex; flex-wrap:wrap; gap:.4rem; margin:.7rem 0; }
-      .透明條 span { padding:.3rem .5rem; border-radius:999px; background:#edf5eb; color:rgba(20,40,43,.64); font-size:.63rem; font-weight:800; }
-
-      .配置總覽 { min-height:14rem; padding:1.05rem; border:1px solid var(--line); border-radius:1rem; background:#fff; box-shadow:0 9px 24px rgba(39,72,61,.045); }
-      .配置總覽 small { color:#227d82; font-weight:850; }
-      .配置總覽 h3 { margin:.45rem 0 .55rem; font-size:1rem; }
-      .配置總覽 p { font-size:.76rem; line-height:1.55; }
-      .評分列 { display:grid; grid-template-columns:repeat(3,1fr); gap:.35rem; margin-top:.8rem; }
-      .評分 { padding:.5rem .35rem; border-radius:.65rem; background:#f2f7ef; text-align:center; }
-      .評分 b { display:block; color:var(--ink); font-size:.92rem; }
-      .評分 span { color:rgba(23,48,50,.5); font-size:.62rem; font-weight:800; }
-      .配置詳情 { padding:1.15rem 1.25rem; border:1px solid rgba(115,159,18,.22); border-radius:1rem; background:#f7fbea; }
-      .配置詳情 p, .配置詳情 li { font-size:.8rem; line-height:1.6; }
-      .配置詳情 b { color:var(--ink); }
-      .版本卡 { padding:1.1rem 1.2rem; border:1px solid rgba(34,125,130,.18); border-radius:1rem; background:linear-gradient(135deg,#eef8f5,#fff); }
-      .版本卡 h3 { margin:.35rem 0 .55rem; font-size:1.02rem; }
-      .版本卡 ul { margin:.4rem 0 0; padding-left:1.15rem; }
-      .版本卡 li { margin:.25rem 0; font-size:.76rem; line-height:1.5; }
-
-      h1, h2, h3 { color:var(--ink) !important; letter-spacing:-.025em; }
-      h2 { margin-top:1.25rem !important; font-size:clamp(1.65rem, 3vw, 2.35rem) !important; font-weight:950 !important; }
-      h3 { font-weight:900 !important; }
-      p, li { color:rgba(23,48,50,.75); }
-      [data-testid="stCaptionContainer"] p { color:rgba(23,48,50,.56) !important; }
-
-      .資料標籤 { position:relative; color:var(--lime); font-size:.7rem; font-weight:900; letter-spacing:.08em; }
-
-      div[data-testid="stVerticalBlockBorderWrapper"] { border:1px solid var(--line) !important; border-radius:1.35rem !important; background:#ffffff !important; box-shadow:0 14px 34px rgba(39,72,61,.07); }
-      div[data-testid="stMetric"] { min-height:6.1rem; border:1px solid var(--line); border-radius:1.05rem; padding:1rem 1.05rem; background:linear-gradient(145deg, #ffffff, #f5f8f3); box-shadow:0 8px 22px rgba(39,72,61,.045); }
-      div[data-testid="stMetric"] [data-testid="stMetricLabel"] p { color:rgba(23,48,50,.56) !important; font-size:.72rem; font-weight:800; }
-      div[data-testid="stMetric"] [data-testid="stMetricValue"] { color:var(--ink); font-size:1.65rem; font-weight:950; letter-spacing:-.04em; }
-
-      [data-baseweb="select"] > div, [data-baseweb="input"] > div, .stTextInput input, .stNumberInput input { min-height:2.85rem; color:var(--ink) !important; border:1px solid rgba(29,73,63,.18) !important; border-radius:.78rem !important; background:#ffffff !important; box-shadow:none !important; }
-      [data-baseweb="select"] > div:hover, [data-baseweb="input"] > div:hover, .stTextInput input:hover { border-color:rgba(115,159,18,.48) !important; }
-      [data-baseweb="select"] span, [data-baseweb="select"] svg, .stNumberInput button svg { color:rgba(23,48,50,.72) !important; fill:currentColor !important; }
-      .react-aria-ComboBox > div[role="group"], .react-aria-NumberField > div[role="group"] { min-height:2.85rem; overflow:hidden; border:1px solid rgba(29,73,63,.18) !important; border-radius:.78rem !important; background:#ffffff !important; box-shadow:none !important; }
-      .react-aria-ComboBox > div[role="group"]:focus-within, .react-aria-NumberField > div[role="group"]:focus-within { border-color:rgba(115,159,18,.58) !important; box-shadow:0 0 0 2px rgba(115,159,18,.1) !important; }
-      .react-aria-ComboBox input[role="combobox"], .react-aria-NumberField input { color:var(--ink) !important; background:transparent !important; }
-      input::placeholder { color:rgba(23,48,50,.42) !important; opacity:1 !important; }
-      .react-aria-ComboBox button, .react-aria-NumberField button { color:rgba(23,48,50,.68) !important; background:transparent !important; }
-      label[data-testid="stWidgetLabel"] p { color:rgba(23,48,50,.78) !important; font-size:.76rem; font-weight:800; }
-      [data-baseweb="popover"], [role="listbox"] { color:var(--ink) !important; background:#ffffff !important; }
-
-      .stButton > button, .stLinkButton > a { min-height:2.65rem; border-radius:.78rem; border-color:rgba(29,73,63,.18); background:#ffffff; color:var(--ink); font-weight:900; transition:transform .16s ease, border-color .16s ease, background .16s ease; }
-      .stButton > button:hover, .stLinkButton > a:hover { transform:translateY(-1px); border-color:rgba(115,159,18,.5); color:#5d850a; }
-      .stButton > button[kind="primary"] { border-color:var(--lime) !important; background:var(--lime) !important; color:#ffffff !important; box-shadow:0 12px 28px rgba(115,159,18,.18); }
-      .stButton > button[kind="primary"]:hover { background:var(--lime-strong) !important; color:#ffffff !important; }
-
-      [data-baseweb="tab-list"] { gap:.3rem; padding:.3rem; border:1px solid var(--line); border-radius:.9rem; background:#ffffff; }
-      [data-baseweb="tab"] { height:2.7rem; border-radius:.65rem; color:rgba(23,48,50,.62); font-weight:850; }
-      [aria-selected="true"][data-baseweb="tab"] { color:#173032 !important; background:#dff49e !important; }
-      [data-baseweb="tab-highlight"], [data-baseweb="tab-border"] { display:none; }
-
-      [data-testid="stAlert"] { border:1px solid var(--line); border-radius:1rem; background:#ffffff; }
-      [data-testid="stExpander"] { overflow:hidden; border:1px solid var(--line); border-radius:.9rem; background:#ffffff; }
-      [data-testid="stDataFrame"] { overflow:hidden; border:1px solid var(--line); border-radius:1rem; }
-      hr { border-color:var(--line) !important; }
-
-      .攻略卡 { min-height:225px; padding:1.2rem; border:1px solid var(--line); border-radius:1.2rem; background:linear-gradient(145deg, #ffffff, #f7faf5); box-shadow:0 12px 28px rgba(39,72,61,.07); }
-      .攻略卡 h3 { font-size:1.1rem; margin:.85rem 0 .55rem; }
-      .攻略卡 p { color:var(--muted); line-height:1.65; font-size:.88rem; }
-      .卡片頂列 { display:flex; justify-content:space-between; gap:.7rem; align-items:center; }
-      .分類 { color:var(--lime); font-size:.72rem; font-weight:900; }
-      .狀態 { border:1px solid; border-radius:999px; padding:.2rem .55rem; font-size:.65rem; font-weight:900; }
-      .更新日 { color:rgba(23,48,50,.48); font-size:.68rem; margin-top:.7rem; }
-      .提醒 { border-left:4px solid var(--orange); padding:.9rem 1rem; background:#fff6e8; border-radius:.8rem; color:#77410b; }
-      .獎勵格 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.65rem; margin:.5rem 0 1rem; }
-      .獎勵項 { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:.8rem; padding:.9rem 1rem; border:1px solid var(--line); border-radius:.95rem; background:#ffffff; box-shadow:0 8px 20px rgba(39,72,61,.045); }
-      .獎勵序 { display:grid; place-items:center; width:1.6rem; height:1.6rem; border-radius:.55rem; background:#edf7d8; color:#5d850a; font-size:.72rem; font-weight:950; }
-      .獎勵名稱 { color:var(--ink); font-size:.82rem; font-weight:900; }
-      .獎勵數據 { color:rgba(23,48,50,.55); font-size:.68rem; text-align:right; }
-
-      @media (max-width: 900px) {
-        .block-container { padding:1rem 1rem 3rem; }
-        .主視覺 { padding:1.3rem 1.25rem; border-radius:1.2rem; }
-        .主標 { font-size:clamp(1.8rem, 7vw, 2.6rem); }
-        .速覽清單 { grid-template-columns:1fr; }
-        .獎勵格 { grid-template-columns:1fr; }
-        .優先格 { grid-template-columns:1fr; }
-        .價值格 { grid-template-columns:repeat(2,minmax(0,1fr)); }
-        .方案比較格 { grid-template-columns:1fr; }
-        .方案卡 { min-height:0; }
-        .模式協議 { grid-template-columns:repeat(2,minmax(0,1fr)); }
-      }
-      @media (max-width: 640px) {
-        [data-testid="stHeader"] { height:1.4rem; }
-        .block-container { padding:.65rem .8rem 6.5rem; }
-        .同步徽章 { font-size:0; padding:.45rem; }
-        .同步徽章::after { content:"同步"; font-size:.68rem; }
-        [data-testid="stRadio"] { position:fixed; left:.6rem; right:.6rem; bottom:max(.55rem, env(safe-area-inset-bottom)); top:auto; width:auto; z-index:9999; filter:drop-shadow(0 12px 26px rgba(29,73,63,.2)); }
-        div[role="radiogroup"] { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
-        div[role="radiogroup"] label { min-width:0; padding:.55rem .35rem; font-size:.7rem; }
-        .主視覺 { margin:1rem 0; }
-        .說明 { font-size:.84rem; }
-        .重點速覽 { padding:1rem; }
-        .速覽區塊 { min-height:0; }
-        .速覽區塊 li { font-size:.82rem; }
-        .速覽結論, .速覽停損 { display:block; }
-        .速覽結論 b, .速覽停損 b { display:block; margin-bottom:.25rem; }
-        .快捷格 { grid-template-columns:1fr; }
-        .快捷卡 { min-height:0; }
-        [data-testid="stImage"] { display:none; }
-        .建議框 { grid-template-columns:1fr; }
-        .配置總覽 { min-height:0; }
-        .安全健檢 { align-items:flex-start; }
-        .決策台格 { grid-template-columns:1fr; }
-        .今日指令 { border-right:0; border-bottom:1px solid rgba(255,255,255,.1); }
-        .決策側欄 { grid-template-columns:1fr 1fr; grid-template-rows:auto; }
-        .決策訊號 { border-right:1px solid rgba(255,255,255,.1); }
-        .決策訊號:nth-child(2) { border-right:0; }
-        .決策訊號:last-child { grid-column:1 / -1; border-top:1px solid rgba(255,255,255,.1); }
-        .價值頭 { display:block; }
-        .價值頭 p { margin-top:.45rem; text-align:left; }
-        .價值格 { grid-template-columns:1fr 1fr; }
-        .價值項 { padding:.78rem; }
-        .今日計畫 { grid-template-columns:1fr; }
-        .模式協議 { grid-template-columns:1fr; }
-        .最佳結論 { padding:1.1rem; }
-        .最佳頂列 { align-items:flex-start; }
-      }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-st.markdown(_decision_ui.STYLE, unsafe_allow_html=True)
+st.markdown(_ui_theme.STYLE, unsafe_allow_html=True)
 
 # Migrate older navigation state without carrying its conflicting recommendation pages.
 if st.session_state.get("主導覽") in ("首頁", "養成"):
@@ -749,28 +444,30 @@ if st.session_state.get("資料分類") == "終局配裝":
 
 st.markdown(
     """
-    <div class="頂導">
-      <div class="品牌">
-        <span class="品牌記號">噠</span>
-        <span class="品牌文字"><span class="品牌名稱">噠噠攻略站 <b class="專業標">PRO</b></span><small>SURVIVOR.IO · 升級決策</small></span>
+    <div class="masthead">
+      <div class="masthead-brand">
+        <span class="brand-mark" aria-hidden="true">噠</span>
+        <div><span class="brand-title">噠噠攻略手冊</span><span class="brand-subtitle">Survivor.io · 玩家養成筆記</span></div>
       </div>
-      <div class="同步徽章"><span class="同步點"></span>一次完成一個門檻</div>
+      <div class="masthead-edition">升級路線 / 活動試算 / 攻略索引</div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-主頁面 = st.radio(
-    "選擇功能",
-    ["下一步", "我的帳號", "活動", "資料庫"],
-    horizontal=True,
-    label_visibility="collapsed",
-    key="主導覽",
-)
+with st.container(key="main_nav"):
+    主頁面 = st.radio(
+        "選擇功能",
+        ["下一步", "我的帳號", "活動", "資料庫"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="主導覽",
+    )
 
 if 主頁面 == "活動":
     頁面 = "活動最佳解"
 elif 主頁面 == "資料庫":
+    _decision_ui.page_heading("攻略索引", "查門檻、查機制。個人投資順序請看「下一步」。")
     頁面 = st.selectbox("要查什麼", ["完整攻略庫", "收藏圖鑑", "最新文章", "配裝參考"], key="資料分類")
     if 頁面 == "配裝參考":
         頁面 = "終局配裝"
@@ -782,7 +479,7 @@ if 頁面 == "下一步":
 elif 頁面 == "我的帳號":
     _decision_ui.render_profile()
 elif 頁面 == "活動最佳解":
-    st.header("活動最佳解：先算免費進度，再決定要不要補")
+    _decision_ui.page_heading("活動試算", "免費進度、里程碑與補鑽成本，一起核對。")
     全部文章, 文章即時 = 取得完整文章庫()
     活動文章 = [item for item in 全部文章 if item["category"] == "活動攻略"]
     if 活動文章:
@@ -804,7 +501,7 @@ elif 頁面 == "活動最佳解":
     活動模型 = match_event_playbook(已選活動["title"])
 
     st.info("文章日期不等於活動仍開放。請先核對遊戲內名稱、截止時間與獎勵表；下方可試算歷史活動。")
-    with st.expander("查看這篇活動的30秒重點"):
+    with st.expander("查看這篇活動的30秒重點", expanded=True):
         顯示活動重點(
             str(已選活動["title"]),
             str(已選活動["date"]),
@@ -825,7 +522,7 @@ elif 頁面 == "活動最佳解":
         st.markdown(f"**免費資源依據：** {活動模型['free_hint']}")
         st.markdown(f"**停損提醒：** {活動模型['avoid']}")
 
-    st.markdown("### 用你的帳號數字精算")
+    st.markdown("### 01 / 活動目標")
     a1, a2, a3 = st.columns(3)
     with a1:
         帳號目標 = st.selectbox(
@@ -843,6 +540,7 @@ elif 頁面 == "活動最佳解":
 
     模型目標 = int(活動模型["target"])
     預設目標 = 模型目標 if 0 < 模型目標 <= 10000 else 100
+    st.markdown("### 02 / 免費進度")
     p1, p2, p3, p4 = st.columns(4)
     with p1:
         目前進度 = int(st.number_input("目前活動進度", min_value=0, value=0, step=1))
@@ -853,6 +551,7 @@ elif 頁面 == "活動最佳解":
     with p4:
         目標進度 = int(st.number_input("目標里程碑", min_value=1, value=預設目標, step=1))
 
+    st.markdown("### 03 / 寶石成本")
     c1, c2, c3 = st.columns(3)
     with c1:
         每次付費進度 = float(st.number_input("一次票券／抽取增加進度", min_value=0.01, value=1.0, step=0.1))
@@ -887,7 +586,7 @@ elif 頁面 == "活動最佳解":
         st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
         st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
 
-    st.markdown("### 商店先看這一項")
+    st.markdown("### 兌換優先項")
     st.write(f"**{獎勵排序[0]['name']}**")
     st.caption("依上方帳號缺口排出的參考順位；先確認這次商店確實有提供。")
     獎勵卡片 = "".join(
@@ -900,7 +599,7 @@ elif 頁面 == "活動最佳解":
         st.markdown(f'<div class="獎勵格">{獎勵卡片}</div>', unsafe_allow_html=True)
 
 elif 頁面 == "終局配裝":
-    st.header("配裝參考")
+    st.subheader("配裝參考")
     st.warning("以下為舊版整理的配裝範例，不是你的升級順位；名稱、神鑄與版本可能需重新核對。個人下一步請回首頁，高階六件配置請用情境計算器比較。")
     st.link_button("開啟完整傷害配置比較", "https://sio-tools.exp0.dev/")
     選擇配置名稱 = st.selectbox("展開完整配置", [build["名稱"] for build in 終局配置])
@@ -929,8 +628,6 @@ elif 頁面 == "終局配裝":
         st.warning("縮寫 E／V／C 分別代表永恆／虛空／混沌神鑄。不要用同一套配置同時評估短場與長場；跨過門檻後仍需固定場景 A/B 實測。")
 
 elif 頁面 == "完整攻略庫":
-    st.header("攻略資料庫")
-    st.caption("按問題查資料；個人升級順序請看「下一步」。")
     精選頁, 全部頁 = st.tabs(["主題摘要", "來源文章"])
     with 精選頁:
         c1, c2 = st.columns([1.35, 1])
@@ -949,11 +646,8 @@ elif 頁面 == "完整攻略庫":
         精選頁數 = max(1, (len(結果) + 5) // 6)
         精選頁碼 = st.selectbox("主題頁碼", range(1, 精選頁數 + 1), key=f"curated_page_{分類}_{查詢}")
         當頁精選 = 結果[(精選頁碼 - 1)*6:精選頁碼*6]
-        for row_start in range(0, len(當頁精選), 2):
-            cols = st.columns(2)
-            for col, item in zip(cols, 當頁精選[row_start : row_start + 2]):
-                with col:
-                    顯示攻略卡片(item)
+        for item in 當頁精選:
+            顯示攻略卡片(item)
         if not 結果:
             st.info("沒有符合的精選主題，請改到『全部來源文章』搜尋。")
 
@@ -982,19 +676,16 @@ elif 頁面 == "完整攻略庫":
             頁碼 = st.selectbox("文章頁碼", list(range(1, 總頁數 + 1)), key=f"article_page_{len(全文結果)}")
             st.caption(f"找到 {len(全文結果)} 篇｜第 {頁碼}/{總頁數} 頁")
             當頁 = 全文結果[(頁碼 - 1) * 每頁數量 : 頁碼 * 每頁數量]
-            for row_start in range(0, len(當頁), 2):
-                cols = st.columns(2)
-                for col, item in zip(cols, 當頁[row_start : row_start + 2]):
-                    with col:
-                        with st.container(border=True):
-                            st.markdown(f"**{item['title']}**")
-                            st.caption(f"{item['category']}｜{item['freshness']}｜{item['date']}")
-                            摘要 = item["excerpt"] or "來源未提供摘要，請開啟原文核對。"
-                            st.write(摘要[:280] + ("…" if len(摘要) > 280 else ""))
-                            st.link_button("閱讀原文", item["link"])
+            for index, item in enumerate(當頁):
+                with st.container(key=f"source_article_{index}"):
+                    st.caption(f"{item['category']} / {item['freshness']} / {item['date']}")
+                    st.markdown(f"### {item['title']}")
+                    摘要 = item["excerpt"] or "來源未提供摘要，請開啟原文核對。"
+                    st.write(摘要[:280] + ("…" if len(摘要) > 280 else ""))
+                    st.link_button("閱讀原文", item["link"])
 
 elif 頁面 == "收藏圖鑑":
-    st.header("完整收藏品圖鑑")
+    st.subheader("收藏品圖鑑")
     收藏圖鑑 = 取得收藏圖鑑()
     d1, d2, d3 = st.columns(3)
     d1.metric("收藏品總數", len(收藏圖鑑))
@@ -1040,15 +731,15 @@ elif 頁面 == "收藏圖鑑":
     )
 
 elif 頁面 == "最新文章":
-    st.header("最新來源動態")
+    st.subheader("最新來源動態")
     全部文章, 全部即時 = 取得完整文章庫()
     if 全部即時:
         最新 = [{"標題": item["title"], "日期": item["date"], "網址": item["link"], "分類": item["category"]} for item in 全部文章[:15]]
     else:
         最新, _ = 取得最新文章()
     st.caption(f"已同步完整來源，共 {len(全部文章)} 篇" if 全部即時 else "來源暫時無法連線，顯示最近備援資料")
-    for item in 最新:
-        with st.container(border=True):
+    for index, item in enumerate(最新):
+        with st.container(key=f"latest_article_{index}"):
             col1, col2 = st.columns([4, 1])
             col1.markdown(f"**{item['標題']}**")
             col2.caption(item["日期"])
@@ -1057,7 +748,6 @@ elif 頁面 == "最新文章":
             st.link_button("閱讀原始文章", item["網址"])
     st.link_button("查看完整文章分類", 來源分類網址)
 
-st.divider()
-st.caption("升級決策版 · 2026.09.08 · 條件與缺口逐項核對")
+st.markdown('<div class="site-footer">噠噠攻略手冊 · 2026.09.08 · 白底手冊版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
 台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
 st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")

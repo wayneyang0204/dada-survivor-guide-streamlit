@@ -7,48 +7,6 @@ import streamlit as st
 import next_step as engine
 
 
-STYLE = """
-<style>
-:root {--bg:#f5f7fa;--panel:#fff;--ink:#16283b;--muted:#536378;--line:#dce3ea;--lime:#176253;--lime-strong:#176253;}
-.stApp {background:#f5f7fa;color:#16283b;}
-.block-container {max-width:1060px;padding-top:1rem;}
-[data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {font-size:1rem;line-height:1.7;color:#293b4c;}
-[data-testid="stCaptionContainer"] p {font-size:.875rem;color:#536378;}
-[data-testid="stRadio"] {position:static;z-index:auto;}
-div[role="radiogroup"] {box-shadow:none;border-color:#dce3ea;background:#fff;}
-div[role="radiogroup"] label {font-size:1rem;padding:.65rem 1rem;}
-div[role="radiogroup"] label:has(input:checked) {background:#e4f3ee;color:#155548;box-shadow:none;}
-button[kind="primary"], button[data-testid="stBaseButton-primary"] {background:#176253!important;border-color:#176253!important;color:white!important;}
-button[kind="primary"] p, button[data-testid="stBaseButton-primary"] p {color:white!important;}
-[data-testid="stButton"] button, [data-testid="stDownloadButton"] button {min-height:44px;}
-.頂導 {padding:.3rem 0 .8rem;}.品牌文字 small {font-size:.75rem;letter-spacing:.05em;}.專業標 {display:none;}
-.同步徽章 {font-size:.875rem;background:#fff;color:#536378;border-color:#dce3ea;}
-.decision-heading {margin:1.25rem 0 .35rem;font-size:clamp(1.65rem,4vw,2.15rem);font-weight:800;letter-spacing:-.03em;color:#16283b;}
-.decision-card {margin:.6rem 0;padding:1.5rem;border:1px solid #c9ddd6;border-left:5px solid #176253;border-radius:14px;background:#fff;}
-.decision-card h2 {font-size:clamp(1.4rem,3.2vw,1.9rem);line-height:1.4;margin:.65rem 0;color:#16283b!important;}
-.decision-label {font-size:.875rem;font-weight:700;color:#176253;letter-spacing:.03em;}
-.decision-state {display:inline-block;padding:.25rem .6rem;margin-left:.5rem;background:#e8f3ee;border-radius:6px;font-size:.875rem;color:#155548;}
-.decision-state.pending {background:#fff3d8;color:#765217;}.decision-state.blocked {background:#f5e9e5;color:#853e2a;}
-.decision-facts {display:grid;grid-template-columns:1fr 1fr;gap:1rem;border-top:1px solid #e5eaf0;margin-top:1rem;padding-top:1rem;}
-.decision-facts small {font-size:.875rem;color:#536378;display:block;margin-bottom:.2rem;}
-.decision-facts strong {font-size:1rem;color:#16283b;line-height:1.6;}
-.decision-note {font-size:.875rem;color:#536378;line-height:1.65;}
-.decision-card p {font-size:1rem;line-height:1.75;color:#293b4c;}
-.decision-checks {margin:.5rem 0 1rem;padding:0;background:#fff;border:1px solid #dce3ea;border-radius:10px;overflow:hidden;}
-.decision-check {display:flex;flex-wrap:wrap;gap:.25rem 1rem;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid #e5eaf0;font-size:1rem;line-height:1.6;}
-.decision-check:last-child {border-bottom:0;}.decision-check b {color:#155548;}.decision-check.short b {color:#853e2a;}.decision-check.unknown b {color:#765217;}.decision-check span {color:#293b4c;}
-.decision-queue {display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid #e5eaf0;}
-.decision-queue b {font-size:1rem;color:#16283b;}.decision-queue span {font-size:.875rem;color:#536378;}
-.主視覺 {min-height:0;padding:1rem 1.2rem;background:#fff;box-shadow:none;margin:.8rem 0;}
-.主視覺::after,.主視覺徽章,.主視覺 .小標 {display:none;}.主標 {font-size:1.5rem;line-height:1.4;}.主標 br {display:none;}
-.主標 span {color:#176253;}.說明 {font-size:1rem;}
-.速覽區塊 li {font-size:1rem;}.速覽頂列,.速覽標籤列 span {font-size:.875rem;}
-.配置總覽,.配置詳情 {min-height:0;}.配置總覽 p,.配置詳情 p,.配置詳情 li {font-size:1rem;}
-.攻略卡 p {font-size:1rem;line-height:1.7;}.攻略卡 h3 {font-size:1.125rem;}.攻略卡 .更新日,.卡片頂列 span {font-size:.875rem;}
-@media(max-width:640px) {.block-container {padding:1rem 1rem 3rem;}.decision-card {padding:1rem;}.decision-facts {grid-template-columns:1fr;gap:.65rem;}.同步徽章 {display:none;}div[role="radiogroup"] label {padding:.5rem;font-size:.9rem;}}
-@media(prefers-reduced-motion:reduce) {* {scroll-behavior:auto!important;transition:none!important;}}
-</style>
-"""
 
 
 def profile() -> dict:
@@ -130,7 +88,7 @@ def star_choice(label: str, key: str, p: dict):
 
 
 def render_backup(p: dict, first_visit: bool = False) -> None:
-    with st.expander("接續上次紀錄" if first_visit else "備份／接續帳號紀錄"):
+    with st.popover("接續上次紀錄" if first_visit else "備份與匯入", width="stretch"):
         st.caption("本次連線切頁會保留；重新整理、斷線或換裝置可能重置。可下載 JSON 備份再匯入，不需要遊戲帳號密碼。")
         if not first_visit:
             st.download_button("下載我的帳號紀錄", engine.export_profile(p), "dada-profile.json", "application/json", on_click="ignore")
@@ -155,7 +113,7 @@ def render_step_inputs(step: dict, p: dict) -> None:
         return
     with st.expander("只核對這一步的材料", expanded=any(c["state"] == "unknown" for c in step.get("checks", []))):
         st.caption(f"本次只核對：{step['title']}。沒有資料的項目留白。")
-        with st.form(f"step_inputs_{sid}_{st.session_state.get('editor_revision', 0)}"):
+        with st.form(f"step_inputs_{sid}_{st.session_state.get('editor_revision', 0)}", border=False):
             values = {}
             if kind:
                 stock_key = "red_boxes" if kind == "collection" else "awakening_cores"
@@ -215,10 +173,10 @@ def next_check(p: dict, scope: str) -> str | None:
 
 def render_next_check(p: dict, scope: str) -> None:
     section = next_check(p, scope)
-    with st.container(border=True):
+    with st.container():
         if section:
-            st.subheader(f"先核對{section}，再決定要不要投入")
-            st.write("這一組資料還沒完整，現在無法可靠地排投資順位。先保留資源，不把未知當成零。")
+            st.subheader(f"待核對：{section}")
+            st.write("補齊這組資料，才能判斷下一個升級目標。目前先保留資源。")
             # The three hall counts uncover zero-cost actions before asking for costs.
             if section == "普通典藏館":
                 with st.form("next_check_hall"):
@@ -233,133 +191,175 @@ def render_next_check(p: dict, scope: str) -> None:
                     st.session_state["pending_navigation"] = "我的帳號"
                     st.rerun()
         else:
-            st.subheader("這個範圍的已收錄門檻，目前沒有下一筆可推薦")
+            st.subheader("目前沒有可確認的下一個門檻")
             st.write("先保留資源。這不代表你的帳號已經滿配；高階六件神鑄、同調與協同互換，需要更完整配置或同場實測。")
             st.link_button("開啟高階配置試算工具", engine.CALCULATOR)
             st.button("校正帳號現況", on_click=edit_resource, args=(scope,))
 
 
+def page_heading(title: str, description: str) -> None:
+    st.markdown(f'<h1 class="page-heading">{html.escape(title)}</h1><p class="page-deck">{html.escape(description)}</p>',
+                unsafe_allow_html=True)
+
+
+def render_completion(p: dict, step: dict) -> None:
+    if not step.get("update"):
+        return
+    with st.popover("記錄遊戲內完成", width="stretch"):
+        st.write(f"記錄的完整目標：{step['target']}")
+        try:
+            preview = engine.completion_preview(p, step)
+            for row in preview["balances"]:
+                st.caption(f"{row['resource']}：{row['before']:,} − {row['used']:,} → 推算剩餘 {row['after']:,}")
+            if preview["unknown"]:
+                st.caption("無法可靠扣除，完成後需重新核對：" + "、".join(preview["unknown"]))
+            st.caption("僅更新本站紀錄，不操作遊戲。已知成本才計算結餘；下一目標的價格與附加材料重新核對。")
+            if st.button("我已在遊戲完成，排下一步", type="primary", key=f"complete_{engine.action_token(p, step)}"):
+                complete_step(step)
+        except ValueError as exc:
+            st.warning(str(exc))
+
+
+def render_decision(p: dict, step: dict) -> None:
+    esc = lambda key: html.escape(str(step.get(key) or ""))
+    state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] in ("星數未達", "資料未齊") else "pending"
+    lead = "優先執行" if step["status"] in ("現在可做", "材料已足") else "儲備目標" if step["status"] == "先存資源" else "待核對目標"
+    with st.container(key="route_layout"):
+        main, notes = st.columns([2.15, 1], gap="large")
+        with main:
+            st.markdown(f'''<section aria-label="優先升級目標">
+              <div class="decision-lead"><span class="section-index">01</span>{lead} / {esc('resource')}
+              <span class="decision-state {state_class}">{esc('status')}</span></div>
+              <h2 class="decision-title">{esc('title')}</h2><p class="decision-intro">{esc('why')}</p>
+              <dl class="decision-facts"><div><dt>目標門檻</dt><dd>{esc('target')}</dd></div>
+              <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
+            if step.get("checks"):
+                indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
+                rows = "".join(f'<div class="decision-check {c["state"]}" role="listitem"><b>{indicators[c["state"]]} · {html.escape(c["label"])}</b><span>{html.escape(c["detail"])}</span></div>' for c in step["checks"])
+                st.markdown(f'<h3 class="ledger-title">材料核對</h3><div class="decision-checks" role="list" aria-label="這一步的必要條件">{rows}</div>', unsafe_allow_html=True)
+            elif step["gap"]:
+                st.info(step["gap"])
+            render_step_inputs(step, p)
+        with notes:
+            with st.container(key="route_notes"):
+                note_rows = ""
+                for label, key, css in (("解鎖效果", "effect", ""), ("停手條件", "stop", "stop"), ("目前紀錄", "current", "")):
+                    if step.get(key):
+                        note_rows += f'<dl class="route-note {css}"><dt>{label}</dt><dd>{esc(key)}</dd></dl>'
+                st.markdown(f'<aside aria-label="執行備忘"><h3 class="notes-heading">執行備忘</h3>{note_rows}</aside>', unsafe_allow_html=True)
+                render_completion(p, step)
+                st.button("補上這一步的資料", width="stretch", on_click=edit_resource, args=(step["resource"],))
+                st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
+                st.caption("規則排序，非實測傷害排名。未確認材料前，先不要投入。")
+
+
+def render_reasoning(result: dict) -> None:
+    with st.expander("排序依據與其他候選"):
+        if result["primary"]:
+            st.write(engine.ranking_reason(result))
+            st.caption("不同資源可分別安排；收藏之心不足，不會阻止你用覺醒核心升主位。只比較已填資料涵蓋的路線。")
+            if result["primary"]["caution"]:
+                st.warning(result["primary"]["caution"])
+            st.caption(f"規則核對：{engine.CHECKED}；來源為社群攻略。材料以遊戲內本次預覽為準。")
+        alternatives = result["alternatives"]
+        if alternatives:
+            st.markdown("#### 其他可比較的目標")
+            st.caption("不是固定升級順序，完成一步會重新計算。")
+            for index, item in enumerate(alternatives[:3], 2):
+                st.markdown(f'''<div class="decision-queue"><span class="queue-index">{index:02d}</span><div>
+                  <div class="queue-title">{html.escape(item['title'])} · {html.escape(item['status'])}</div>
+                  <p class="queue-detail">停在：{html.escape(item['target'])}。{html.escape(item['gap'] or item['why'])}</p>
+                  </div></div>''', unsafe_allow_html=True)
+            if len(alternatives) > 3:
+                st.caption("其餘候選可從資源選單查看。")
+        st.markdown("#### 帳號核對")
+        st.caption(f"尚缺 {len(result['missing'])} 組資料。未填不等於零；已完成門檻不代表整個帳號滿配。")
+        for item in result["missing"]:
+            st.write(f"待補：{item}")
+        for item in result["complete"]:
+            st.write(f"已完成：{item}")
+        for item in st.session_state.get("completed_steps", [])[-3:]:
+            st.caption(f"本次已記錄完成：{item}")
+
+
 def render_home() -> None:
     p = profile()
-    st.markdown('<h1 class="decision-heading">下一份資源，先升哪裡？</h1>', unsafe_allow_html=True)
-    st.caption("先完成一個有效門檻，再決定下一步。")
+    first_visit = not st.session_state.get("player_profile")
+    heading, backup = st.columns([4, 1.2], vertical_alignment="center")
+    with heading:
+        page_heading("升級路線", "依目前配置，安排下一個有效門檻。")
+    with backup:
+        render_backup(p, first_visit=first_visit)
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
     if previous := st.session_state.get("completion_undo"):
-        a, b = st.columns([3, 1])
+        a, b = st.columns([3, 1], vertical_alignment="center")
         with a:
             st.caption(f"剛才記錄：{previous['title']}")
         with b:
             if st.button("撤回剛才紀錄", width="stretch"):
                 undo_completion()
-    left, right = st.columns([3, 1])
-    with left:
-        scope = st.selectbox("這次要安排的資源", ("自動排序", *engine.RESOURCES), key="decision_resource")
-    with right:
-        st.button("更新我的帳號", width="stretch", on_click=navigate, args=("我的帳號",))
-    st.caption(f"主要模式：{p['mode']} · " + (f"{p['survivor']} R{p['awakening']}" if p['survivor'] and p['awakening'] is not None else "主位尚未確認"))
-    if p["estimated_balances"]:
-        labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
-        st.caption(f"{labels}：依上次紀錄扣除後的推算結餘，沒有同步遊戲；有其他收入或消耗時請校正。")
-    result = engine.recommend(p, scope)
-    step = result["primary"]
-    if not st.session_state.get("player_profile"):
-        with st.container(border=True):
-            st.subheader("先告訴我你正在玩誰")
-            st.write("只填三項開始。之後再補典藏館與裝備，不用一次填完整張表。")
-            with st.form("quick_profile"):
+    if first_visit:
+        with st.container(key="onboarding"):
+            st.markdown('<h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
+            st.write("從主位與模式開始。裝備、典藏館與收藏品可稍後補齊。")
+            with st.form("quick_profile", border=False):
                 mode = st.selectbox("主要模式", engine.MODES)
-                hero = st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "其他"), index=None, placeholder="選目前主位")
-                level = st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6")
-                if st.form_submit_button("建立我的升級路線", type="primary", width="stretch"):
+                hero_col, level_col = st.columns(2)
+                with hero_col:
+                    hero = st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "其他"), index=None, placeholder="選目前主位")
+                with level_col:
+                    level = st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6")
+                if st.form_submit_button("建立我的升級路線", type="primary"):
                     if hero is None or level is None:
-                        st.error("請選主位並填覺醒等級；未覺醒填 0。")
+                        st.error("請先填主位特工與覺醒等級；不確定的帳號資料可以之後補。")
                     else:
                         save({"mode": mode, "survivor": hero, "awakening": level})
-        render_backup(p, first_visit=True)
+            st.markdown('<p class="setup-note">不需要遊戲帳號密碼。資料只保留於本次連線；離開前可從「備份與匯入」下載紀錄。</p>', unsafe_allow_html=True)
         return
-    if not step:
-        render_next_check(p, scope)
+    with st.container(key="route_toolbar"):
+        left, context, edit = st.columns([2, 1.4, 1.2], vertical_alignment="bottom")
+        with left:
+            scope = st.selectbox("這次要安排的資源", ("自動排序", *engine.RESOURCES), key="decision_resource")
+        with context:
+            hero = f"{p['survivor']} R{p['awakening']}" if p['survivor'] and p['awakening'] is not None else "主位尚未確認"
+            st.markdown(f'<div class="route-context">{html.escape(p["mode"])}<strong>{html.escape(hero)}</strong></div>', unsafe_allow_html=True)
+        with edit:
+            st.button("更新我的帳號", width="stretch", on_click=navigate, args=("我的帳號",))
+    if p["estimated_balances"]:
+        labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
+        st.caption(f"{labels}為推算結餘，未同步遊戲。有其他收入或消耗時請校正。")
+    result = engine.recommend(p, scope)
+    if step := result["primary"]:
+        render_decision(p, step)
     else:
-        esc = lambda key: html.escape(str(step.get(key) or ""))
-        state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] in ("星數未達", "資料未齊") else "pending"
-        lead = "現在先做" if step["status"] in ("現在可做", "材料已足") else "先存到這裡" if step["status"] == "先存資源" else "先核對這個目標"
-        st.markdown(f'''<section class="decision-card">
-          <div class="decision-label">{lead} · {esc('resource')} <span class="decision-state {state_class}">{esc('status')}</span></div>
-          <h2>{esc('title')}</h2><p>{esc('why')}</p>
-          <div class="decision-facts"><div><small>做到這裡</small><strong>{esc('target')}</strong></div>
-          <div><small>需要投入</small><strong>{esc('cost')}</strong></div></div>
-          <p class="decision-note">停手條件：{esc('stop')}</p></section>''', unsafe_allow_html=True)
-        if step.get("checks"):
-            indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
-            rows = "".join(f'<div class="decision-check {c["state"]}" role="listitem"><b>{indicators[c["state"]]} · {html.escape(c["label"])}</b><span>{html.escape(c["detail"])}</span></div>' for c in step["checks"])
-            st.markdown(f'<div class="decision-checks" role="list" aria-label="這一步的必要條件">{rows}</div>', unsafe_allow_html=True)
-        elif step["gap"]:
-            st.info(step["gap"])
-        if step["effect"]:
-            st.write(f"**解鎖效果：** {step['effect']}")
-        if step["current"]:
-            st.caption(f"依據你的資料：{step['current']}")
-        if step["status"] not in ("現在可做", "材料已足"):
-            st.caption("目前是待確認的路線目標，不代表已證明比所有其他投資更強。")
-        render_step_inputs(step, p)
-        a, b = st.columns(2)
-        with a:
-            st.button("補上這一步的資料", width="stretch", on_click=edit_resource, args=(step["resource"],))
-        with b:
-            st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
-        with st.expander("為什麼先做這個？哪些情況會改變答案？"):
-            st.write(engine.ranking_reason(result))
-            st.write("不同資源可分別安排；收藏之心不足，不會阻止你用覺醒核心升主位。自動排序是規則建議，不是實測傷害排名。")
-            if step["caution"]:
-                st.warning(step["caution"])
-            st.caption(f"規則核對：{engine.CHECKED}；來源為社群攻略。材料以遊戲內本次預覽為準。")
-        if step.get("update"):
-            with st.expander("這一步已在遊戲完成？更新紀錄"):
-                st.write(f"記錄的完整目標：{step['target']}")
-                try:
-                    preview = engine.completion_preview(p, step)
-                    for row in preview["balances"]:
-                        st.caption(f"{row['resource']}：{row['before']:,} − {row['used']:,} → 推算剩餘 {row['after']:,}")
-                    if preview["unknown"]:
-                        st.caption("無法可靠扣除，完成後需重新核對：" + "、".join(preview["unknown"]))
-                    st.caption("僅更新本站紀錄，不操作遊戲。已知成本才計算結餘；下一目標的價格與附加材料重新核對。")
-                    if st.button("我已在遊戲完成，排下一步", key=f"complete_{engine.action_token(p, step)}"):
-                        complete_step(step)
-                except ValueError as exc:
-                    st.warning(str(exc))
-        alternatives = result["alternatives"]
-        if alternatives:
-            with st.expander(f"其他候選（{len(alternatives)} 項，先不必同時做）"):
-                st.caption("這是依目前資料比較的候選，不是固定升級順序；完成一步會重算。")
-                for index, item in enumerate(alternatives[:3], 2):
-                    st.markdown(f"**{index:02d} · {item['title']}** — {item['status']}")
-                    st.write(f"停在：{item['target']}。{item['gap'] or item['why']}")
-                if len(alternatives) > 3:
-                    st.caption("其他候選可由上方資源選單逐項查看。")
-    with st.expander(f"帳號尚缺 {len(result['missing'])} 組資料／已完成門檻"):
-        for item in result["missing"]:
-            st.write(f"待補：{item}")
-        for item in result["complete"]:
-            st.success(item)
-        for item in st.session_state.get("completed_steps", [])[-3:]:
-            st.caption(f"本次已記錄完成：{item}")
-        st.caption("只比較已填資料涵蓋的路線；未填不等於零，已完成不代表整個帳號滿配。")
-    render_backup(p)
+        render_next_check(p, scope)
+    render_reasoning(result)
 
 
 def render_profile() -> None:
     p = profile()
-    st.markdown('<h1 class="decision-heading">我的帳號</h1>', unsafe_allow_html=True)
-    st.caption("只打開你這次要更新的項目。留白代表未知；0 代表確定沒有。")
+    page_heading("我的配置", "留白表示未知，0 表示確定沒有。儲存後會重排升級路線。")
     if p["estimated_balances"]:
-        st.caption("部分庫存為完成紀錄後的推算值。核對遊戲現況後儲存，即以你確認的數值接續。")
+        st.caption("部分庫存為推算值。核對遊戲現況後儲存，即以你確認的數值接續。")
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
-    st.button("← 回到我的下一步", on_click=navigate, args=("下一步",))
     sections = ("角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技")
-    section = st.selectbox("這次更新哪一項", sections, key="profile_section")
-    with st.form(f"edit_{section}"):
+    with st.container(key="profile_layout"):
+        nav, editor = st.columns([1, 3], gap="large")
+        with nav:
+            with st.container(key="profile_nav"):
+                section = st.radio("這次更新哪一項", sections, key="profile_section", label_visibility="collapsed")
+            st.button("← 回到我的下一步", on_click=navigate, args=("下一步",), width="stretch")
+            render_backup(p)
+        with editor:
+            with st.container(key="profile_editor"):
+                st.markdown(f'<h2 class="editor-heading">{html.escape(section)}</h2>', unsafe_allow_html=True)
+                render_profile_form(p, section)
+
+
+def render_profile_form(p: dict, section: str) -> None:
+    with st.form(f"edit_{section}", border=False):
         values = {}
         if section == "角色與模式":
             values["mode"] = st.selectbox("主要模式", engine.MODES, index=engine.MODES.index(p["mode"]))
@@ -424,4 +424,3 @@ def render_profile() -> None:
                 save(values)
             except ValueError as exc:
                 st.error(str(exc))
-    render_backup(p)
