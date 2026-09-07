@@ -46,7 +46,8 @@ def test_onboarding_contextual_edit_save_navigation_and_completion():
     by_label(a.button, "我已在遊戲完成，排下一步").click().run()
     assert not a.exception
     assert a.session_state["player_profile"]["awakening"] == 7
-    assert a.session_state["player_profile"]["awakening_cores"] is None
+    assert a.session_state["player_profile"]["awakening_cores"] == 0
+    assert "awakening_cores" in a.session_state["player_profile"]["estimated_balances"]
     assert any("維納托 R7 → R8" in x.value for x in a.markdown)
 
 
@@ -134,7 +135,8 @@ def test_collection_quote_completion_and_undo_restore_exact_prior_state():
     by_label(a.button, "我已在遊戲完成，排下一步").click().run()
     assert not a.exception
     assert a.session_state["player_profile"]["memory"] == 5
-    assert a.session_state["player_profile"]["red_boxes"] is None
+    assert a.session_state["player_profile"]["red_boxes"] == 1
+    assert "red_boxes" in a.session_state["player_profile"]["estimated_balances"]
     assert not a.session_state["player_profile"]["step_quotes"]
     assert any("紅3星" in x.value for x in a.markdown)
     assert by_label(a.number_input, "從目前狀態到目標，合計要用多少箱").value is None
@@ -221,3 +223,47 @@ def test_all_resource_filters_work_on_a_mixed_endgame_profile():
         by_label(a.selectbox, "這次要安排的資源").select(scope).run()
         assert not a.exception
         assert len(a.get("form")) <= 1
+
+
+def test_editing_one_estimated_balance_preserves_other_resource_provenance():
+    a = boot()
+    a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6,
+        "hearts": 1000, "awakening_cores": 20, "estimated_balances": ["hearts", "awakening_cores"]}
+    a.radio[0].set_value("我的帳號").run()
+    by_label(a.selectbox, "這次更新哪一項").select("普通典藏館").run()
+    by_label(a.number_input, "現有收藏之心").set_value(1200)
+    by_label(a.button, "儲存並重新排序").click().run()
+    assert not a.exception
+    assert a.session_state["player_profile"]["hearts"] == 1200
+    assert a.session_state["player_profile"]["estimated_balances"] == ["awakening_cores"]
+
+
+def test_whole_set_confirmation_and_next_action_have_distinct_buttons():
+    a = boot()
+    a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 8,
+        "ss_boots": True, "boot_stars": [2, 2, 3, 5]}
+    a.run()
+    assert any("四件全部達到" in x.value for x in a.warning)
+    by_label(a.number_input, "現有傳奇收藏自選箱").set_value(5)
+    by_label(a.number_input, "從目前狀態到目標，合計要用多少箱").set_value(4)
+    by_label(a.selectbox, "箱子可選目標期數，且其他碎片／條件都符合").set_value(True)
+    by_label(a.button, "更新這一步的材料").click().run()
+    original_key = by_label(a.button, "我已在遊戲完成，排下一步").key
+    by_label(a.button, "我已在遊戲完成，排下一步").click().run()
+    assert not a.exception
+    assert a.session_state["player_profile"]["boot_stars"] == [3, 3, 3, 5]
+    assert a.session_state["player_profile"]["red_boxes"] == 1
+    assert not any(button.key == original_key for button in a.button)
+
+
+def test_completion_buttons_are_bound_to_precise_awakening_target():
+    a = boot()
+    a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6,
+        "awakening_cores": 60, "s_shards": 1200, "quantum_ready": True}
+    a.run()
+    old_key = by_label(a.button, "我已在遊戲完成，排下一步").key
+    by_label(a.button, "我已在遊戲完成，排下一步").click().run()
+    assert not a.exception
+    assert by_label(a.button, "我已在遊戲完成，排下一步").key != old_key
+    assert a.session_state["player_profile"]["awakening_cores"] == 30
+    assert a.session_state["player_profile"]["quantum_ready"] is None

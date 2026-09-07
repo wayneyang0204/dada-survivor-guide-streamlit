@@ -10,7 +10,9 @@ application is not a Cloudflare Worker.
 1. 下一步: a three-field initial profile, then a single primary recommendation.
 2. 我的帳號: edit one system at a time; saving returns to the recalculated result.
 3. Confirm an upgrade already completed in the game to update the local record.
-   Resource balances and per-slot price quotes are invalidated after spending.
+   Known costs are deducted from known stock and explicitly labelled as inferred
+   balances, not live game data. Unknown or inconsistent stock becomes unknown.
+   Per-slot price quotes and next-target material confirmations are invalidated.
 4. Export/import JSON for subsequent sessions; no cross-user or server-file
    profile persistence is used. Refreshing or disconnecting can reset the session.
    Restore is available on the first screen; backup is available on the result.
@@ -41,7 +43,16 @@ are not exposed as competing personalized recommendations.
   Rearranging already owned collectibles within a set can be a zero-cost action.
 - Variable recipes are keyed to the exact target, current milestone, character
   and mode. A recipe for yellow five cannot leak into a red-three recommendation.
-  Confirmed spending clears the consumed stock and relevant recipe confirmations.
+  Confirmed spending clears relevant recipe confirmations. Known stock can carry
+  forward as a labelled estimate; editing a balance confirms that field only.
+- Completion previews use the current recommendation, validate its target and
+  update, and never accept a stale milestone. Completion buttons are also bound
+  to the exact profile/target so the next awakening has a different widget key.
+- SS boots use an entire-set yellow-three target. The recipe covers all missing
+  members and completion updates the whole set without lowering any higher star.
+  A partial real-game upgrade must be entered as actual stars in the profile.
+- Ranking explanations compare actual candidate readiness. A lone candidate
+  must not be described as a proven global optimum.
 - Memory Editor and Dark Matter Construct routes continue through supported
   yellow-three, yellow-five, red-three and red-five breakpoints; their equipment
   conditions and modifier-vs-total-damage limits remain explicit.

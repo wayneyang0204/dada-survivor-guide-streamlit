@@ -66,36 +66,20 @@ def edit_resource(resource: str) -> None:
 
 def complete_step(step: dict) -> None:
     """User confirms an in-game action; update notes only, not the game."""
-    values = dict(step.get("update") or {})
-    if not values:
-        return
-    # Never keep an old balance or a prior slot's price after an upgrade.
-    if step["id"] == "hall_open":
-        values.update(hearts=None, next_slot_cost=None)
-    elif step["resource"] == "高級收藏之心" and not step["id"].endswith("_rearrange"):
-        values.update(advanced_hearts=None, advanced_cost=None, advanced_quote=None)
-    elif step["resource"] == "覺醒核心":
-        values.update(awakening_cores=None, s_shards=None, quantum_ready=None)
-    elif step["resource"] == "神器核心":
-        values.update(relic_cores=None, gear_materials_ready=None)
-    elif step["resource"] == "傳奇收藏自選":
-        values.update(red_boxes=None)
-        p = profile()
-        # Unlocking through a star milestone also adds a distinct legendary.
-        newly_owned = sum(1 for key in ("memory", "dark_matter") if key in values and p[key] == 0 and values[key] > 0)
-        if "boot_stars" in values:
-            newly_owned += sum(1 for old, new in zip(p["boot_stars"], values["boot_stars"]) if old == 0 and new > 0)
-        if newly_owned and "red_owned" not in values and p["red_owned"] is not None:
-            values["red_owned"] = p["red_owned"] + newly_owned
-    if step["resource"] in ("傳奇收藏自選", "覺醒核心"):
-        values["step_quotes"] = {}
-    save(values, completed_title=step["title"])
+    try:
+        preview = engine.completion_preview(profile(), step)
+        save(preview["profile"], completed_title=step["title"])
+    except ValueError as exc:
+        st.error(str(exc))
 
 
-def save(values: dict, completed_title: str | None = None) -> None:
+def save(values: dict, completed_title: str | None = None, restoring: bool = False) -> None:
     try:
         before = profile()
         combined = engine.clean_profile({**before, **values})
+        if not completed_title and not restoring:
+            # Saving an edited balance is the user's confirmation of its value.
+            combined["estimated_balances"] = [key for key in combined["estimated_balances"] if key not in values]
         st.session_state["completion_undo"] = None
         if completed_title:
             st.session_state["completion_undo"] = {"before": before, "title": completed_title}
@@ -152,7 +136,7 @@ def render_backup(p: dict, first_visit: bool = False) -> None:
             try:
                 imported = engine.import_profile(upload.getvalue())
                 st.session_state["completed_steps"] = []
-                save(imported)
+                save(imported, restoring=True)
             except ValueError as exc:
                 st.error(str(exc))
 
@@ -181,6 +165,8 @@ def render_step_inputs(step: dict, p: dict) -> None:
                     (None, True, False), index=(None, True, False).index(quote["materials_ready"]),
                     format_func=lambda x: "尚未確認" if x is None else "已核對，符合" if x else "尚未齊全")
                 st.caption("需要多階升級時，請合計整段材料；不同期自選箱不可只加總箱數。這是你核對的材料，不是本站推算成本。")
+                if sid == "boots_set":
+                    st.warning("本目標是四件全部達到黃三星：請合計所有缺件，並確認鞋子永恆神鑄的冰甲已啟用。只升好一件，請到「我的帳號」更新實際星數。")
                 quotes = dict(p["step_quotes"])
                 quotes[step["quote_key"]] = {"cost": cost, "materials_ready": ready}
                 values["step_quotes"] = dict(list(quotes.items())[-32:])
@@ -269,6 +255,9 @@ def render_home() -> None:
     with right:
         st.button("更新我的帳號", width="stretch", on_click=navigate, args=("我的帳號",))
     st.caption(f"主要模式：{p['mode']} · " + (f"{p['survivor']} R{p['awakening']}" if p['survivor'] and p['awakening'] is not None else "主位尚未確認"))
+    if p["estimated_balances"]:
+        labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
+        st.caption(f"{labels}：依上次紀錄扣除後的推算結餘，沒有同步遊戲；有其他收入或消耗時請校正。")
     result = engine.recommend(p, scope)
     step = result["primary"]
     if not st.session_state.get("player_profile"):
@@ -313,16 +302,25 @@ def render_home() -> None:
         with b:
             st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
         with st.expander("為什麼先做這個？哪些情況會改變答案？"):
-            st.write("排序先看材料齊全且能啟動的項目，再看待存材料的目標。缺星數的進階格不會被標成可執行。")
+            st.write(engine.ranking_reason(result))
             st.write("不同資源可分別安排；收藏之心不足，不會阻止你用覺醒核心升主位。自動排序是規則建議，不是實測傷害排名。")
             if step["caution"]:
                 st.warning(step["caution"])
             st.caption(f"規則核對：{engine.CHECKED}；來源為社群攻略。材料以遊戲內本次預覽為準。")
         if step.get("update"):
             with st.expander("這一步已在遊戲完成？更新紀錄"):
-                st.caption("僅更新本站的星數／槽位紀錄；實際庫存請重新填寫。不會操作遊戲。")
-                if st.button("我已在遊戲完成，排下一步", key=f"complete_{step['id']}"):
-                    complete_step(step)
+                st.write(f"記錄的完整目標：{step['target']}")
+                try:
+                    preview = engine.completion_preview(p, step)
+                    for row in preview["balances"]:
+                        st.caption(f"{row['resource']}：{row['before']:,} − {row['used']:,} → 推算剩餘 {row['after']:,}")
+                    if preview["unknown"]:
+                        st.caption("無法可靠扣除，完成後需重新核對：" + "、".join(preview["unknown"]))
+                    st.caption("僅更新本站紀錄，不操作遊戲。已知成本才計算結餘；下一目標的價格與附加材料重新核對。")
+                    if st.button("我已在遊戲完成，排下一步", key=f"complete_{engine.action_token(p, step)}"):
+                        complete_step(step)
+                except ValueError as exc:
+                    st.warning(str(exc))
         alternatives = result["alternatives"]
         if alternatives:
             with st.expander(f"其他候選（{len(alternatives)} 項，先不必同時做）"):
@@ -347,6 +345,8 @@ def render_profile() -> None:
     p = profile()
     st.markdown('<h1 class="decision-heading">我的帳號</h1>', unsafe_allow_html=True)
     st.caption("只打開你這次要更新的項目。留白代表未知；0 代表確定沒有。")
+    if p["estimated_balances"]:
+        st.caption("部分庫存為完成紀錄後的推算值。核對遊戲現況後儲存，即以你確認的數值接續。")
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
     st.button("← 回到我的下一步", on_click=navigate, args=("下一步",))

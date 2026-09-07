@@ -19,6 +19,9 @@ CALCULATOR = "https://sio-tools.exp0.dev/"
 RESOURCES = ("收藏之心", "高級收藏之心", "傳奇收藏自選", "覺醒核心", "神器核心", "科技配件")
 MODES = ("末世迴響", "遠征／月礦首領", "主線推關", "新版區域行動")
 STARS = ("未持有", "黃1", "黃2", "黃3", "黃4", "黃5", "紅1", "紅2", "紅3", "紅4", "紅5")
+STOCK_LABELS = {"hearts": "收藏之心", "advanced_hearts": "高級收藏之心", "red_boxes": "傳奇收藏自選箱",
+                "awakening_cores": "覺醒核心", "s_shards": "主位S特工碎片", "relic_cores": "神器核心"}
+READY_STATES = ("現在可做", "材料已足")
 FIELDS = {
     "mode": ("末世迴響", MODES),
     "survivor": (None, ("維納托", "塔洛莎", "楊大師", "其他")),
@@ -37,6 +40,7 @@ FIELDS = {
     "red_boxes": (None, (0, 10000)),
     "dark_matter": (None, (0, 10)),
     "step_quotes": ({}, "quotes"),
+    "estimated_balances": ([], "balances"),
     "weapon": (None, ("雙絕槍", "其他")),
     "weapon_e": (None, (0, 5)), "weapon_v": (None, (0, 5)),
     "relic_cores": (None, (0, 10000)), "gear_materials_ready": (None, (True, False)),
@@ -70,6 +74,10 @@ def clean_profile(raw: dict) -> dict:
                     raise ValueError("其他材料是否齊全必須選是或否。")
                 checked[quote_key] = dict(quote)
             value = checked
+        elif rule == "balances":
+            if not isinstance(value, list) or len(value) > len(STOCK_LABELS) or any(not isinstance(k, str) or k not in STOCK_LABELS for k in value):
+                raise ValueError("推算庫存欄位不正確。")
+            value = list(dict.fromkeys(value))
         elif isinstance(rule, str) and rule.startswith("stars"):
             limit = int(rule[5:])
             if not isinstance(value, list) or len(value) > limit or any(type(n) is not int or not 0 <= n <= 10 for n in value):
@@ -89,6 +97,7 @@ def clean_profile(raw: dict) -> dict:
         for key in ("slots", "red_owned"):
             if result[key] is not None and result["red_placed"] > result[key]:
                 raise ValueError("已擺入的紅收藏數不可超過已開槽位或已持有紅收藏數。")
+    result["estimated_balances"] = [k for k in result["estimated_balances"] if result[k] is not None]
     return result
 
 
@@ -303,16 +312,14 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
             update={"dark_matter": target}, quote_kind="collection"))
     if p["ss_boots"] and len(p["boot_stars"]) == 4 and min(p["boot_stars"]) < 3:
         names = ("賽博圖騰柱", "複製寶鏡", "夢境拼圖", "基因編輯器")
-        index = min((i for i, n in enumerate(p["boot_stars"]) if n < 3), key=lambda i: (3-p["boot_stars"][i], i))
-        step = Step("boots_set", "傳奇收藏自選", f"先補{names[index]}到黃三星", "四件SS鞋套裝各黃三星",
-            "先補已最接近門檻的成員；只有四件同時達標才取得套裝技能效果。",
-            "這件黃三星就重算下一位，不把單件推到五星。", SET_SOURCE, 85,
-            current="、".join(STARS[n] for n in p["boot_stars"]),
-            effect="整套達標後強化冰霜戰靴冰甲的護盾增傷",
-            caution="須已啟用對應鞋子神鑄效果；只補一件未必立刻增傷。", quote_kind="collection")
-        updated = list(p["boot_stars"])
-        updated[index] = 3
-        step.update = {"boot_stars": updated}
+        needed = [f"{names[i]} {STARS[n]}→黃3" for i, n in enumerate(p["boot_stars"]) if n < 3]
+        step = Step("boots_set", "傳奇收藏自選", "SS鞋套裝：補齊四件黃三星", "四件都至少黃3星，啟動同一個套裝門檻",
+            f"這套還缺 {len(needed)} 件達標。先核對整組成本，避免只花到一半卻尚未啟動套裝技能。",
+            "四件各到黃三星就停，已超過的成員不降星、不再追加。", SET_SOURCE, 85,
+            current="；".join(needed),
+            effect="四件達標且已啟用鞋子永恆神鑄冰甲時，每層冰霜血脈增加10%護盾增傷",
+            caution="不是整體傷害直接增加10%。必須核對冰甲已啟用；填寫的是所有缺件合計成本，不只一件。",
+            quote_kind="collection", update={"boot_stars": [max(3, n) for n in p["boot_stars"]]})
         steps.append(step)
     if p["neck"] is None or p["memory"] is None:
         missing.append("收藏：目前項鍊與記憶編輯器星數")
@@ -391,3 +398,82 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
         complete.append("第二套8進階格／80傳奇星：菁英與BOSS門檻已完成")
     return {"primary": asdict(steps[0]) if steps else None,
             "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete}
+
+
+def ranking_reason(result: dict) -> str:
+    """Explain the actual comparator, without inventing efficiency or DPS data."""
+    first = result["primary"]
+    if not first:
+        return "尚無足夠資料可比較，先保留資源。"
+    if first["id"] == "hall_fill" or first["id"].endswith("_rearrange"):
+        return "先使用已經持有、而且不需要新材料的提升；付費材料留到重新排序後再安排。"
+    other = next((s for s in result["alternatives"] if s["resource"] == first["resource"]),
+                 next(iter(result["alternatives"]), None))
+    if not other:
+        return "這是目前已填資料中唯一可列出的路線，不代表已證明比未填資料的投資更好。"
+    if first["status"] in READY_STATES and other["status"] not in READY_STATES:
+        return f"這個目標的材料已齊；「{other['title']}」仍是{other['status']}，所以先列能完成的這一步。"
+    if first["status"] == other["status"]:
+        separate = "兩者使用不同資源，可以分別安排。" if first["resource"] != other["resource"] else "兩者使用同一種資源，先完成一個門檻再重算。"
+        return f"與「{other['title']}」同為{first['status']}。{separate}本次以已收錄的門檻規則排序，並非實測傷害或每份材料效益排名。"
+    return f"「{other['title']}」仍是{other['status']}。目前先追蹤資料較明確的目標；不要在未核對成本時直接投入。"
+
+
+def action_token(raw: dict, step: dict) -> str:
+    identity = {"profile": clean_profile(raw), "id": step["id"], "target": step["target"], "update": step.get("update")}
+    return hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:24]
+
+
+def completion_preview(raw: dict, step: dict) -> dict:
+    """Calculate a guide-record transition; this never changes the game or input."""
+    p = clean_profile(raw)
+    current = recommend(p)
+    candidates = ([current["primary"]] if current["primary"] else []) + current["alternatives"]
+    fresh = next((s for s in candidates if all(s.get(k) == step.get(k) for k in ("id", "target", "current", "update"))), None)
+    if not fresh or not fresh.get("update"):
+        raise ValueError("帳號或目標已變更，請重新查看下一步再記錄完成。")
+    values = dict(fresh["update"])
+    costs, cleared = {}, []
+    sid, resource = fresh["id"], fresh["resource"]
+    if sid == "hall_open":
+        costs["hearts"] = p["next_slot_cost"]
+        values["next_slot_cost"] = None
+    elif sid.startswith("adv") and sid.rsplit("_", 1)[-1].isdigit():
+        costs["advanced_hearts"] = p["advanced_cost"] if p["advanced_quote"] == sid else None
+        values.update(advanced_cost=None, advanced_quote=None)
+    elif sid == "venato":
+        costs.update(awakening_cores=30, s_shards=550 if values["awakening"] == 7 else 600)
+        values["quantum_ready"] = None
+    elif resource == "覺醒核心":
+        quote = p["step_quotes"].get(fresh["quote_key"], {})
+        costs["awakening_cores"] = quote.get("cost") if quote.get("materials_ready") is True else None
+        values.update(s_shards=None, quantum_ready=None)
+    elif resource == "神器核心":
+        costs["relic_cores"] = 1 if sid == "lance_e1" else None
+        values["gear_materials_ready"] = None
+    elif resource == "傳奇收藏自選":
+        quote = p["step_quotes"].get(fresh["quote_key"], {})
+        costs["red_boxes"] = quote.get("cost") if quote.get("materials_ready") is True else None
+        newly_owned = sum(1 for key in ("memory", "dark_matter") if key in values and p[key] == 0 and values[key] > 0)
+        if "boot_stars" in values:
+            newly_owned += sum(1 for old, new in zip(p["boot_stars"], values["boot_stars"]) if old == 0 and new > 0)
+        if newly_owned and "red_owned" not in values and p["red_owned"] is not None:
+            values["red_owned"] = p["red_owned"] + newly_owned
+    if resource in ("傳奇收藏自選", "覺醒核心"):
+        # Partial fragments and shared selectors may have changed during spending.
+        values["step_quotes"] = {}
+    estimates = set(p["estimated_balances"])
+    changes = []
+    for key, cost in costs.items():
+        owned = p[key]
+        if owned is not None and cost is not None and owned >= cost:
+            values[key] = owned - cost
+            estimates.add(key)
+            changes.append({"resource": STOCK_LABELS[key], "before": owned, "used": cost, "after": owned-cost})
+        else:
+            values[key] = None
+            estimates.discard(key)
+            cleared.append(STOCK_LABELS[key])
+    values["estimated_balances"] = sorted(estimates)
+    updated = clean_profile({**p, **values})
+    return {"profile": updated, "balances": changes, "unknown": cleared}
