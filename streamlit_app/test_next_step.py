@@ -185,4 +185,46 @@ def test_shortfall_reports_core_and_shard_gaps_together():
     r = recommend({"survivor": "維納托", "awakening": 6, "awakening_cores": 20,
                    "s_shards": 500, "quantum_ready": True})["primary"]
     assert "還差 10" in r["gap"]
-    assert "角色碎片差 50" in r["gap"]
+    assert "角色碎片：500／550，還差 50" in r["gap"]
+
+
+@pytest.mark.parametrize("cores,shards,quantum,expected", [
+    (0, None, None, "先存資源"), (None, 0, None, "先存資源"),
+    (None, None, False, "先存資源"), (30, None, True, "待核對材料"),
+    (None, 550, True, "待核對材料"), (30, 550, None, "待核對材料"),
+    (30, 550, True, "材料已足"),
+])
+def test_readiness_keeps_known_shortages_visible(cores, shards, quantum, expected):
+    step = recommend({"survivor": "維納托", "awakening": 6, "awakening_cores": cores,
+                      "s_shards": shards, "quantum_ready": quantum})["primary"]
+    assert step["status"] == expected
+    assert len(step["checks"]) == 3
+    assert (all(c["state"] == "ready" for c in step["checks"])) == (expected == "材料已足")
+
+
+def test_zero_required_resource_is_not_the_same_as_unknown_cost():
+    p = {"neck": "破壞者徽記", "memory": 3}
+    key = recommend(p)["primary"]["quote_key"]
+    p["step_quotes"] = {key: {"cost": 0, "materials_ready": True}}
+    assert recommend(p)["primary"]["status"] == "材料已足"
+    assert clean_profile(p)["red_boxes"] is None
+    p["step_quotes"][key]["cost"] = None
+    assert recommend(p)["primary"]["status"] == "待核對材料"
+
+
+@pytest.mark.parametrize("opened,stars", [(1, [10]), (3, [10, 10])])
+def test_missing_star_positions_are_unknown_not_zero(opened, stars):
+    step = recommend({"adv2": opened, "stars2": stars}, "高級收藏之心")["primary"]
+    assert step["status"] == "資料未齊"
+    assert "填" in step["gap"]
+
+
+def test_explicit_unowned_star_position_remains_a_real_shortage():
+    step = recommend({"adv2": 1, "stars2": [10, 0]}, "高級收藏之心")["primary"]
+    assert step["status"] == "星數未達"
+
+
+def test_equipment_shortage_is_not_hidden_by_unknown_other_materials():
+    step = recommend({"weapon": "雙絕槍", "weapon_e": 0, "relic_cores": 0})["primary"]
+    assert step["status"] == "先存資源"
+    assert [c["state"] for c in step["checks"]] == ["short", "unknown"]

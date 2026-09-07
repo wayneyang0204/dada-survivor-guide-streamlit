@@ -34,6 +34,9 @@ button[kind="primary"] p, button[data-testid="stBaseButton-primary"] p {color:wh
 .decision-facts strong {font-size:1rem;color:#16283b;line-height:1.6;}
 .decision-note {font-size:.875rem;color:#536378;line-height:1.65;}
 .decision-card p {font-size:1rem;line-height:1.75;color:#293b4c;}
+.decision-checks {margin:.5rem 0 1rem;padding:0;background:#fff;border:1px solid #dce3ea;border-radius:10px;overflow:hidden;}
+.decision-check {display:flex;flex-wrap:wrap;gap:.25rem 1rem;justify-content:space-between;padding:.75rem 1rem;border-bottom:1px solid #e5eaf0;font-size:1rem;line-height:1.6;}
+.decision-check:last-child {border-bottom:0;}.decision-check b {color:#155548;}.decision-check.short b {color:#853e2a;}.decision-check.unknown b {color:#765217;}.decision-check span {color:#293b4c;}
 .decision-queue {display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid #e5eaf0;}
 .decision-queue b {font-size:1rem;color:#16283b;}.decision-queue span {font-size:.875rem;color:#536378;}
 .主視覺 {min-height:0;padding:1rem 1.2rem;background:#fff;box-shadow:none;margin:.8rem 0;}
@@ -148,9 +151,9 @@ def render_step_inputs(step: dict, p: dict) -> None:
     advanced = sid.startswith("adv") and sid.rsplit("_", 1)[-1].isdigit()
     if not (kind or advanced or sid in ("venato", "hall_open", "lance_e1", "twin_drone")):
         return
-    if step["status"] == "星數未達":
+    if step["status"] in ("星數未達", "資料未齊"):
         return
-    with st.expander("只核對這一步的材料", expanded=step["status"] == "待核對材料"):
+    with st.expander("只核對這一步的材料", expanded=any(c["state"] == "unknown" for c in step.get("checks", []))):
         st.caption(f"本次只核對：{step['title']}。沒有資料的項目留白。")
         with st.form(f"step_inputs_{sid}_{st.session_state.get('editor_revision', 0)}"):
             values = {}
@@ -279,7 +282,7 @@ def render_home() -> None:
         render_next_check(p, scope)
     else:
         esc = lambda key: html.escape(str(step.get(key) or ""))
-        state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] == "星數未達" else "pending"
+        state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] in ("星數未達", "資料未齊") else "pending"
         lead = "現在先做" if step["status"] in ("現在可做", "材料已足") else "先存到這裡" if step["status"] == "先存資源" else "先核對這個目標"
         st.markdown(f'''<section class="decision-card">
           <div class="decision-label">{lead} · {esc('resource')} <span class="decision-state {state_class}">{esc('status')}</span></div>
@@ -287,7 +290,11 @@ def render_home() -> None:
           <div class="decision-facts"><div><small>做到這裡</small><strong>{esc('target')}</strong></div>
           <div><small>需要投入</small><strong>{esc('cost')}</strong></div></div>
           <p class="decision-note">停手條件：{esc('stop')}</p></section>''', unsafe_allow_html=True)
-        if step["gap"]:
+        if step.get("checks"):
+            indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
+            rows = "".join(f'<div class="decision-check {c["state"]}" role="listitem"><b>{indicators[c["state"]]} · {html.escape(c["label"])}</b><span>{html.escape(c["detail"])}</span></div>' for c in step["checks"])
+            st.markdown(f'<div class="decision-checks" role="list" aria-label="這一步的必要條件">{rows}</div>', unsafe_allow_html=True)
+        elif step["gap"]:
             st.info(step["gap"])
         if step["effect"]:
             st.write(f"**解鎖效果：** {step['effect']}")

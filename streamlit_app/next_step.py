@@ -5,7 +5,7 @@ Costs that vary by account are supplied from the game's upgrade preview.
 """
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import hashlib
 import json
 
@@ -154,18 +154,43 @@ class Step:
     update: dict | None = None
     quote_kind: str = ""
     quote_key: str = ""
+    checks: list[dict] = field(default_factory=list)
+
+
+def numeric_check(label: str, owned: int | None, needed: int | None) -> dict:
+    if needed == 0 and owned is None:
+        detail, state = "本目標不需要投入這項資源；庫存仍未填寫", "ready"
+    elif owned is None or needed is None:
+        detail = ("庫存尚未填寫" if owned is None else f"庫存 {owned:,}") + "；" + ("需求尚未核對" if needed is None else f"需要 {needed:,}")
+        state = "unknown"
+    elif owned < needed:
+        detail, state = f"{owned:,}／{needed:,}，還差 {needed-owned:,}", "short"
+    else:
+        detail, state = f"{owned:,}／{needed:,}，投入後推算剩 {owned-needed:,}", "ready"
+    return {"label": label, "state": state, "detail": detail, "owned": owned, "needed": needed}
+
+
+def condition_check(label: str, value: bool | None) -> dict:
+    return {"label": label, "state": "unknown" if value is None else "ready" if value else "short",
+            "detail": "尚未核對" if value is None else "已符合" if value else "尚未符合"}
+
+
+def assess_checks(step: Step, checks: list[dict]) -> Step:
+    """Known shortages remain visible even when another requirement is unknown."""
+    step.checks = checks
+    shortages = [c for c in checks if c["state"] == "short"]
+    unknowns = [c for c in checks if c["state"] == "unknown"]
+    step.status = "先存資源" if shortages else "待核對材料" if unknowns or not checks else "材料已足"
+    messages = [f"{c['label']}：{c['detail']}。" for c in shortages]
+    if unknowns:
+        messages.append("還需核對：" + "、".join(c["label"] for c in unknowns) + "。")
+    step.gap = ("尚未建立這個目標的必要條件。" if not checks else " ".join(messages)
+                if messages else "這個目標的材料條件已齊，完成後再重新排序。")
+    return step
 
 
 def affordability(step: Step, owned: int | None, cost: int | None) -> Step:
-    if cost is None or owned is None:
-        step.status = "待核對材料"
-        step.gap = "補上庫存與這個目標的實際材料需求，才判斷現在能否完成。"
-    elif owned < cost:
-        step.status = "先存資源"
-        step.gap = f"還差 {cost - owned:,}；目前 {owned:,}／需要 {cost:,}。"
-    else:
-        step.status = "材料已足"
-        step.gap = f"目前 {owned:,}／需要 {cost:,}，完成後剩 {owned-cost:,}。"
+    assess_checks(step, [numeric_check(step.resource, owned, cost)])
     if cost is not None:
         step.cost = f"{cost:,} {step.resource}"
     return step
@@ -180,14 +205,12 @@ def apply_quote(step: Step, p: dict) -> None:
     step.quote_key = hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:24]
     quote = p["step_quotes"].get(step.quote_key, {})
     stock_key = "red_boxes" if step.quote_kind == "collection" else "awakening_cores"
-    affordability(step, p[stock_key], quote.get("cost"))
+    unit = "傳奇收藏自選箱" if step.quote_kind == "collection" else "覺醒核心"
+    condition = "自選期數與其他升級條件" if step.quote_kind == "collection" else "目標角色碎片與連攜條件"
+    assess_checks(step, [numeric_check(unit, p[stock_key], quote.get("cost")),
+                        condition_check(condition, quote.get("materials_ready"))])
     if quote.get("cost") is not None:
-        unit = "傳奇收藏自選箱" if step.quote_kind == "collection" else "覺醒核心"
         step.cost = f"{quote['cost']:,} {unit}（你核對的整段需求）"
-    if quote.get("materials_ready") is not True:
-        step.status = "先存資源" if quote.get("materials_ready") is False else "待核對材料"
-        step.gap += " 自選期數／碎片及其他條件" if step.quote_kind == "collection" else " 角色碎片／量子碎片與連攜條件"
-        step.gap += "尚未齊全。" if quote.get("materials_ready") is False else "還未確認。"
 
 
 def advanced_options(p: dict) -> list[Step]:
@@ -226,6 +249,9 @@ def advanced_options(p: dict) -> list[Step]:
                 "星數未達", "本步先不花高級收藏之心",
                 f"已進階 {opened} 格合計 {active_total}／{thresholds[n-1]} 星，還差 {thresholds[n-1]-active_total} 星。",
                 effect=effects[n-1]))
+            if len(stars) < opened:
+                options[-1].status = "資料未齊"
+                options[-1].gap = f"已進階 {opened} 格，但只填了 {len(stars)} 件星數；請補完，不能把未填當成零。"
             continue
         if opened == limit:
             continue
@@ -242,7 +268,10 @@ def advanced_options(p: dict) -> list[Step]:
             caution="這是條件式路線，不代表固定增加同等百分比的總輸出。第一套和第二套不可重複使用同一件收藏。",
             update={f"adv{number}": n})
         if not ready:
-            step.status, step.gap = "星數未達", f"目前 {total}／{thresholds[n-1]} 星；先補星或調整擺放。"
+            if len(stars) < n:
+                step.status, step.gap = "資料未齊", f"請先填完這套前 {n} 格的星數；目前只填 {len(stars)} 件，未持有的那件請明確填 0。"
+            else:
+                step.status, step.gap = "星數未達", f"目前 {total}／{thresholds[n-1]} 星；先補星或調整擺放。"
         else:
             quoted = p["advanced_cost"] if p["advanced_quote"] == step.id else None
             affordability(step, p["advanced_hearts"], quoted)
@@ -335,12 +364,9 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
             caution="這是主位路線建議；尚未計入完整同調、協同和實戰覆蓋率。",
             update={"awakening": target}), p["awakening_cores"], 30)
         step.cost = f"30 覺醒核心＋{shards} 角色碎片＋遊戲預覽所需量子碎片"
-        if p["s_shards"] is None or p["quantum_ready"] is None:
-            step.status = "待核對材料"
-            step.gap += " 尚需核對角色碎片與量子碎片。"
-        elif p["s_shards"] < shards or not p["quantum_ready"]:
-            step.status = "先存資源"
-            step.gap += f" 角色碎片差 {max(0, shards-p['s_shards'])}；量子碎片{'已足' if p['quantum_ready'] else '不足'}。"
+        assess_checks(step, [numeric_check("覺醒核心", p["awakening_cores"], 30),
+                            numeric_check("角色碎片", p["s_shards"], shards),
+                            condition_check("量子碎片", p["quantum_ready"])])
         steps.append(step)
     elif p["survivor"] is None or p["awakening"] is None:
         missing.append("特工：目前主位與精確覺醒等級")
@@ -365,9 +391,8 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
             caution="還需對應S裝、永恆核心與基礎材料；僅神器核心足夠不代表能升。",
             update={"weapon_e": 1}), p["relic_cores"], 1))
         step = steps[-1]
-        if p["gear_materials_ready"] is not True:
-            step.status = "先存資源" if p["gear_materials_ready"] is False else "待核對材料"
-            step.gap += " 神鑄預覽中的S裝與其他材料" + ("尚未齊全。" if p["gear_materials_ready"] is False else "還未核對。")
+        assess_checks(step, [numeric_check("神器核心", p["relic_cores"], 1),
+                            condition_check("E1所需S裝及其他材料", p["gear_materials_ready"])])
     if p["weapon"] is None or p["weapon_e"] is None or p["weapon_v"] is None:
         missing.append("裝備：主武器與永恆／虛空神鑄")
 
@@ -379,6 +404,8 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
             "紅無人機＋紅力場；其他條件依合成頁核對",
             "合成前核對諧振配置" if p["forcefield_red"] is True else "先把力場配件補到紅色" if p["forcefield_red"] is False else "先確認是否已有紅力場，不把未知當成沒有。",
             update={"twin_drone": True})
+        assess_checks(step, [condition_check("紅無人機配件", p["drone_red"]),
+                            condition_check("紅力場配件", p["forcefield_red"])])
         steps.append(step)
     if p["twin_drone"] is None:
         missing.append("科技：是否已完成雙生無人機")
@@ -389,7 +416,7 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     if resource != "自動排序":
         steps = [s for s in steps if s.resource == resource]
     # Ready actions first; within the same readiness group use explained rules.
-    state = {"現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0}
+    state = {"現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0, "資料未齊": 0}
     steps.sort(key=lambda s: (state.get(s.status, 0), s.priority, s.id), reverse=True)
     complete = []
     if p["awakening"] == 8:

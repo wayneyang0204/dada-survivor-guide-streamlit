@@ -267,3 +267,28 @@ def test_completion_buttons_are_bound_to_precise_awakening_target():
     assert by_label(a.button, "我已在遊戲完成，排下一步").key != old_key
     assert a.session_state["player_profile"]["awakening_cores"] == 30
     assert a.session_state["player_profile"]["quantum_ready"] is None
+
+
+def test_home_separates_known_shortfall_from_unknown_requirements():
+    a = boot()
+    a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 6, "awakening_cores": 20}
+    a.run()
+    assert not a.exception
+    content = "\n".join(x.value for x in a.markdown)
+    assert "先存資源" in content
+    assert "缺 · 覺醒核心" in content
+    assert "還差 10" in content
+    assert "待確認 · 角色碎片" in content
+    assert "待確認 · 量子碎片" in content
+    assert next(e for e in a.expander if e.label == "只核對這一步的材料").proto.expanded
+
+
+def test_missing_stars_do_not_open_an_irrelevant_material_form():
+    a = boot()
+    a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 8, "adv2": 1, "stars2": [10]}
+    a.run()
+    assert not a.exception
+    assert any("資料未齊" in x.value for x in a.markdown)
+    assert not a.get("form")
+    by_label(a.button, "補上這一步的資料").click().run()
+    assert by_label(a.selectbox, "這次更新哪一項").value == "進階典藏館"

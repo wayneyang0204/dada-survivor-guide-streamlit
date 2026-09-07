@@ -29,6 +29,13 @@ are not exposed as competing personalized recommendations.
 ## Recommendation contract
 
 - Unknown is `None`, never zero. Actual zero is an explicit player input.
+- Material checks retain each known shortage and each unknown requirement.
+  A known shortage takes precedence over unknown details in the headline state;
+  it must never disappear because a different material was not entered.
+- A user-confirmed zero requirement is distinct from an unknown requirement:
+  that resource need not have known stock to satisfy a zero-cost target.
+- Incomplete advanced-star positions are missing data, not zero-star holdings.
+  The app asks for the star data before opening the material-price form.
 - Material-ready actions precede saving goals, then unverified candidates.
 - Resource categories are independent, not converted into an invented DPS score.
 - General and advanced collector hearts are separate resources.

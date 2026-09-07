@@ -1058,6 +1058,6 @@ elif 頁面 == "最新文章":
     st.link_button("查看完整文章分類", 來源分類網址)
 
 st.divider()
-st.caption("升級決策版 · 2026.09.08 · 整套門檻與資源接續")
+st.caption("升級決策版 · 2026.09.08 · 條件與缺口逐項核對")
 台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
 st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")
