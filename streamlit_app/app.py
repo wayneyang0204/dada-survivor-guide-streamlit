@@ -10,6 +10,11 @@ from zoneinfo import ZoneInfo
 import streamlit as st
 
 import data_engine as _data_engine
+import next_step as _next_step
+import decision_ui as _decision_ui
+
+_next_step = importlib.reload(_next_step)
+_decision_ui = importlib.reload(_decision_ui)
 
 
 # Streamlit Cloud can hot-reload app.py before a changed helper module. Reloading
@@ -43,7 +48,7 @@ st.set_page_config(
         "分類": "關卡活動",
         "標題": "音樂圓盤大作戰：九百八十進度停損線",
         "日期": "2026/08/30",
-        "狀態": "現行",
+        "狀態": "歷史活動｜已於9/3結束",
         "摘要": "活動到 9 月 3 日結束。社群實測約可取得九百張免費麥克風，盤面返還會放大實際進度；先跑免費資源，九百八十進度是目前最平衡的停損點。",
         "行動": ["先完成登入、每日任務與免費麥克風", "寶箱先開二百至三百箱，最後一天再補差額", "商店先換傳奇收藏品自選箱、萬能神火特工碎片與高級收藏之心"],
         "來源": "https://notalknote.xyz/survivor-io-music-disc-clash-guide/",
@@ -345,7 +350,7 @@ def 切換主頁面(主要: str, 次要: str | None = None) -> None:
 
 
 def 顯示攻略卡片(item: dict) -> None:
-    狀態色 = {"現行": "#5f860b", "常駐": "#187178", "需版本核對": "#a85a08"}[item["狀態"]]
+    狀態色 = {"現行": "#5f860b", "常駐": "#187178", "需版本核對": "#a85a08"}.get(item["狀態"], "#735b45")
     st.markdown(
         f"""
         <div class="攻略卡">
@@ -360,7 +365,7 @@ def 顯示攻略卡片(item: dict) -> None:
         """,
         unsafe_allow_html=True,
     )
-    with st.expander("你現在該做什麼"):
+    with st.expander("查看這篇攻略的重點"):
         for action in item["行動"]:
             st.markdown(f"- {action}")
         st.link_button("核對原始文章", item["來源"], width="stretch")
@@ -732,14 +737,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown(_decision_ui.STYLE, unsafe_allow_html=True)
+
+# Migrate older navigation state without carrying its conflicting recommendation pages.
+if st.session_state.get("主導覽") in ("首頁", "養成"):
+    st.session_state["主導覽"] = "下一步"
+if pending := st.session_state.pop("pending_navigation", None):
+    st.session_state["主導覽"] = pending
+if st.session_state.get("資料分類") == "終局配裝":
+    st.session_state["資料分類"] = "配裝參考"
+
 st.markdown(
     """
     <div class="頂導">
       <div class="品牌">
         <span class="品牌記號">噠</span>
-        <span class="品牌文字"><span class="品牌名稱">噠噠攻略站 <b class="專業標">PRO</b></span><small>SURVIVOR.IO DECISION INTELLIGENCE</small></span>
+        <span class="品牌文字"><span class="品牌名稱">噠噠攻略站 <b class="專業標">PRO</b></span><small>SURVIVOR.IO · 升級決策</small></span>
       </div>
-      <div class="同步徽章"><span class="同步點"></span>資料每 15 分鐘自動同步</div>
+      <div class="同步徽章"><span class="同步點"></span>一次完成一個門檻</div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -747,7 +762,7 @@ st.markdown(
 
 主頁面 = st.radio(
     "選擇功能",
-    ["首頁", "活動", "養成", "資料庫"],
+    ["下一步", "我的帳號", "活動", "資料庫"],
     horizontal=True,
     label_visibility="collapsed",
     key="主導覽",
@@ -755,166 +770,17 @@ st.markdown(
 
 if 主頁面 == "活動":
     頁面 = "活動最佳解"
-elif 主頁面 == "養成":
-    頁面 = st.selectbox("選擇養成工具", ["智能最優解", "帳號診斷", "終局配裝", "收藏優先級"], key="養成分類")
 elif 主頁面 == "資料庫":
-    頁面 = st.selectbox("選擇資料內容", ["完整攻略庫", "收藏圖鑑", "最新文章"], key="資料分類")
+    頁面 = st.selectbox("要查什麼", ["完整攻略庫", "收藏圖鑑", "最新文章", "配裝參考"], key="資料分類")
+    if 頁面 == "配裝參考":
+        頁面 = "終局配裝"
 else:
-    頁面 = "首頁"
+    頁面 = 主頁面
 
-頁面主視覺 = {
-    "首頁": ("SURVIVOR.IO META INTELLIGENCE", "每一顆寶石，<br><span>都有可驗證的理由。</span>", "把活動進度、帳號階段與終局斷點，轉成今天可以直接執行的一個決策。不是照抄榜單，而是依你的狀態算出答案。"),
-    "活動最佳解": ("活動決策中心", "先算完免費進度，<br><span>再決定要不要補。</span>", "選活動、填進度，直接得到補鑽上限、寶石安全線與兌換優先級。"),
-    "智能最優解": ("SMART ROUTE OPTIMIZER", "讓系統比較所有路線，<br><span>只留下現在最值得做的。</span>", "同時衡量目標、模式、帳號階段、四種稀缺核心、寶石安全線與每天可玩時間。"),
-    "帳號診斷": ("個人化養成路線", "先找到最大缺口，<br><span>再集中跨過斷點。</span>", "依模式、裝備階段與稀缺資源，整理現在最該做的三件事。"),
-    "終局配裝": ("終局實戰配置", "不是只有一套神裝，<br><span>模式不同，答案就不同。</span>", "把首領、區域行動與高速清怪拆開判斷，避免用錯配置。"),
-    "完整攻略庫": ("完整資料中心", "攻略不只收得多，<br><span>還要知道現在能不能用。</span>", "精選決策卡加上全部來源同步，並標記現行、常駐與需核對內容。"),
-    "收藏圖鑑": ("290 件完整收藏", "先查缺哪一件，<br><span>再決定自選箱投哪裡。</span>", "依名稱、品質與期數篩選收藏，快速核對圖示與詳細資料。"),
-    "收藏優先級": ("收藏養成決策", "不要平均升星，<br><span>先跨真正有效的斷點。</span>", "依套裝、主力技能與乘區收益，排出收藏資源的正確順序。"),
-    "最新文章": ("版本情報同步", "新活動、新系統，<br><span>一次掌握真正有用的變化。</span>", "自動彙整最新來源，版本變動時保留原文入口供你快速核對。"),
-}
-視覺小標, 視覺標題, 視覺說明 = 頁面主視覺[頁面]
-主視覺內容 = f"""
-    <section class="主視覺">
-      <div class="小標">{視覺小標}</div>
-      <div class="主標">{視覺標題}</div>
-      <p class="說明">{視覺說明}</p>
-      <span class="主視覺徽章">不是 Tier List｜是依版本、模式與帳號斷點計算的決策系統</span>
-    </section>
-    """
-if 頁面 == "首頁":
-    主視覺左, 主視覺右 = st.columns([1.25, 0.75])
-    with 主視覺左:
-        st.markdown(主視覺內容, unsafe_allow_html=True)
-    with 主視覺右:
-        st.image("public/dada-guide-hero.png", width="stretch")
-else:
-    st.markdown(主視覺內容, unsafe_allow_html=True)
-
-if 頁面 == "首頁":
-    全部文章首頁, 首頁即時 = 取得完整文章庫()
-    首頁活動文章 = [item for item in 全部文章首頁 if item["category"] == "活動攻略"]
-    首頁收藏圖鑑 = 取得收藏圖鑑()
-    首頁活動 = 首頁活動文章[0] if 首頁活動文章 else None
-    首頁活動模型 = match_event_playbook(首頁活動["title"]) if 首頁活動 else None
-
-    st.markdown(
-        f'<div class="信任列"><span><b>{官方版本資訊["版本"]}</b> 版本追蹤</span>'
-        f'<span><b>{len(全部文章首頁)}</b> 篇來源攻略</span><span><b>{len(首頁活動文章)}</b> 篇活動資料</span>'
-        f'<span><b>{len(首頁收藏圖鑑)}</b> 件收藏圖鑑</span><span><b>{"即時" if 首頁即時 else "備援"}</b> 資料模式</span><span><b>0</b> 密碼需求</span></div>',
-        unsafe_allow_html=True,
-    )
-
-    if 首頁活動 and 首頁活動模型:
-        今日步驟 = "".join(
-            f'<span>{index:02d}　{html.escape(str(step))}</span>'
-            for index, step in enumerate(首頁活動模型["steps"][:3], 1)
-        )
-        st.markdown(
-            f"""
-            <section class="決策台">
-              <div class="決策台頭"><span>LIVE PLAYER COMMAND CENTER</span><span class="決策信心">來源已同步・版本已標記</span></div>
-              <div class="決策台格">
-                <article class="今日指令">
-                  <small>TODAY'S MOVE・今天只做對這件事</small>
-                  <h3>{html.escape(str(首頁活動['title']))}</h3>
-                  <p class="今日結論">{html.escape(str(首頁活動模型.get('verdict') or 首頁活動模型['free_hint']))}</p>
-                  <div class="今日步驟">{今日步驟}</div>
-                </article>
-                <aside class="決策側欄">
-                  <div class="決策訊號"><small>ACCOUNT ROADMAP</small><strong>四個狀態，一條資源路線</strong><span>主位、混沌、模式、支援鏈一起判斷</span></div>
-                  <div class="決策訊號"><small>BUILD LAB</small><strong>三種模式分開配裝</strong><span>短場、長場與區域行動不再互相誤用</span></div>
-                  <div class="決策訊號"><small>DATA CONFIDENCE</small><strong>{'即時' if 首頁即時 else '備援'}資料・{官方版本資訊['版本']}</strong><span>每筆攻略保留日期、狀態與原始來源</span></div>
-                </aside>
-              </div>
-            </section>
-            """,
-            unsafe_allow_html=True,
-        )
-        指揮操作一, 指揮操作二 = st.columns([1.15, 0.85])
-        with 指揮操作一:
-            st.button("立即算我的活動停損線", type="primary", width="stretch", on_click=切換主頁面, args=("活動",))
-        with 指揮操作二:
-            st.button("找出我的全局最優路線", width="stretch", on_click=切換主頁面, args=("養成", "智能最優解"))
-
-    st.header("本期活動完整作戰簡報")
-    st.caption("先看結論，再展開 16 項完整依據；真正投入資源前可進入活動頁用帳號數字精算。")
-    if 首頁活動 and 首頁活動模型:
-        顯示活動重點(首頁活動["title"], 首頁活動["date"], 首頁活動模型, "目前活動 · 30 秒攻略")
-        活動操作, 原文操作 = st.columns(2)
-        with 活動操作:
-            st.button("用我的帳號精算這次活動", type="primary", width="stretch", on_click=切換主頁面, args=("活動",))
-        with 原文操作:
-            st.link_button("核對完整原始攻略 ↗", 首頁活動["link"], width="stretch")
-    else:
-        st.info("活動來源暫時無法連線；活動試算與既有攻略仍可正常使用。")
-
-    st.markdown("### 三個專業決策入口")
-    st.markdown(
-        f"""
-        <div class="快捷格">
-          <div class="快捷卡"><span class="快捷編號">01 · 活動</span><strong>這次活動值不值得追？</strong><p>先算免費進度，再看補鑽上限、寶石安全線與獎勵兌換順序。</p></div>
-          <div class="快捷卡"><span class="快捷編號">02 · 最佳化</span><strong>下一份資源投在哪？</strong><p>比較角色、神器、異寵、配件與收藏路線，依資源與時間找出最高收益方案。</p></div>
-          <div class="快捷卡"><span class="快捷編號">03 · 資料庫</span><strong>需要查完整資料？</strong><p>搜尋 {len(全部文章首頁)} 篇來源文章與 {len(首頁收藏圖鑑)} 件收藏，另有人工整理的精選攻略。</p></div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    入口一, 入口二, 入口三 = st.columns(3)
-    with 入口一:
-        st.button("開啟活動判斷", width="stretch", on_click=切換主頁面, args=("活動",))
-    with 入口二:
-        st.button("執行智能最佳化", width="stretch", on_click=切換主頁面, args=("養成", "智能最優解"))
-    with 入口三:
-        st.button("搜尋完整資料", width="stretch", on_click=切換主頁面, args=("資料庫", "完整攻略庫"))
-
-    st.markdown(
-        f"""
-        <section class="價值主張">
-          <div class="價值頭">
-            <div><small>WHY PLAYERS KEEP IT OPEN</small><h3>玩家需要的不是更多文章，而是更少錯誤決策。</h3></div>
-            <p>每個答案都從同一條路徑產生：先確認版本與帳號狀態，再計算成本，最後給出可停手的明確界線。</p>
-          </div>
-          <div class="價值格">
-            <div class="價值項"><b>活動情報密度</b><strong>16 項重點</strong><span>免費來源、最佳里程碑、操作順序與商店優先級一次看完</span></div>
-            <div class="價值項"><b>個人化停損</b><strong>7 個數字 → 1 結論</strong><span>同時計算免費期末進度、補鑽成本、寶石安全線與獎勵價值</span></div>
-            <div class="價值項"><b>終局情境配置</b><strong>3 套實戰模型</strong><span>首領短場、長場疊層與區域詞條各自獨立判斷</span></div>
-            <div class="價值項"><b>可追溯資料</b><strong>{len(全部文章首頁)}＋{len(首頁收藏圖鑑)}</strong><span>來源攻略與收藏圖鑑集中搜尋，保留日期、版本狀態與原文</span></div>
-          </div>
-          <div class="方法條"><span>免費進度投影</span><span>寶石安全線</span><span>帳號價值上限</span><span>裝備斷點</span><span>模式 A/B 驗證</span><span>版本風險標記</span></div>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    最新區, 版本區 = st.columns([1.35, 0.65])
-    with 最新區:
-        st.markdown("### 最新情報")
-        首頁最新 = 全部文章首頁[:3]
-        if 首頁最新:
-            for item in 首頁最新:
-                with st.container(border=True):
-                    st.caption(f"{item['category']}｜{item['date']}")
-                    st.markdown(f"**{item['title']}**")
-                    摘要 = item.get("excerpt") or "開啟原文查看完整內容。"
-                    st.write(摘要[:120] + ("…" if len(摘要) > 120 else ""))
-                    st.link_button("閱讀原文", item["link"], width="stretch")
-        else:
-            st.caption("最新來源暫時無法載入。")
-    with 版本區:
-        st.markdown("### 版本雷達")
-        版本項目 = "".join(f"<li>{html.escape(item)}</li>" for item in 官方版本資訊["重點"])
-        st.markdown(
-            f'<div class="版本卡"><span class="資料標籤">官方商店版本 {官方版本資訊["版本"]}</span>'
-            f'<h3>{官方版本資訊["標題"]}</h3><p>最後查核：{官方版本資訊["查核"]}</p><ul>{版本項目}</ul></div>',
-            unsafe_allow_html=True,
-        )
-        官方一, 官方二 = st.columns(2)
-        with 官方一:
-            st.link_button("Apple 官方", "https://apps.apple.com/us/app/survivor-io/id1528941310", width="stretch")
-        with 官方二:
-            st.link_button("Google 官方", "https://play.google.com/store/apps/details?id=com.dxx.firenow", width="stretch")
-
+if 頁面 == "下一步":
+    _decision_ui.render_home()
+elif 頁面 == "我的帳號":
+    _decision_ui.render_profile()
 elif 頁面 == "活動最佳解":
     st.header("活動最佳解：先算免費進度，再決定要不要補")
     全部文章, 文章即時 = 取得完整文章庫()
@@ -937,12 +803,14 @@ elif 頁面 == "活動最佳解":
         }
     活動模型 = match_event_playbook(已選活動["title"])
 
-    顯示活動重點(
-        str(已選活動["title"]),
-        str(已選活動["date"]),
-        活動模型,
-        f"{已選活動.get('freshness', '待核對')} · 30 秒攻略",
-    )
+    st.info("文章日期不等於活動仍開放。請先核對遊戲內名稱、截止時間與獎勵表；下方可試算歷史活動。")
+    with st.expander("查看這篇活動的30秒重點"):
+        顯示活動重點(
+            str(已選活動["title"]),
+            str(已選活動["date"]),
+            活動模型,
+            f"{已選活動.get('freshness', '待核對')} · 參考攻略",
+        )
     st.caption(
         f"已同步 {len(全部文章)} 篇來源攻略｜其中 {len(活動文章)} 篇活動攻略｜自動套用：{活動模型['name']}"
         if 文章即時
@@ -1019,231 +887,22 @@ elif 頁面 == "活動最佳解":
         st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
         st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
 
-    st.markdown("### 兌換商店優先級")
+    st.markdown("### 商店先看這一項")
+    st.write(f"**{獎勵排序[0]['name']}**")
+    st.caption("依上方帳號缺口排出的參考順位；先確認這次商店確實有提供。")
     獎勵卡片 = "".join(
         f'<div class="獎勵項"><span class="獎勵序">{index:02d}</span>'
         f'<span class="獎勵名稱">{html.escape(str(reward["name"]))}</span>'
-        f'<span class="獎勵數據">適配 {reward["score"]}<br>上限 {reward["adjusted_gem_value"]:,} 鑽</span></div>'
+        f'<span class="獎勵數據">試算上限 {reward["adjusted_gem_value"]:,} 鑽</span></div>'
         for index, reward in enumerate(獎勵排序[:8], 1)
     )
-    st.markdown(f'<div class="獎勵格">{獎勵卡片}</div>', unsafe_allow_html=True)
-
-elif 頁面 == "智能最優解":
-    st.header("智能最優解：比較所有可行路線，再決定下一份資源")
-    st.caption("這是透明的帳號路線最佳化器，不是假裝還原官方隱藏傷害公式；結果會把策略適配與資料信心分開顯示。")
-
-    o1, o2, o3 = st.columns(3)
-    with o1:
-        最佳化目標 = st.selectbox(
-            "最想最佳化的結果",
-            ["長期帳號成長", "首領傷害上限", "區域行動穩定", "活動獎勵效率", "不確定，自動判斷"],
-        )
-        最佳化模式 = st.selectbox("主要遊玩模式", ["綜合養成", "短場首領", "長場首領", "區域行動"])
-    with o2:
-        最佳化階段 = st.selectbox("帳號階段", ["紅裝成套、神器核心不足", "尚未紅裝成套", "主要裝備斷點已完成", "接近滿配"])
-        最佳化風格 = st.selectbox("決策風格", ["平衡收益", "穩定優先", "追求上限"])
-    with o3:
-        最佳化消費 = st.selectbox("資源投入風格", ["無課／只用免費資源", "微課／可小補寶石", "課金／只看效率"])
-        規劃週期文字 = st.selectbox("規劃週期", ["30 天", "7 天", "90 天"])
-
-    q1, q2 = st.columns(2)
-    with q1:
-        最佳化寶石 = int(st.number_input("目前寶石", min_value=0, value=30000, step=500, key="optimizer_gems"))
-    with q2:
-        每天時間 = int(st.number_input("每天可投入時間（分鐘）", min_value=4, max_value=180, value=30, step=5))
-
-    with st.expander("精準模式：填入四種稀缺核心（不知道可填 0）"):
-        k1, k2, k3, k4 = st.columns(4)
-        with k1:
-            神器核心數 = int(st.number_input("神器核心", min_value=0, value=4, step=1))
-        with k2:
-            諧振晶片數 = int(st.number_input("諧振晶片", min_value=0, value=0, step=1))
-        with k3:
-            異世核心數 = int(st.number_input("異世核心", min_value=0, value=0, step=1))
-        with k4:
-            覺醒核心數 = int(st.number_input("覺醒核心", min_value=0, value=0, step=1))
-
-    最佳化結果 = optimize_player_plan(
-        goal=最佳化目標,
-        account_stage=最佳化階段,
-        play_mode=最佳化模式,
-        spending_style=最佳化消費,
-        risk_style=最佳化風格,
-        horizon_days=int(規劃週期文字.split()[0]),
-        gems=最佳化寶石,
-        relic_cores=神器核心數,
-        resonance_chips=諧振晶片數,
-        xeno_cores=異世核心數,
-        awakening_cores=覺醒核心數,
-        daily_minutes=每天時間,
-    )
-    最佳方案 = 最佳化結果["best"]
-    理由標籤 = "".join(f"<span>{html.escape(str(reason))}</span>" for reason in 最佳方案["reasons"])
-    if 最佳方案["gaps"]:
-        理由標籤 += "".join(f"<span>待補：{html.escape(str(gap))}</span>" for gap in 最佳方案["gaps"])
-    st.markdown(
-        f"""
-        <section class="最佳結論">
-          <div class="最佳頂列"><small>本期最佳路線 · 適配 {最佳方案['score']}/100</small><span class="信心徽章">資料信心 {最佳化結果['confidence']}/100</span></div>
-          <h3>現在最好的選擇：{html.escape(str(最佳方案['name']))}</h3>
-          <p>{html.escape(str(最佳方案['summary']))}</p>
-          <div class="最佳理由">{理由標籤}</div>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("策略適配", f"{最佳方案['score']}/100")
-    m2.metric("資料信心", f"{最佳化結果['confidence']}/100")
-    m3.metric("可安全動用寶石", f"{最佳化結果['spendable_gems']:,}")
-    m4.metric("每日最佳行程", f"{最佳化結果['schedule']['minutes_used']} 分")
-    st.progress(最佳化結果["confidence"] / 100, text=f"信心 {最佳化結果['confidence']}%｜高端帳號仍應用固定場景 A/B 實測驗證")
-
-    st.markdown("### 為什麼這條路線勝出")
-    方案卡片 = ""
-    for 排名, 方案 in enumerate(最佳化結果["ranked"][:3], 1):
-        原因清單 = "".join(f"<li>{html.escape(str(item))}</li>" for item in 方案["reasons"])
-        缺口文字 = "目前可直接執行" if 方案["feasible"] else "；".join(方案["gaps"])
-        狀態類別 = "可行" if 方案["feasible"] else "待補"
-        推薦類別 = " 推薦" if 排名 == 1 else ""
-        方案卡片 += (
-            f'<article class="方案卡{推薦類別}"><div class="方案排名"><span>方案 {排名} · {html.escape(str(方案["label"]))}</span>'
-            f'<span class="方案分數">{方案["score"]}/100</span></div><h4>{html.escape(str(方案["name"]))}</h4>'
-            f'<p>{html.escape(str(方案["summary"]))}</p><ul>{原因清單}</ul>'
-            f'<p class="{狀態類別}"><b>{"可執行" if 方案["feasible"] else "先補門檻"}：</b>{html.escape(str(缺口文字))}</p></article>'
-        )
-    st.markdown(f'<div class="方案比較格">{方案卡片}</div>', unsafe_allow_html=True)
-
-    st.markdown("### 今天的最高價值行程")
-    行程卡片 = "".join(
-        f'<article class="計畫項"><span class="計畫序">{index:02d}</span><div><strong>{html.escape(str(task["name"]))}</strong>'
-        f'<span>{html.escape(str(task["why"]))}</span></div><span class="計畫時間">{task["minutes"]} 分</span></article>'
-        for index, task in enumerate(最佳化結果["schedule"]["tasks"], 1)
-    )
-    st.markdown(f'<div class="今日計畫">{行程卡片}</div>', unsafe_allow_html=True)
-    if 最佳化結果["schedule"]["next_if_more_time"]:
-        下個任務 = "、".join(item["name"] for item in 最佳化結果["schedule"]["next_if_more_time"])
-        st.caption(f"若今天多出時間，再依序考慮：{下個任務}。目前已使用 {最佳化結果['schedule']['minutes_used']}/{最佳化結果['schedule']['budget']} 分鐘。")
-
-    模式協議 = 最佳化結果["mode_protocol"]
-    st.markdown(f"### {模式協議['title']}")
-    協議卡片 = "".join(
-        f'<article class="模式步"><small>{label}</small><strong>{title}</strong><span>{html.escape(str(content))}</span></article>'
-        for label, title, content in [
-            ("01 · OPENING", "開局", 模式協議["opening"]),
-            ("02 · MID GAME", "中段", 模式協議["mid"]),
-            ("03 · FINISH", "收尾", 模式協議["finish"]),
-            ("04 · VERIFY", "驗證指標", 模式協議["measure"]),
-        ]
-    )
-    st.markdown(f'<div class="模式協議">{協議卡片}</div>', unsafe_allow_html=True)
-
-    停止條件 = [
-        最佳方案["stop"],
-        f"任何投入會讓寶石低於 {最佳化結果['reserve']:,} 安全線時停止。",
-        "關鍵資料、版本或遊戲內數值與假設不同時，先停止不可逆投入並重新計算。",
-    ]
-    停止清單 = "".join(f"<li>{html.escape(str(item))}</li>" for item in 停止條件)
-    st.markdown(f'<section class="硬停框"><strong>硬停條件｜任何一項觸發就停</strong><ol>{停止清單}</ol></section>', unsafe_allow_html=True)
-
-    st.markdown("### 執行順序")
-    for index, step in enumerate(最佳方案["steps"], 1):
-        st.markdown(f"**{index}. {step}**")
-    st.info(f"切換條件：{最佳方案['switch']}")
-
-    with st.expander("查看模型依據、限制與進階驗證"):
-        st.markdown(f"**評分方法：** {最佳化結果['method']}")
-        st.markdown("**限制：** 目前比較的是帳號路線與稀缺資源投資，不是官方精準 DPS 模擬。高端裝備仍需輸入各槽 E／V／C／X、暴率、技能與異常覆蓋率後驗證。")
-        st.markdown("**新版區域行動：** 2026/08/27 後局外角色與裝備不帶入，應最佳化小關路線、局內 Buff、主動技能與被動生存，而不是套用舊版 AoQ 配置。")
-        st.markdown("**本輪查核來源：** [官方版本紀錄](https://apps.apple.com/tw/app/%E5%99%A0%E5%99%A0%E7%89%B9%E6%94%BB/id1528941310)｜[sIO Tools 情境計算器](https://sio-tools.exp0.dev/)｜[新版區域行動實測](https://www.taptap.cn/moment/842186300982296852?group_id=338134)｜[音樂圓盤實測](https://www.taptap.cn/moment/842881652471365745)")
-        驗證一, 驗證二 = st.columns(2)
-        with 驗證一:
-            st.link_button("進階傷害交叉驗證｜sIO Tools ↗", "https://sio-tools.exp0.dev/", width="stretch")
-        with 驗證二:
-            st.link_button("查看本站完整終局配置", "https://notalknote.xyz/moblegame/survivorio/", width="stretch")
-
-elif 頁面 == "帳號診斷":
-    st.header("現在該點哪個數字")
-    st.caption("選完會直接告訴你：哪種核心花在誰身上、點到哪一階停、沒到以前不要動什麼。")
-    st.markdown(
-        '<section class="安全健檢"><div><strong>完整健檢不需要帳號密碼</strong><span>自行登入遊戲後提供角色／裝備、科技配件、寵物、收藏、核心與寶石頁面即可判斷；不要把登入資料交給任何攻略服務。</span></div><span class="安全徽章">PRIVACY FIRST</span></section>',
-        unsafe_allow_html=True,
-    )
-    with st.expander("深度帳號健檢：建議準備的 6 組截圖"):
-        st.markdown(
-            "1. **角色與主位**：角色列表、主力角色覺醒階級、基礎暴擊率\n"
-            "2. **裝備與神器**：六個裝備欄、神鑄／雙生階級、剩餘神器核心\n"
-            "3. **科技配件**：三攻三防、諧振與雙生配件階級\n"
-            "4. **寵物系統**：主戰、助戰、覺醒與共鳴技能\n"
-            "5. **收藏系統**：套裝進度、傳奇收藏、自選箱與碎片\n"
-            "6. **資源與目標**：寶石、鑰匙、通用碎片，以及最想突破的模式"
-        )
-    col1, col2 = st.columns(2)
-    with col1:
-        主位階段 = st.selectbox(
-            "① 主位與暴率門檻",
-            ["維納托覺醒7以上", "維納托覺醒5＋塔洛莎覺醒4", "塔洛莎覺醒5＋暴率70%", "塔洛莎覺醒1～4／暴率未滿70%", "都未達／不確定"],
-        )
-        武器階段 = st.selectbox(
-            "② 主武器與神鑄",
-            ["雙生槍E4V4＋異界轉化", "雙生槍E3V2以上未滿E4V4", "雙生槍E1V2骨架", "苦無／虛空／未達雙生槍"],
-        )
-        遊玩模式 = st.selectbox("④ 目前主要模式", ["短場首領", "長場首領", "區域行動"])
-    with col2:
-        混沌階段 = st.selectbox("③ 混沌之力", ["混沌之力27以上", "混沌之力18～26", "混沌之力9～17", "混沌之力未滿9／不確定"])
-        神火階段 = st.selectbox("⑤ SP 支援鏈", ["哪吒R4＋伏爾坎R4支援鏈", "只有哪吒或伏爾坎", "都沒有／不確定"])
-
-    診斷 = diagnose_account(
-        main_stage=主位階段,
-        chaos_stage=混沌階段,
-        play_mode=遊玩模式,
-        divine_stage=神火階段,
-        weapon_stage=武器階段,
-    )
-    st.markdown(
-        f'<section class="診斷結論"><span class="診斷標籤">{診斷["phase"]} · 即時判斷</span>'
-        f'<h3>{診斷["title"]}</h3><p>{診斷["reason"]}</p></section>',
-        unsafe_allow_html=True,
-    )
-    st.progress(診斷["readiness"] / 100, text=f"終局準備度 {診斷['readiness']}%｜現在停點：{診斷['next_breakpoint']}")
-
-    優先卡片 = "".join(
-        f'<article class="優先項"><small>0{index} · {html.escape(item["label"])}｜做到這裡就停：{html.escape(item.get("stop", ""))}</small><strong>{html.escape(item["title"])}</strong><p>{html.escape(item["detail"])}</p></article>'
-        for index, item in enumerate(診斷["priorities"], 1)
-    )
-    st.markdown(f'<div class="優先格">{優先卡片}</div>', unsafe_allow_html=True)
-
-    裝備列 = "".join(
-        f'<article class="優先項"><small>{html.escape(item["slot"])}｜核心拿去：{html.escape(item["spend"])}</small><strong>現在穿：{html.escape(item["wear"])}</strong><p>沒好以前不要：{html.escape(item["freeze"])}</p></article>'
-        for item in 診斷["gear"]
-    )
-    st.markdown(f'<p style="margin:1rem 0 .4rem;font-weight:800;">現在穿這六格</p><div class="優先格">{裝備列}</div>', unsafe_allow_html=True)
-
-    收藏列 = "".join(
-        f'<article class="優先項"><small>0{index} · {html.escape(item["spend"])}｜做到這裡就停：{html.escape(item["stop"])}</small><strong>{html.escape(item["name"])}</strong><p>{html.escape(item["why"])}</p></article>'
-        for index, item in enumerate(診斷["collectibles"], 1)
-    )
-    st.markdown(f'<p style="margin:1rem 0 .4rem;font-weight:800;">現在只升這三件收藏</p><div class="優先格">{收藏列}</div>', unsafe_allow_html=True)
-    st.warning(診斷["collectible_freeze"])
-    st.markdown(
-        f'<div class="建議框"><div><b>模式配置｜{診斷["build"]}</b>{診斷["mode_instruction"]}</div>'
-        f'<div><b>還沒點到以前，不要做這些</b>{診斷["avoid"]}</div></div>',
-        unsafe_allow_html=True,
-    )
-    st.info(f"點到以後才可以做：{診斷['switch_condition']}")
-    st.button("依這個結果查看完整配裝", type="primary", width="stretch", on_click=切換主頁面, args=("養成", "終局配裝"))
+    with st.expander("比較其他獎勵與試算上限"):
+        st.markdown(f'<div class="獎勵格">{獎勵卡片}</div>', unsafe_allow_html=True)
 
 elif 頁面 == "終局配裝":
-    st.header("三套終局配置：先選模式，再核對斷點")
-    cols = st.columns(3)
-    for col, build in zip(cols, 終局配置):
-        with col:
-            評分 = "".join(f'<div class="評分"><b>{score}</b><span>{label}</span></div>' for label, score in build["評分"].items())
-            st.markdown(
-                f'<article class="配置總覽"><small>{build["適用"]}</small><h3>{build["名稱"]}</h3><p>{build["核心"]}</p><div class="評分列">{評分}</div></article>',
-                unsafe_allow_html=True,
-            )
+    st.header("配裝參考")
+    st.warning("以下為舊版整理的配裝範例，不是你的升級順位；名稱、神鑄與版本可能需重新核對。個人下一步請回首頁，高階六件配置請用情境計算器比較。")
+    st.link_button("開啟完整傷害配置比較", "https://sio-tools.exp0.dev/")
     選擇配置名稱 = st.selectbox("展開完整配置", [build["名稱"] for build in 終局配置])
     選擇配置 = next(build for build in 終局配置 if build["名稱"] == 選擇配置名稱)
     詳情左, 詳情右 = st.columns(2)
@@ -1270,8 +929,9 @@ elif 頁面 == "終局配裝":
         st.warning("縮寫 E／V／C 分別代表永恆／虛空／混沌神鑄。不要用同一套配置同時評估短場與長場；跨過門檻後仍需固定場景 A/B 實測。")
 
 elif 頁面 == "完整攻略庫":
-    st.header("完整攻略庫：精選決策＋全部來源自動同步")
-    精選頁, 全部頁 = st.tabs(["精選決策卡", "全部來源文章"])
+    st.header("攻略資料庫")
+    st.caption("按問題查資料；個人升級順序請看「下一步」。")
+    精選頁, 全部頁 = st.tabs(["主題摘要", "來源文章"])
     with 精選頁:
         c1, c2 = st.columns([1.35, 1])
         with c1:
@@ -1285,10 +945,13 @@ elif 頁面 == "完整攻略庫":
             if (分類 == "全部" or item["分類"] == 分類)
             and (not 查詢 or 查詢.lower() in " ".join([item["標題"], item["摘要"], *item["行動"]]).lower())
         ]
-        st.caption(f"找到 {len(結果)} 個人工核對的決策主題")
-        for row_start in range(0, len(結果), 3):
-            cols = st.columns(3)
-            for col, item in zip(cols, 結果[row_start : row_start + 3]):
+        st.caption(f"找到 {len(結果)} 個參考主題；請留意各篇資料日期。")
+        精選頁數 = max(1, (len(結果) + 5) // 6)
+        精選頁碼 = st.selectbox("主題頁碼", range(1, 精選頁數 + 1), key=f"curated_page_{分類}_{查詢}")
+        當頁精選 = 結果[(精選頁碼 - 1)*6:精選頁碼*6]
+        for row_start in range(0, len(當頁精選), 2):
+            cols = st.columns(2)
+            for col, item in zip(cols, 當頁精選[row_start : row_start + 2]):
                 with col:
                     顯示攻略卡片(item)
         if not 結果:
@@ -1376,22 +1039,6 @@ elif 頁面 == "收藏圖鑑":
         },
     )
 
-elif 頁面 == "收藏優先級":
-    st.header("現在只升這三件收藏，其他先不要動")
-    left, right = st.columns([1.1, 1])
-    with left:
-        for index, item in enumerate(收藏優先順序, 1):
-            st.markdown(f"### {index:02d}　{item}")
-    with right:
-        st.markdown(
-            '<div class="提醒"><b>現在不要做</b><br>追光者、混亂之劍、平均升星、先開空欄位硬塞。</div>',
-            unsafe_allow_html=True,
-        )
-        st.divider()
-        st.metric("現在停點", "圖紙紅3")
-        st.metric("第二件", "腳蹼紅3")
-        st.metric("第三件", "傀儡黃5")
-
 elif 頁面 == "最新文章":
     st.header("最新來源動態")
     全部文章, 全部即時 = 取得完整文章庫()
@@ -1411,5 +1058,6 @@ elif 頁面 == "最新文章":
     st.link_button("查看完整文章分類", 來源分類網址)
 
 st.divider()
+st.caption("升級決策版 · 2026.09.07")
 台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
-st.caption(f"最後載入：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")
+st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")

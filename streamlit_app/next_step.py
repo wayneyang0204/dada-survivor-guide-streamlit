@@ -1,0 +1,323 @@
+"""Evidence-labelled milestones, not a simulated global DPS optimum.
+
+Unknown inputs remain None. Resource pools are never treated as interchangeable.
+Costs that vary by account are supplied from the game's upgrade preview.
+"""
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+import json
+
+SCHEMA = 1
+CHECKED = "2026-09-07"
+HALL_SOURCE = "https://notalknote.xyz/custom-collection/"
+AWAKE_SOURCE = "https://notalknote.xyz/survivor-awakening/"
+COLLECT_SOURCE = "https://notalknote.xyz/survivorio-collection-hall/"
+SET_SOURCE = "https://notalknote.xyz/collectible-sets/"
+CALCULATOR = "https://sio-tools.exp0.dev/"
+RESOURCES = ("收藏之心", "高級收藏之心", "傳奇收藏自選", "覺醒核心", "神器核心", "科技配件")
+MODES = ("末世迴響", "遠征／月礦首領", "主線推關", "新版區域行動")
+STARS = ("未持有", "黃1", "黃2", "黃3", "黃4", "黃5", "紅1", "紅2", "紅3", "紅4", "紅5")
+FIELDS = {
+    "mode": ("末世迴響", MODES),
+    "survivor": (None, ("維納托", "塔洛莎", "楊大師", "其他")),
+    "awakening": (None, (0, 8)), "taloxa": (None, (0, 8)),
+    "awakening_cores": (None, (0, 10000)), "s_shards": (None, (0, 100000)),
+    "quantum_ready": (None, (True, False)),
+    "slots": (None, (0, 100)), "red_owned": (None, (0, 100)),
+    "red_placed": (None, (0, 100)), "hearts": (None, (0, 10000000)),
+    "next_slot_cost": (None, (0, 10000000)),
+    "adv1": (None, (0, 4)), "adv2": (None, (0, 8)),
+    "stars1": ([], "stars4"), "stars2": ([], "stars8"),
+    "advanced_hearts": (None, (0, 100000)),
+    "advanced_cost": (None, (0, 100000)), "advanced_quote": (None, "text"),
+    "neck": (None, ("破壞者徽記", "其他")), "memory": (None, (0, 10)),
+    "ss_boots": (None, (True, False)), "boot_stars": ([], "stars4"),
+    "red_boxes": (None, (0, 10000)),
+    "weapon": (None, ("雙絕槍", "其他")),
+    "weapon_e": (None, (0, 5)), "weapon_v": (None, (0, 5)),
+    "relic_cores": (None, (0, 10000)), "gear_materials_ready": (None, (True, False)),
+    "drone_red": (None, (True, False)), "forcefield_red": (None, (True, False)),
+    "twin_drone": (None, (True, False)),
+}
+
+
+def clean_profile(raw: dict) -> dict:
+    if not isinstance(raw, dict):
+        raise ValueError("帳號資料必須是物件。")
+    result = {}
+    for key, (default, rule) in FIELDS.items():
+        value = raw.get(key, default)
+        if value is None:
+            result[key] = default if key == "mode" or isinstance(rule, str) and rule.startswith("stars") else None
+            continue
+        if isinstance(rule, str) and rule.startswith("stars"):
+            limit = int(rule[5:])
+            if not isinstance(value, list) or len(value) > limit or any(type(n) is not int or not 0 <= n <= 10 for n in value):
+                raise ValueError("收藏星數格式錯誤，請用黃1～紅5。")
+        elif rule == "text":
+            if not isinstance(value, str) or len(value) > 100:
+                raise ValueError("欄位文字過長。")
+        elif isinstance(rule, tuple) and type(rule[0]) is int:
+            if type(value) is not int or not rule[0] <= value <= rule[1]:
+                raise ValueError(f"{key} 超出可接受範圍。")
+        elif isinstance(rule, tuple) and type(rule[0]) is bool and type(value) is not bool:
+            raise ValueError(f"{key} 必須選是或否。")
+        elif value not in rule:
+            raise ValueError(f"{key} 的選項不正確。")
+        result[key] = value
+    if result["red_placed"] is not None:
+        for key in ("slots", "red_owned"):
+            if result[key] is not None and result["red_placed"] > result[key]:
+                raise ValueError("已擺入的紅收藏數不可超過已開槽位或已持有紅收藏數。")
+    return result
+
+
+def export_profile(profile: dict) -> str:
+    return json.dumps({"schema": SCHEMA, "profile": clean_profile(profile)}, ensure_ascii=False, indent=2)
+
+
+def import_profile(content: bytes) -> dict:
+    if len(content) > 32768:
+        raise ValueError("紀錄檔過大，請選本站匯出的 JSON。")
+    try:
+        raw = json.loads(content)
+        if not isinstance(raw, dict) or raw.get("schema") != SCHEMA:
+            raise ValueError("紀錄版本不支援。")
+        return clean_profile(raw.get("profile"))
+    except (UnicodeDecodeError, json.JSONDecodeError, TypeError) as exc:
+        raise ValueError("無法讀取紀錄，請選本站匯出的 JSON。") from exc
+
+
+def parse_stars(text: str, limit: int) -> list[int]:
+    import re
+    if not text.strip():
+        return []
+    values = []
+    for token in re.split(r"[\s,，、]+", text.strip()):
+        token = token.upper().replace("金", "黃").replace("Y", "黃").replace("R", "紅")
+        if token in ("0", "未持有"):
+            values.append(0)
+        elif token in STARS:
+            values.append(STARS.index(token))
+        else:
+            raise ValueError("請填黃1～黃5、紅1～紅5；未持有填 0，項目以逗號分隔。")
+    if len(values) > limit:
+        raise ValueError(f"這組最多 {limit} 件。")
+    return values
+
+
+@dataclass
+class Step:
+    id: str
+    resource: str
+    title: str
+    target: str
+    why: str
+    stop: str
+    source: str
+    priority: int = 50
+    status: str = "待核對材料"
+    cost: str = "依遊戲升級預覽核對"
+    gap: str = ""
+    caution: str = ""
+    current: str = ""
+    effect: str = ""
+    update: dict | None = None
+
+
+def affordability(step: Step, owned: int | None, cost: int | None) -> Step:
+    if cost is None or owned is None:
+        step.status = "待核對材料"
+        step.gap = "補上庫存與這個目標的實際材料需求，才判斷現在能否完成。"
+    elif owned < cost:
+        step.status = "先存資源"
+        step.gap = f"還差 {cost - owned:,}；目前 {owned:,}／需要 {cost:,}。"
+    else:
+        step.status = "材料已足"
+        step.gap = f"目前 {owned:,}／需要 {cost:,}，完成後剩 {owned-cost:,}。"
+    if cost is not None:
+        step.cost = f"{cost:,} {step.resource}"
+    return step
+
+
+def advanced_options(p: dict) -> list[Step]:
+    thresholds = (5, 12, 24, 36, 50, 60, 70, 80)
+    effects = ("暴擊傷害＋20%", "技能傷害＋20%", "對衰弱／中毒／冰緩目標傷害各＋10%",
+               "暴擊傷害＋40%", "攻擊與生命", "對衰弱／中毒／冰緩目標傷害各＋15%",
+               "技能傷害＋40%", "對菁英／BOSS傷害＋20%，另有異常增傷")
+    options = []
+    for number, limit in ((1, 4), (2, 8)):
+        opened, stars = p[f"adv{number}"], p[f"stars{number}"]
+        if opened is None or not stars:
+            continue
+        # Positions are the player's planned assignment, not reusable copies.
+        unmet_opened = next((n for n in range(1, opened + 1)
+                             if len(stars) < n or sum(stars[:n]) < thresholds[n-1]), None)
+        if unmet_opened:
+            n = unmet_opened
+            options.append(Step(f"adv{number}_stars", "高級收藏之心",
+                f"先補第{number}套已開槽的星數", f"前{n}格合計 {thresholds[n-1]} 星",
+                "槽位已進階，但傳奇星數不足，繼續開格不會補上這個效果。",
+                "這個星數門檻亮起後重新比較下一格。", HALL_SOURCE, 90,
+                "星數未達", "本步先不花高級收藏之心",
+                f"目前 {sum(stars[:n])}／{thresholds[n-1]} 星",
+                effect=effects[n-1]))
+            continue
+        if opened == limit:
+            continue
+        n = opened + 1
+        total = sum(stars[:n])
+        ready = len(stars) >= n and total >= thresholds[n-1]
+        boss_route = number == 2 and len(stars) == 8 and sum(stars) >= 80 and p["mode"] in MODES[:2]
+        step = Step(f"adv{number}_{n}", "高級收藏之心",
+            f"進階第{number}套第{n}格", f"第{number}套 {n} 個進階格＋{thresholds[n-1]} 星",
+            "已備妥80傳奇星，可把第二套第8格菁英／BOSS加成列為路線目標；這一筆先推進下一格。" if boss_route else "以能立即啟動的門檻比較；開格與收藏星數必須一起達標。",
+            "啟動這一檔就停，重新比較下一筆材料。", HALL_SOURCE,
+            115 if boss_route else 85 if n in (1, 2, 7) else 65,
+            current=f"已開 {opened} 格；預定前{n}格 {total} 星", effect=effects[n-1],
+            caution="這是條件式路線，不代表固定增加同等百分比的總輸出。第一套和第二套不可重複使用同一件收藏。",
+            update={f"adv{number}": n})
+        if not ready:
+            step.status, step.gap = "星數未達", f"目前 {total}／{thresholds[n-1]} 星；先補星或調整擺放。"
+        else:
+            quoted = p["advanced_cost"] if p["advanced_quote"] == step.id else None
+            affordability(step, p["advanced_hearts"], quoted)
+        options.append(step)
+    return options
+
+
+def recommend(raw: dict, resource: str = "自動排序") -> dict:
+    p = clean_profile(raw)
+    steps: list[Step] = []
+    missing = []
+    if p["mode"] == "新版區域行動":
+        return {"primary": asdict(Step("zone", "玩法", "先調整局內路線與技能", "先取得局內 Buff，再挑戰區域首領",
+                "這個模式需先確認局外養成是否帶入，不能直接拿首領養成順位套用。", "記錄一次失敗原因後，只改一項再試。",
+                "https://notalknote.xyz/dadasurvivor-regional-action-update-guide/", status="先做玩法調整",
+                cost="不消耗核心")), "alternatives": [], "missing": [], "complete": []}
+
+    if any(p[k] is None for k in ("slots", "red_owned", "red_placed")):
+        missing.append("典藏館：已開格數、持有與已擺入的紅收藏數")
+    else:
+        empty = p["slots"] - p["red_placed"]
+        spare = p["red_owned"] - p["red_placed"]
+        if empty and spare:
+            steps.append(Step("hall_fill", "收藏之心", "把已持有紅收藏放進空槽", "先填滿已開槽位",
+                "已解鎖槽位和紅收藏都在手上，先拿到不需再買材料的典藏加成。",
+                "可放的紅收藏用完就停。", HALL_SOURCE, 120, "現在可做", "0 收藏之心",
+                update={"red_placed": min(p["slots"], p["red_owned"])}))
+        elif empty:
+            first_new = "記憶編輯器" if p["memory"] == 0 and p["neck"] == "破壞者徽記" else "一件尚未持有的紅收藏"
+            steps.append(affordability(Step("red_unlock", "傳奇收藏自選", "先解鎖一件尚未持有的紅收藏", "填上 1 個已開的空槽",
+                "普通典藏格看原生品質；黃一星的傳奇收藏即可計入紅品質件數。",
+                "補上空槽後重算，不先集中同一件升高星。", HALL_SOURCE, 105,
+                caution="自選箱必須能選尚未解鎖的傳奇收藏，且足夠合成一件；不是把黃品質升紅星。"),
+                None, None))
+            steps[-1].title = f"先解鎖{first_new}，補上典藏空槽"
+        elif spare:
+            steps.append(affordability(Step("hall_open", "收藏之心", "開下一個能立刻放紅收藏的槽位", "開 1 格並擺入紅收藏",
+                "先比較各套下一格價格；已持有多餘紅收藏時，開格才能立即取得效果。",
+                "開一格後重算，避免一次買到昂貴空槽。", HALL_SOURCE, 95,
+                current=f"{p['red_placed']}／{p['slots']} 格已放紅收藏；另有 {spare} 件可放",
+                update={"slots": p["slots"]+1, "red_placed": p["red_placed"]+1}), p["hearts"], p["next_slot_cost"]))
+
+    steps.extend(advanced_options(p))
+    if p["adv2"] is None or not p["stars2"]:
+        missing.append("進階典藏：第二套已進階格數與各格傳奇星數")
+
+    if p["neck"] == "破壞者徽記" and p["memory"] is not None and p["memory"] < 5:
+        target = 3 if p["memory"] < 3 else 5
+        steps.append(Step("memory", "傳奇收藏自選", f"記憶編輯器升到黃{target}星", f"黃{target}星",
+            "你使用破壞者徽記，這個節點提高其低血量暴擊率上限。",
+            "到目標星數就停，再比較SS鞋套裝或其他缺口。", COLLECT_SOURCE, 90,
+            current=STARS[p["memory"]], effect="破壞者徽記低血量暴擊率上限＋20%",
+            caution="不是常駐暴擊率；需滿足徽記的低血量條件。自選箱期數、每箱碎片量與現有碎片須核對。",
+            update={"memory": target}))
+    if p["ss_boots"] and len(p["boot_stars"]) == 4 and min(p["boot_stars"]) < 3:
+        names = ("賽博圖騰柱", "複製寶鏡", "夢境拼圖", "基因編輯器")
+        index = min((i for i, n in enumerate(p["boot_stars"]) if n < 3), key=lambda i: (3-p["boot_stars"][i], i))
+        step = Step("boots_set", "傳奇收藏自選", f"先補{names[index]}到黃三星", "四件SS鞋套裝各黃三星",
+            "先補已最接近門檻的成員；只有四件同時達標才取得套裝技能效果。",
+            "這件黃三星就重算下一位，不把單件推到五星。", SET_SOURCE, 85,
+            current="、".join(STARS[n] for n in p["boot_stars"]),
+            effect="整套達標後強化冰霜戰靴冰甲的護盾增傷",
+            caution="須已啟用對應鞋子神鑄效果；只補一件未必立刻增傷。")
+        updated = list(p["boot_stars"])
+        updated[index] = 3
+        step.update = {"boot_stars": updated}
+        steps.append(step)
+    if p["neck"] is None or p["memory"] is None:
+        missing.append("收藏：目前項鍊與記憶編輯器星數")
+
+    if p["survivor"] == "維納托" and p["awakening"] in (6, 7):
+        target = p["awakening"]+1
+        shards = 550 if target == 7 else 600
+        step = affordability(Step("venato", "覺醒核心", f"維納托 R{p['awakening']} → R{target}", f"維納托覺醒{target}",
+            "主位的下一個已查核技能節點；保留現役協同，不預設重置任何角色。",
+            "只升這一階，達標後重新比較協同與其他資源。", AWAKE_SOURCE, 88,
+            current=f"維納托 R{p['awakening']}",
+            effect="猩紅蝙蝠傷害與對菁英／首領增傷強化" if target == 7 else "背水一戰每層暴擊傷害強化",
+            caution="這是主位路線建議；尚未計入完整同調、協同和實戰覆蓋率。",
+            update={"awakening": target}), p["awakening_cores"], 30)
+        step.cost = f"30 覺醒核心＋{shards} 角色碎片＋遊戲預覽所需量子碎片"
+        if p["s_shards"] is None or p["quantum_ready"] is None:
+            step.status = "待核對材料"
+            step.gap += " 尚需核對角色碎片與量子碎片。"
+        elif p["s_shards"] < shards or not p["quantum_ready"]:
+            step.status = "先存資源"
+            step.gap = f"角色碎片差 {max(0, shards-p['s_shards'])}；量子碎片{'已足' if p['quantum_ready'] else '不足'}。"
+        steps.append(step)
+    elif p["survivor"] is None or p["awakening"] is None:
+        missing.append("特工：目前主位與精確覺醒等級")
+
+    if p["survivor"] == "維納托" and p["awakening"] == 5:
+        steps.append(Step("venato6", "覺醒核心", "維納托下一階先到 R6", "維納托覺醒6",
+            "覺醒6強化背水一戰層數，並新增連攜被動槽位。",
+            "升到R6後重新比較R7與協同，不一次投入到R8。", AWAKE_SOURCE, 85,
+            current="維納托 R5", effect="背水一戰最多疊加層數＋5、連攜被動槽位＋1",
+            update={"awakening": 6}))
+    if p["survivor"] == "維納托" and p["taloxa"] is not None and p["taloxa"] < 4 and (p["drone_red"] or p["twin_drone"]):
+        steps.append(Step("taloxa4", "覺醒核心", "補塔洛莎協同到 R4", "塔洛莎覺醒4並裝備連攜被動",
+            "你已使用無人機配件；此節點讓無人機命中能施加裂傷，需實際裝入連攜才計入。",
+            "R4就停，再比較主位下一階。", AWAKE_SOURCE, 95,
+            current=f"塔洛莎 R{p['taloxa']}", effect="無人機觸發裂傷的被動門檻",
+            caution="未計算重置其他特工的成本；升級前確認連攜槽與碎片需求。", update={"taloxa": 4}))
+
+    if p["weapon"] == "雙絕槍" and p["weapon_e"] == 0:
+        steps.append(affordability(Step("lance_e1", "神器核心", "雙絕槍先補永恆神鑄1", "E1",
+            "先完成主武器的基礎進化節點，才比較後續高成本神鑄。", "E1完成後停，不自動一路加到E4。",
+            "https://notalknote.xyz/ss-twin-lance-starforged-havoc/", 90,
+            caution="還需對應S裝、永恆核心與基礎材料；僅神器核心足夠不代表能升。",
+            update={"weapon_e": 1}), p["relic_cores"], 1))
+        step = steps[-1]
+        if p["gear_materials_ready"] is not True:
+            step.status = "待核對材料"
+            step.gap = "先核對遊戲神鑄預覽中的S裝與其他材料。"
+    if p["weapon"] is None or p["weapon_e"] is None or p["weapon_v"] is None:
+        missing.append("裝備：主武器與永恆／虛空神鑄")
+
+    if p["twin_drone"] is False and p["drone_red"] is True:
+        step = Step("twin_drone", "科技配件", "下一個配件目標：雙生無人機", "紅無人機＋紅力場，完成雙生合成",
+            "已有紅無人機，先補合成缺口；不要求你同時換整套裝備。", "合成後依戰鬥傷害分布重排。",
+            "https://notalknote.xyz/twinborn-parts/", 80,
+            "現在可做" if p["forcefield_red"] is True else "先存資源" if p["forcefield_red"] is False else "待核對材料",
+            "紅無人機＋紅力場；其他條件依合成頁核對",
+            "合成前核對諧振配置" if p["forcefield_red"] is True else "先把力場配件補到紅色" if p["forcefield_red"] is False else "先確認是否已有紅力場，不把未知當成沒有。",
+            update={"twin_drone": True})
+        steps.append(step)
+    if p["twin_drone"] is None:
+        missing.append("科技：是否已完成雙生無人機")
+
+    if resource != "自動排序":
+        steps = [s for s in steps if s.resource == resource]
+    # Ready actions first; within the same readiness group use explained rules.
+    state = {"現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0}
+    steps.sort(key=lambda s: (state.get(s.status, 0), s.priority, s.id), reverse=True)
+    complete = []
+    if p["awakening"] == 8:
+        complete.append("主位覺醒8：不再推薦重複升級")
+    if p["adv2"] == 8 and len(p["stars2"]) == 8 and sum(p["stars2"]) >= 80:
+        complete.append("第二套8進階格／80傳奇星：菁英與BOSS門檻已完成")
+    return {"primary": asdict(steps[0]) if steps else None,
+            "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete}
