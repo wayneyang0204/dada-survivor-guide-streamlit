@@ -95,10 +95,94 @@ def test_memory_respects_equipped_neck_and_stops_at_breakpoint():
     p = {"neck": "破壞者徽記", "memory": 3}
     assert recommend(p)["primary"]["target"] == "黃5星"
     assert recommend({**p, "neck": "其他"})["primary"] is None
-    assert recommend({**p, "memory": 5})["primary"] is None
+    assert recommend({**p, "memory": 5})["primary"]["target"] == "紅3星"
+    assert recommend({**p, "memory": 8})["primary"]["target"] == "紅5星"
+    assert recommend({**p, "memory": 10})["primary"] is None
 
 
 def test_zone_does_not_recommend_external_spending():
     r = recommend({"mode": "新版區域行動", "survivor": "維納托", "awakening": 6})
     assert r["primary"]["id"] == "zone"
     assert not r["alternatives"]
+
+
+def test_advanced_bonuses_use_all_active_stars_not_each_position_prefix():
+    p = {"adv2": 2, "stars2": [2, 10, 10]}
+    result = recommend(p, "高級收藏之心")["primary"]
+    assert result["id"] == "adv2_3"  # 12 active stars already meet tiers 1 and 2.
+    assert "22／24" in result["gap"]
+
+
+def test_unopened_slots_do_not_count_as_active_stars():
+    p = {"adv2": 2, "stars2": [1, 1, 1, 1, 1, 1, 1, 1]}
+    result = recommend(p, "高級收藏之心")["primary"]
+    assert result["id"] == "adv2_stars"
+    assert "2／5" in result["gap"]
+
+
+def test_free_reassignment_of_owned_stars_precedes_spending():
+    p = {"adv2": 2, "stars2": [1, 1, 10, 10, 10, 10, 10, 10]}
+    result = recommend(p, "高級收藏之心")["primary"]
+    assert result["id"] == "adv2_rearrange"
+    assert result["status"] == "現在可做"
+    assert result["cost"] == "0 高級收藏之心"
+    assert result["update"]["stars2"] == [10, 10, 10, 10, 10, 10, 1, 1]
+    updated = {**p, **result["update"]}
+    assert recommend(updated, "高級收藏之心")["primary"]["id"] == "adv2_3"
+
+
+@pytest.mark.parametrize("owned,cost,ready,status", [
+    (3, 3, True, "材料已足"), (2, 3, True, "先存資源"),
+    (99, 3, None, "待核對材料"), (99, 3, False, "先存資源"),
+    (99, None, True, "待核對材料"), (None, 3, True, "待核對材料"),
+])
+def test_collection_costs_require_compatible_box_and_full_recipe(owned, cost, ready, status):
+    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": owned}
+    key = recommend(p)["primary"]["quote_key"]
+    p["step_quotes"] = {key: {"cost": cost, "materials_ready": ready}}
+    result = recommend(p)["primary"]
+    assert result["status"] == status
+
+
+def test_quote_never_leaks_to_a_new_star_target_or_another_character():
+    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": 99}
+    key = recommend(p)["primary"]["quote_key"]
+    p["step_quotes"] = {key: {"cost": 1, "materials_ready": True}}
+    assert recommend(p)["primary"]["status"] == "材料已足"
+    assert recommend({**p, "memory": 5})["primary"]["status"] == "待核對材料"
+    assert recommend({**p, "memory": 4})["primary"]["status"] == "待核對材料"
+    assert recommend({**p, "survivor": "塔洛莎"})["primary"]["status"] == "待核對材料"
+
+
+def test_quotes_are_validated_and_exported_without_breaking_old_backups():
+    key = "a" * 24
+    for quotes in ([], {"bad": {}}, {key: {"cost": -1, "materials_ready": True}},
+                   {key: {"cost": True, "materials_ready": True}},
+                   {key: {"cost": 1, "materials_ready": 1}}, {key: {"cost": 1}}):
+        with pytest.raises(ValueError):
+            clean_profile({"step_quotes": quotes})
+    p = clean_profile({"step_quotes": {key: {"cost": 3, "materials_ready": True}}})
+    assert import_profile(export_profile(p).encode()) == p
+    assert import_profile(b'{"schema":1,"profile":{}}')["step_quotes"] == {}
+
+
+def test_red_unlock_updates_ownership_and_slot_in_one_action():
+    result = recommend({"slots": 3, "red_owned": 2, "red_placed": 2, "neck": "破壞者徽記", "memory": 0})
+    assert result["primary"]["id"] == "red_unlock"
+    assert result["primary"]["update"] == {"red_owned": 3, "red_placed": 3, "memory": 1}
+
+
+def test_drone_collectible_route_is_conditional_and_stops_at_each_breakpoint():
+    for current, target in ((0, "黃3星"), (3, "黃5星"), (5, "紅3星"), (8, "紅5星")):
+        r = recommend({"twin_drone": True, "dark_matter": current}, "傳奇收藏自選")["primary"]
+        assert r["id"] == "dark_matter"
+        assert r["target"] == target
+    assert recommend({"twin_drone": True, "dark_matter": 10}, "傳奇收藏自選")["primary"] is None
+    assert recommend({"dark_matter": 0}, "傳奇收藏自選")["primary"] is None
+
+
+def test_shortfall_reports_core_and_shard_gaps_together():
+    r = recommend({"survivor": "維納托", "awakening": 6, "awakening_cores": 20,
+                   "s_shards": 500, "quantum_ready": True})["primary"]
+    assert "還差 10" in r["gap"]
+    assert "角色碎片差 50" in r["gap"]

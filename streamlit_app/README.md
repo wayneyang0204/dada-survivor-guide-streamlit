@@ -13,6 +13,11 @@ application is not a Cloudflare Worker.
    Resource balances and per-slot price quotes are invalidated after spending.
 4. Export/import JSON for subsequent sessions; no cross-user or server-file
    profile persistence is used. Refreshing or disconnecting can reset the session.
+   Restore is available on the first screen; backup is available on the result.
+5. Check the current target's materials directly on the result screen. Variable
+   recipes are explicitly player-confirmed, never fabricated from box count alone.
+6. A completion can be undone until the next profile edit. This changes the guide
+   record only; no game account is accessed and no game resources are spent.
 
 `next_step.py` contains independent, evidence-labelled milestone rules.
 `decision_ui.py` renders the profile and recommendations. The older broad
@@ -31,6 +36,15 @@ are not exposed as competing personalized recommendations.
   collectibles mean 40. Assignment order is entered by the player. A collectible
   cannot be duplicated across sets; identities are not automatically validated.
 - Per-slot advanced prices apply only to their explicitly selected slot.
+- Active advanced bonuses use the total stars in all advanced positions, not an
+  arbitrary prefix for each tier. Planned, non-advanced positions are not counted.
+  Rearranging already owned collectibles within a set can be a zero-cost action.
+- Variable recipes are keyed to the exact target, current milestone, character
+  and mode. A recipe for yellow five cannot leak into a red-three recommendation.
+  Confirmed spending clears the consumed stock and relevant recipe confirmations.
+- Memory Editor and Dark Matter Construct routes continue through supported
+  yellow-three, yellow-five, red-three and red-five breakpoints; their equipment
+  conditions and modifier-vs-total-damage limits remain explicit.
 - Milestones are rule-based advice for the recorded fields, not a full-account
   mathematical optimum. High-end six-slot gear comparisons require the linked
   scenario calculator. Legacy loadouts are labelled as dated references.
