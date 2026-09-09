@@ -23,6 +23,14 @@ def test_music_event_has_complete_professional_summary() -> None:
     assert sum(len(section["items"]) for section in playbook["summary_sections"]) == 16
 
 
+def test_soup_kitchen_uses_current_stop_line() -> None:
+    playbook = match_event_playbook("煲湯廚房｜湯勺與砂鍋攻略")
+    assert playbook["name"] == "煲湯廚房"
+    assert playbook["target"] == 220
+    assert "二十四點" in playbook["mechanic"]
+    assert len(playbook["summary_sections"]) == 3
+
+
 def test_reward_ranking_respects_account_stage() -> None:
     early = rank_rewards("不確定，幫我排", "尚未紅裝成套")
     assert early[0]["name"] == "S 級裝備自選箱"

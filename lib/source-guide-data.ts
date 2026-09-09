@@ -25,12 +25,22 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'soup-kitchen',
+    category: '關卡活動',
+    title: '煲湯廚房：先守二十四點，再選二百二十或三百湯勺',
+    updated: '2026/09/05',
+    status: '現行',
+    summary: '官方活動頁確認單鍋不可超過二十四點；社群攻略估算完整任務可取得三百至三百二十二張湯勺。無課與鑰匙有限者先以二百二十湯勺的異世寵物自選箱為目標。',
+    actions: ['每輪至少煲三次，多數鍋在十八至二十一點時立即出鍋', '二百二十湯勺約需開三百八十至四百箱，鑰匙不足就不要硬追', '三百湯勺只適合可開約五百六十箱且確定需要異世靈藥的帳號'],
+    sourceUrl: 'https://notalknote.xyz/survivorio-soup-kitchen-event-guide/',
+  },
+  {
     id: 'music-disc-clash',
     category: '關卡活動',
     title: '音樂圓盤大作戰：九百八十進度停損線',
     updated: '2026/08/30',
-    status: '現行',
-    summary: '本期活動到 9 月 3 日結束。社群實測約可取得九百張免費麥克風，盤面返還會放大實際進度；先跑免費資源，九百八十進度是目前最平衡的停損點。',
+    status: '需版本核對',
+    summary: '本期活動已於 9 月 3 日結束。保留社群實測的九百八十進度停損與開箱節奏，只供日後復刻時核對，不能直接套用到其他活動。',
     actions: ['先完成登入、每日任務與免費麥克風', '寶箱先開二百至三百箱，最後一天再補差額', '商店優先換傳奇收藏品自選箱、萬能神火特工碎片與高級收藏之心'],
     sourceUrl: 'https://notalknote.xyz/survivor-io-music-disc-clash-guide/',
   },
@@ -228,6 +238,11 @@ export const SOURCE_GUIDES: SourceGuide[] = [
 
 export const LATEST_SOURCE_FALLBACK = [
   {
+    title: '煲湯廚房攻略',
+    date: '2026/09/05',
+    link: 'https://notalknote.xyz/survivorio-soup-kitchen-event-guide/',
+  },
+  {
     title: '音樂圓盤大作戰攻略',
     date: '2026/08/30',
     link: 'https://notalknote.xyz/survivor-io-music-disc-clash-guide/',
@@ -251,10 +266,5 @@ export const LATEST_SOURCE_FALLBACK = [
     title: '幽暗之靈完整解析',
     date: '2026/08/22',
     link: 'https://notalknote.xyz/survivor-io-umbral-soul-pet-guide-2026/',
-  },
-  {
-    title: '4週年彩虹礦攻略',
-    date: '2026/08/18',
-    link: 'https://notalknote.xyz/survivor-io-4th-anniversary-rainbow-mine-event-guide/',
   },
 ];
