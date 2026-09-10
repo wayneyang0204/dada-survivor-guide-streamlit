@@ -31,6 +31,14 @@ def test_soup_kitchen_uses_current_stop_line() -> None:
     assert len(playbook["summary_sections"]) == 3
 
 
+def test_water_park_uses_verified_only_guidance() -> None:
+    playbook = match_event_playbook("水上樂園大亂鬥｜水槍活動")
+    assert playbook["name"] == "水上樂園大亂鬥"
+    assert playbook["target"] == 0
+    assert "免費進度" in playbook["verdict"]
+    assert "可能取得" in playbook["avoid"]
+
+
 def test_reward_ranking_respects_account_stage() -> None:
     early = rank_rewards("不確定，幫我排", "尚未紅裝成套")
     assert early[0]["name"] == "S 級裝備自選箱"

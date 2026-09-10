@@ -25,12 +25,22 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'water-park-rumble',
+    category: '關卡活動',
+    title: '水上樂園大亂鬥：先拿免費水槍，等獎勵表再定停損',
+    updated: '2026/09/10',
+    status: '現行',
+    summary: '官方目前只確認用水槍參加，並有機會取得轉化核心、限定收藏品與幽冥烈焰追獵者碎片。完整任務數、機率與里程碑尚未核實，現階段不先砸寶石或大量開箱。',
+    actions: ['先領登入、任務與免費水槍', '進遊戲核對結束時間、獎勵表與水槍取得量', '可靠數值補齊前只做免費進度，不預先投入寶石或鑰匙'],
+    sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310?eventid=6806949373',
+  },
+  {
     id: 'soup-kitchen',
     category: '關卡活動',
     title: '煲湯廚房：先守二十四點，再選二百二十或三百湯勺',
     updated: '2026/09/05',
-    status: '現行',
-    summary: '官方活動頁確認單鍋不可超過二十四點；社群攻略估算完整任務可取得三百至三百二十二張湯勺。無課與鑰匙有限者先以二百二十湯勺的異世寵物自選箱為目標。',
+    status: '需版本核對',
+    summary: '本期活動已於 9 月 9 日結束。保留單鍋二十四點上限、二百二十湯勺停損與開箱成本，只供日後復刻時重新核對。',
     actions: ['每輪至少煲三次，多數鍋在十八至二十一點時立即出鍋', '二百二十湯勺約需開三百八十至四百箱，鑰匙不足就不要硬追', '三百湯勺只適合可開約五百六十箱且確定需要異世靈藥的帳號'],
     sourceUrl: 'https://notalknote.xyz/survivorio-soup-kitchen-event-guide/',
   },
