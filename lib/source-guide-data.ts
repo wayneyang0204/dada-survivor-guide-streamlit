@@ -25,14 +25,24 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'version-5-2-0',
+    category: '最新系統',
+    title: '5.2.0：洛基、伊蓮與主線 350 章更新判斷',
+    updated: '2026/09/11',
+    status: '現行',
+    summary: '官方商店已公布 5.2.0，新增 346–350 章、神火特工洛基與高階特工伊蓮；特工同調等級 100 與公會活動「潮霧港灣」仍是預告內容。繁中版本尚在分批上架，兩名新特工的技能、覺醒與終局排名也尚未有可靠實測。',
+    actions: ['先確認自己的商店是否已可下載 5.2.0', '洛基與伊蓮的完整數值公開前，不先轉換主力或投入萬能碎片', '主線 346–350 章先沿用已成形後期配置，卡關再依實際詞條調整'],
+    sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310',
+  },
+  {
     id: 'water-park-rumble',
     category: '關卡活動',
     title: '水上樂園大亂鬥：先拿免費水槍，等獎勵表再定停損',
     updated: '2026/09/10',
     status: '現行',
-    summary: '官方目前只確認用水槍參加，並有機會取得轉化核心、限定收藏品與幽冥烈焰追獵者碎片。完整任務數、機率與里程碑尚未核實，現階段不先砸寶石或大量開箱。',
+    summary: '官方繁中活動頁確認用水槍參加，並有機會取得神煉核心、限定收藏品與幽暗逐影碎片。完整任務數、機率與里程碑尚未核實，現階段不先砸寶石或大量開箱。',
     actions: ['先領登入、任務與免費水槍', '進遊戲核對結束時間、獎勵表與水槍取得量', '可靠數值補齊前只做免費進度，不預先投入寶石或鑰匙'],
-    sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310?eventid=6806949373',
+    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6806949373',
   },
   {
     id: 'soup-kitchen',

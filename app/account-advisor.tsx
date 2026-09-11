@@ -20,6 +20,7 @@ import {
 import { useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { OFFICIAL_UPDATE } from '@/lib/guide-data';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Progress,
@@ -434,8 +435,8 @@ export default function AccountAdvisor() {
             </div>
           </div>
           <div className="flex items-center gap-2 text-[11px] font-bold text-white/50">
-            <span className="rounded-full border border-white/10 px-2.5 py-1">版本 5.1.0</span>
-            <span className="rounded-full border border-white/10 px-2.5 py-1">最後查核 9月7日</span>
+            <span className="rounded-full border border-white/10 px-2.5 py-1">版本 {OFFICIAL_UPDATE.version}</span>
+            <span className="rounded-full border border-white/10 px-2.5 py-1">最後查核 {OFFICIAL_UPDATE.checkedAt}</span>
             <Button
               type="button"
               variant="ghost"

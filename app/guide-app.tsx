@@ -45,7 +45,7 @@ const categoryStyles: Record<GuideCategory, string> = {
 const buildUseWhen = [
   '你要打短場頭目／公會遠征，重點是最短時間爆發',
   '你要打長場頭目，能讓混沌之力與共鳴疊滿',
-  '你要穩過區域行動或 341–345 章，不想因詞條翻車',
+  '你要穩過區域行動或 346–350 章，不想因詞條翻車',
 ];
 
 export default function GuideApp() {
@@ -158,7 +158,7 @@ export default function GuideApp() {
         <div className="relative z-10 mb-7 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <span className="mb-4 inline-flex h-6 w-fit items-center rounded-full border border-primary/30 bg-primary/10 px-2.5 text-xs font-semibold text-primary">
-              {OFFICIAL_UPDATE.version} 後期版 · 2026/09/07 更新
+              {OFFICIAL_UPDATE.version} 後期版 · {OFFICIAL_UPDATE.checkedAt} 更新
             </span>
             <h1 className="max-w-3xl text-4xl font-black leading-[1.08] tracking-[-0.04em] sm:text-5xl">
               先知道現在該點哪個數字，
@@ -428,7 +428,7 @@ export default function GuideApp() {
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
               <p className="text-xs font-black uppercase tracking-[.18em] opacity-60">
-                5.1.0 · 終局強勢配置
+                {OFFICIAL_UPDATE.version} · 終局強勢配置
               </p>
               <h2 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">
                 診斷結果對應這三套
