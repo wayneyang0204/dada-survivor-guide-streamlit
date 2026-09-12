@@ -39,6 +39,7 @@ const categories: Array<'全部' | SourceGuideCategory> = [
   '科技配件',
   '收藏系統',
   '特工寵物',
+  '載具養成',
   '裝備養成',
   '關卡活動',
 ];

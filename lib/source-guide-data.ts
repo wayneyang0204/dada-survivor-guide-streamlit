@@ -3,6 +3,7 @@ export type SourceGuideCategory =
   | '科技配件'
   | '收藏系統'
   | '特工寵物'
+  | '載具養成'
   | '裝備養成'
   | '關卡活動';
 
@@ -30,19 +31,19 @@ export const SOURCE_GUIDES: SourceGuide[] = [
     title: '5.2.0：洛基、伊蓮與主線 350 章更新判斷',
     updated: '2026/09/11',
     status: '現行',
-    summary: '官方商店已公布 5.2.0，新增 346–350 章、神火特工洛基與高階特工伊蓮；特工同調等級 100 與公會活動「潮霧港灣」仍是預告內容。繁中版本尚在分批上架，兩名新特工的技能、覺醒與終局排名也尚未有可靠實測。',
-    actions: ['先確認自己的商店是否已可下載 5.2.0', '洛基與伊蓮的完整數值公開前，不先轉換主力或投入萬能碎片', '主線 346–350 章先沿用已成形後期配置，卡關再依實際詞條調整'],
+    summary: '台灣與美國官方蘋果商店目前皆已上架 5.2.0，新增 346–350 章、神火特工洛基與高階特工伊蓮；特工同調等級 100 與公會活動「潮霧港灣」仍是預告內容。兩名新特工的技能、覺醒與終局排名也尚未有可靠實測。',
+    actions: ['挑戰 346–350 章前先把遊戲更新到 5.2.0', '洛基與伊蓮的完整數值公開前，不先轉換主力或投入萬能碎片', '新主線先沿用已成形後期配置，卡關再依實際詞條調整'],
     sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310',
   },
   {
     id: 'water-park-rumble',
     category: '關卡活動',
-    title: '水上樂園大亂鬥：先拿免費水槍，等獎勵表再定停損',
-    updated: '2026/09/10',
+    title: '水上樂園大亂鬥：三百三十水槍拿神器核心',
+    updated: '2026/09/11',
     status: '現行',
-    summary: '官方繁中活動頁確認用水槍參加，並有機會取得神煉核心、限定收藏品與幽暗逐影碎片。完整任務數、機率與里程碑尚未核實，現階段不先砸寶石或大量開箱。',
-    actions: ['先領登入、任務與免費水槍', '進遊戲核對結束時間、獎勵表與水槍取得量', '可靠數值補齊前只做免費進度，不預先投入寶石或鑰匙'],
-    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6806949373',
+    summary: '「別說筆記」依 5.2.0 整理的社群試算把三百三十累計水槍列為神器核心自選箱停損點。其三百一十八至三百二十二把是完成全部任務的總量，包含開寶箱任務，不能當成完全免費；隨機返還約三至五成也只是社群估算。',
+    actions: ['前四天先開二百至二百五十箱，最後一天依差額調整，常見總量約二百五十至三百五十箱', '累計消耗三百三十水槍拿到神器核心後停手', '不追六百三十檔；社群估算即使開六百箱仍可能缺二萬二至五萬寶石'],
+    sourceUrl: 'https://notalknote.xyz/survivorio-water-park-brawl-guide/',
   },
   {
     id: 'soup-kitchen',
@@ -156,13 +157,13 @@ export const SOURCE_GUIDES: SourceGuide[] = [
   },
   {
     id: 'mount-system',
-    category: '最新系統',
-    title: '載具系統：屬性、技能與投資順序',
-    updated: '2026/04/25',
+    category: '載具養成',
+    title: '載具與模組：先解鎖全種類，再集中主戰載具',
+    updated: '2026/09/11',
     status: '現行',
-    summary: '載具是獨立養成線，會提供屬性與戰鬥效果。高階帳號可投入，但不應犧牲神器核心、主力科技與角色斷點。',
-    actions: ['先確認載具效果適用的模式', '只升能跨越技能斷點的階段', '與神器核心、異寵核心一起比較成本'],
-    sourceUrl: 'https://notalknote.xyz/survivorio-mount-system-ultimate-guide/',
+    summary: '「別說筆記」依 5.2.0 整理：通過第八十章後開啟載具；只能啟用一台主戰載具，備用載具會按同步率傳遞模組單件屬性，但整排技能只對主戰載具生效。',
+    actions: ['先解鎖平衡車與懸浮滑板，再以幻影追獵者作主戰，末日戰馬最後', '先增加載具種類與模組槽位，再集中升星，不要一開始把資源全壓同一台', '金色模組優先鎖定技能、首領與護盾增傷；優先留方形模組，難拼的丁字形可合成'],
+    sourceUrl: 'https://notalknote.xyz/survivorio-vehicle-and-unit-guide/',
   },
   {
     id: 'ss-belt-comparison',
@@ -257,6 +258,16 @@ export const SOURCE_GUIDES: SourceGuide[] = [
 ];
 
 export const LATEST_SOURCE_FALLBACK = [
+  {
+    title: '水上樂園大亂鬥攻略',
+    date: '2026/09/11',
+    link: 'https://notalknote.xyz/survivorio-water-park-brawl-guide/',
+  },
+  {
+    title: '載具與模組完整攻略',
+    date: '2026/09/11',
+    link: 'https://notalknote.xyz/survivorio-vehicle-and-unit-guide/',
+  },
   {
     title: '煲湯廚房攻略',
     date: '2026/09/05',

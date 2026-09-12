@@ -12,6 +12,8 @@ from data_engine import (
 def test_strip_html_and_classification() -> None:
     assert strip_html("<p>音樂&nbsp;圓盤</p>") == "音樂 圓盤"
     assert classify_article("音樂圓盤大作戰攻略") == "活動攻略"
+    assert classify_article("水上樂園大亂鬥水槍攻略") == "活動攻略"
+    assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
 
@@ -31,12 +33,13 @@ def test_soup_kitchen_uses_current_stop_line() -> None:
     assert len(playbook["summary_sections"]) == 3
 
 
-def test_water_park_uses_verified_only_guidance() -> None:
+def test_water_park_uses_current_community_stop_line() -> None:
     playbook = match_event_playbook("水上樂園大亂鬥｜水槍活動")
     assert playbook["name"] == "水上樂園大亂鬥"
-    assert playbook["target"] == 0
-    assert "免費進度" in playbook["verdict"]
-    assert "可能取得" in playbook["avoid"]
+    assert playbook["target"] == 330
+    assert "三百三十" in playbook["verdict"]
+    assert "六百箱" in playbook["avoid"]
+    assert "開寶箱任務" in playbook["free_hint"]
 
 
 def test_reward_ranking_respects_account_stage() -> None:
