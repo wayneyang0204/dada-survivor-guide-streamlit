@@ -126,8 +126,12 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
     core = [guide for guide in results if not guide.get("reference_only")]
     references = [guide for guide in results if guide.get("reference_only")]
     st.caption(f"{len(core)} 篇詳解 · {len(references)} 篇來源摘要")
-    for guide in core:
+    for guide in (core[:1] if query.strip() else core):
         guide_row(guide, prefix, query)
+    if query.strip() and len(core) > 1:
+        with st.expander(f"其他相關詳解（{len(core) - 1}）"):
+            for guide in core[1:]:
+                guide_row(guide, prefix)
     catalog_count = render_catalog_matches(query, category)
     if references:
         with st.expander(f"來源摘要與歷史資料（{len(references)}）", expanded=not core and not catalog_count):

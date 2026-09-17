@@ -32,6 +32,8 @@ def test_exact_breakpoint_is_first_in_answer_preview():
     guide = content.get_guide("collectible-breakpoints", content.GUIDES)
     row = content.answer_rows(guide, "暗物質黃5")[0]
     assert row[:2] == ["暗物質傀儡", "黃5"] and "10%" in row[2]
+    assert len(content.answer_rows(guide, "暗物質黃5")) == 1
+    assert not content.answer_rows(content.get_guide("epic-collectibles", content.GUIDES), "暗物質黃5")
 
 
 def test_collectible_aliases_and_id_do_not_fabricate_effects():

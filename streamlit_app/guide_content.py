@@ -335,6 +335,7 @@ def answer_rows(guide: dict, query: str = "") -> list[list[str]]:
     rows = [(section["title"], row) for section in guide["sections"] for row in section.get("rows", [])]
     terms = query_terms(query)
     if terms:
+        rows = [entry for entry in rows if all(term in normalize(entry[0] + " " + " ".join(entry[1])) for term in terms)]
         rows.sort(key=lambda entry: sum(3 * (term in normalize(" ".join(entry[1]))) +
                                        (term in normalize(entry[0])) for term in terms), reverse=True)
     return [row for _, row in rows[:4]]
