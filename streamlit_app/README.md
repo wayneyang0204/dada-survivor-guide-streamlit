@@ -9,13 +9,19 @@ application is not a Cloudflare Worker.
 
 - New visitors open `攻略首頁`, not an account form. Home and the guide index
   read a local, source-labelled catalog and remain usable without source APIs.
-- Six cornerstone articles have conclusions, conditions, tables, cautions,
+- Cornerstone articles have conclusions, conditions, tables, cautions,
   FAQs, source dates and related reading. Existing summaries are explicitly
   labelled as references awaiting re-verification, not newly verified guides.
 - `?guide=<stable-slug>` addresses each article without any account data in the
   URL. Invalid slugs only perform a local lookup and offer an index return.
 - Category and full-text search share `guide_content.py`. `guide_ui.py` owns
   reading views and connects articles to the appropriate planner resource.
+- Common Chinese questions and collectible aliases are normalized for search;
+  title and summary matches rank before incidental body mentions. Epic
+  collectibles have their own answer instead of using legendary-box rules.
+- Articles preserve the originating search and category through related
+  reading. Scenario selectors display costs and stopping points without
+  changing account records; the planner remains the account-editing surface.
 - In-app navigation preserves session profiles. Reloading a direct article
   link starts a new session as usual; article links are not profile backups.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,

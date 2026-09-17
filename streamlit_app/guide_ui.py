@@ -15,6 +15,7 @@ PUBLIC_URL = "https://dada-survivor-guide.streamlit.app/"
 
 def clear_article() -> None:
     st.session_state.pop("article_slug", None)
+    st.session_state.pop("article_origin", None)
     st.query_params.pop("guide", None)
     st.session_state["seen_guide_query"] = None
 
@@ -26,12 +27,20 @@ def sync_query() -> None:
         if slug:
             # Only a local lookup is performed. The URL never controls a request/path.
             st.session_state["article_slug"] = str(slug)[:100]
+            st.session_state.pop("article_origin", None)
             st.session_state["主導覽"] = "資料庫"
         else:
             st.session_state.pop("article_slug", None)
 
 
 def open_guide(slug: str) -> None:
+    if not st.session_state.get("article_slug"):
+        page = st.session_state.get("主導覽", "攻略首頁")
+        query_key = "home_guide_search" if page == "攻略首頁" else "guide_query"
+        st.session_state["article_origin"] = {
+            "page": page, "query": st.session_state.get(query_key, ""),
+            "category": st.session_state.get("guide_topic", "全部"),
+        }
     st.session_state["article_slug"] = slug
     st.session_state["pending_navigation"] = "資料庫"
     st.query_params["guide"] = slug
@@ -43,6 +52,26 @@ def open_index(category: str = "全部") -> None:
     st.session_state["guide_topic"] = category
     st.session_state["guide_query"] = ""
     st.session_state["資料分類"] = "本站攻略"
+    st.session_state["pending_navigation"] = "資料庫"
+
+
+def return_to_guides(category: str) -> None:
+    origin = st.session_state.get("article_origin")
+    if not origin:
+        open_index(category)
+        return
+    clear_article()
+    page = origin["page"] if origin["page"] in ("攻略首頁", "資料庫") else "資料庫"
+    query_key = "home_guide_search" if page == "攻略首頁" else "guide_query"
+    st.session_state[query_key] = origin["query"]
+    st.session_state["guide_topic"] = origin["category"]
+    st.session_state["資料分類"] = "本站攻略"
+    st.session_state["pending_navigation"] = page
+
+
+def open_collectible_catalog() -> None:
+    clear_article()
+    st.session_state["資料分類"] = "收藏圖鑑"
     st.session_state["pending_navigation"] = "資料庫"
 
 
@@ -72,18 +101,27 @@ def render_home(legacy: list[dict]) -> None:
     page_heading("噠噠特攻攻略", "特工養成、裝備神鑄、收藏典藏與活動投入。")
     with st.container(key="guide_search"):
         query = st.text_input("搜尋攻略", placeholder="例如：典藏館、暗物質傀儡、雙絕槍、覺醒", max_chars=160, key="home_guide_search")
-    with st.container(key="topic_directory"):
-        columns = st.columns(3)
-        for index, category in enumerate(content.CATEGORIES):
-            columns[index % 3].button(category, key=f"home_topic_{index}", on_click=open_index, args=(category,), width="stretch")
+    if not query.strip():
+        with st.container(key="answer_shortcuts"):
+            st.markdown("### 常用升級問題")
+            for slug, label in (("survivor-awakening", "維納托 R6：先升主位，還是塔洛莎？"),
+                                ("epic-collectibles", "黃色收藏：先選哪件、升到哪一星？")):
+                guide = content.get_guide(slug, guides)
+                article_button(guide, "answer", label)
+                st.caption(guide["summary"])
     if query.strip():
         results = content.search_guides(guides, query)
         st.caption(f"{len(results)} 篇符合「{query}」")
         if not results:
-            st.info("沒有符合的攻略。試試角色、裝備名稱，或從上方分類查找。")
+            st.info("沒有符合的攻略。試試角色、裝備名稱，或清除搜尋查看分類。")
+            st.button("瀏覽攻略分類", on_click=open_index)
         for guide in results:
             guide_row(guide, "home_search")
         return
+    with st.container(key="topic_directory"):
+        columns = st.columns(3)
+        for index, category in enumerate(content.CATEGORIES):
+            columns[index % 3].button(category, key=f"home_topic_{index}", on_click=open_index, args=(category,), width="stretch")
     with st.container(key="guide_frontpage"):
         lead, quick = st.columns([1.8, 1], gap="large")
         with lead:
@@ -136,6 +174,20 @@ def table_markup(columns: list[str], rows: list[list[str]]) -> str:
     return f'<div class="guide-table-scroll" role="region" aria-label="攻略門檻表" tabindex="0"><table class="guide-table"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>'
 
 
+def render_quick_decision(guide: dict) -> None:
+    decisions = guide.get("decisions", [])
+    if not decisions:
+        return
+    selected = st.selectbox("選擇目前狀況", [decision["condition"] for decision in decisions],
+                            index=None, placeholder="選相符情境，直接看投入與停手點", key=f"guide_scenario_{guide['slug']}")
+    if selected is None:
+        return
+    decision = next(item for item in decisions if item["condition"] == selected)
+    st.markdown(f'''<section class="scenario-answer" aria-label="目前情境建議">
+        <h3>{html.escape(decision['action'])}</h3><p><b>投入與效果：</b>{html.escape(decision['cost'])}</p>
+        <p><b>停在這裡：</b>{html.escape(decision['stop'])}</p></section>''', unsafe_allow_html=True)
+
+
 def render_article(slug: str, legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
     guide = content.get_guide(slug, guides)
@@ -144,7 +196,9 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         st.button("返回攻略索引", on_click=open_index, type="primary")
         return
     back, link = st.columns([4, 1])
-    back.button("← 攻略索引", on_click=open_index, args=(guide["category"],))
+    origin = st.session_state.get("article_origin", {})
+    back_label = "← 搜尋結果" if origin.get("query") else "← 攻略首頁" if origin.get("page") == "攻略首頁" else "← 攻略索引"
+    back.button(back_label, on_click=return_to_guides, args=(guide["category"],))
     with link:
         with st.popover("文章連結", width="stretch"):
             st.caption("可收藏或複製此連結；連結不含個人帳號資料。")
@@ -165,6 +219,13 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         body, rail = st.columns([2.4, 1], gap="large")
         with body:
             st.markdown(f'<section class="guide-verdict"><h2>先看結論</h2><p>{html.escape(guide["verdict"])}</p></section>', unsafe_allow_html=True)
+            render_quick_decision(guide)
+            if guide["resource"]:
+                st.button("用我的配置排升級順序", on_click=open_tool, args=(guide["resource"],), width="stretch", type="primary")
+            elif guide["slug"] == "epic-collectibles":
+                st.button("查完整收藏圖鑑", on_click=open_collectible_catalog, width="stretch")
+            elif guide["slug"] == "event-budget":
+                st.button("開啟活動投入試算", on_click=open_tool, kwargs={"activity": True}, width="stretch", type="primary")
             if guide.get("editorial_note"):
                 st.caption(guide["editorial_note"])
             for index, section in enumerate(guide["sections"], 1):
@@ -192,10 +253,6 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         with rail:
             with st.container(key="article_rail"):
                 st.markdown(f'<nav class="article-toc" aria-label="本文目錄"><strong>本文目錄</strong>{toc}</nav>', unsafe_allow_html=True)
-                if guide["resource"]:
-                    st.button("用我的配置排升級順序", on_click=open_tool, args=(guide["resource"],), width="stretch", type="primary")
-                elif guide["slug"] == "event-budget":
-                    st.button("開啟活動投入試算", on_click=open_tool, kwargs={"activity": True}, width="stretch", type="primary")
                 st.caption("閱讀攻略不需要填帳號；需要個人化建議時再使用工具。")
     related = [content.get_guide(item, guides) for item in guide["related"]]
     if related:

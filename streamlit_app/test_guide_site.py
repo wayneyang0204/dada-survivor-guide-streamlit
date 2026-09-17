@@ -21,7 +21,7 @@ def legacy_guides():
 def test_guide_catalog_has_stable_ids_and_honest_source_labels():
     guides = content.all_guides(legacy_guides())
     assert len({g["slug"] for g in guides}) == len(guides)
-    assert len(content.GUIDES) == 6
+    assert content.get_guide("epic-collectibles", guides)["category"] == "收藏典藏"
     assert all(g["category"] in content.CATEGORIES for g in guides)
     for guide in guides:
         assert guide["title"] and guide["verdict"] and guide["sections"] and guide["caution"]

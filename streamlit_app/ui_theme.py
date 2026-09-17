@@ -186,6 +186,12 @@ button[kind="primary"]:hover {background:#193bbd;border-color:#193bbd;}
 .article-toc a {display:block;color:var(--muted);font-size:.9375rem;line-height:1.6;padding:.55rem 0;text-decoration:none;}
 .article-toc a:hover {color:var(--accent);text-decoration:underline;}
 .mobile-toc {display:none;}
+.st-key-answer_shortcuts {padding:.4rem 0 .8rem;border-bottom:1px solid var(--line);}
+.st-key-answer_shortcuts button {justify-content:flex-start;text-align:left;padding:.4rem 0;}
+.st-key-answer_shortcuts button p {font-size:1.125rem;font-weight:700;}
+.scenario-answer {border-left:3px solid var(--accent);padding:.6rem 1rem;margin:.5rem 0 1rem;background:var(--wash);}
+.scenario-answer h3 {font-size:1.15rem;margin:0 0 .5rem;}
+.scenario-answer p {margin:.4rem 0;}
 
 @media(max-width:760px) {
   .block-container {padding:1rem 1rem 3rem;}
@@ -201,7 +207,7 @@ button[kind="primary"]:hover {background:#193bbd;border-color:#193bbd;}
   .st-key-profile_nav [role="radiogroup"] {display:flex;flex-direction:row;flex-wrap:wrap;gap:.25rem;}
   .st-key-profile_nav label[data-testid="stRadioOption"] {padding:.5rem .6rem;}
   .速覽清單 {grid-template-columns:1fr;gap:.5rem;}
-  .st-key-main_nav label p {font-size:.875rem;}
+  .st-key-main_nav label p {font-size:.875rem;white-space:nowrap;}
   .st-key-guide_frontpage > [data-testid="stHorizontalBlock"],
   .st-key-guide_article_layout > [data-testid="stHorizontalBlock"] {flex-direction:column;}
   .st-key-guide_frontpage > [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
