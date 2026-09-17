@@ -42,7 +42,7 @@ GUIDES = [
                     ("別說筆記｜塔洛西婭（本站稱塔洛莎）技能", "https://notalknote.xyz/taloxa/")],
         "decisions": [
             {"condition": "維納托 R6，塔洛莎已 R4", "action": "主位下一個目標：維納托 R7。保留塔洛莎 R4 連攜。", "cost": "30 覺醒核心＋550 角色碎片＋遊戲預覽量子碎片", "stop": "升到 R7 先停；R8 是另外一筆 30 核心＋600 碎片。"},
-            {"condition": "維納托 R6，塔洛莎未 R4，主力是無人機", "action": "把塔洛莎 R4 火控專精連攜列為優先補齊目標。", "cost": "合計目前等級到 R4 的材料。兩條路材料皆足時先補裂傷；若只有主位 R7 材料已足，可先完成主位門檻。", "stop": "塔洛莎 R4，且無人機裂傷已實際生效就停。"},
+            {"condition": "維納托 R6，塔洛莎未 R4，主力是無人機", "action": "把塔洛莎 R4 戰術協議連攜列為優先補齊目標。", "cost": "合計目前等級到 R4 的材料。兩條路材料皆足時先補裂傷；若只有主位 R7 材料已足，可先完成主位門檻。", "stop": "塔洛莎 R4，且無人機裂傷已實際生效就停。"},
             {"condition": "維納托 R7，塔洛莎已 R4", "action": "主位下一個門檻：維納托 R8。", "cost": "30 覺醒核心＋600 角色碎片＋遊戲預覽量子碎片", "stop": "到 R8 停；保留現有連攜，另行比較其他系統。"},
         ],
         "sections": [
@@ -89,21 +89,23 @@ GUIDES = [
         "summary": "按實際裝備與主力技能挑收藏，不把每個增傷數字當成總輸出提升。",
         "audience": "使用破壞者徽記或無人機系統的玩家", "resource": "傳奇收藏自選",
         "verdict": "穿破壞者徽記才核對記憶編輯器的裝備效果；用無人機才核對暗物質傀儡的技能收益。先找下一個有效星級，再確認自選箱能否選到對應期數。",
-        "source_date": "2026-03-07", "checked": CHECKED, "status": "機制參考",
-        "sources": [("別說筆記｜收藏品效果表", "https://notalknote.xyz/survivorio-collection-hall/")],
+        "source_date": "2026-03-07", "checked": "2026-09-17", "status": "門檻效果已核對",
+        "sources": [("別說筆記｜收藏品效果表", "https://notalknote.xyz/survivorio-collection-hall/"), ("別說筆記｜第9期暗物質效果", "https://notalknote.xyz/collectible-edition-9/")],
         "sections": [
             {"title": "常用門檻速查", "columns": ["收藏品", "星級", "來源所載效果重點"], "rows": [
                 ["記憶編輯器", "黃3／黃5", "各階提高破壞者徽記低血量暴率上限"],
                 ["記憶編輯器", "紅3／紅5", "暴擊傷害／徽記低血量增傷上限"],
-                ["暗物質傀儡", "黃3／黃5", "無人機及雙生無人機飛彈單發傷害"],
-                ["暗物質傀儡", "紅3／紅5", "暴擊傷害／飛彈單發傷害"]]},
+                ["暗物質傀儡", "黃3", "普通／雙生無人機飛彈單發傷害＋5%"],
+                ["暗物質傀儡", "黃5", "該階列飛彈單發傷害＋10%"],
+                ["暗物質傀儡", "紅3", "暴擊傷害＋10%"],
+                ["暗物質傀儡", "紅5", "該階列飛彈單發傷害＋15%"]]},
             {"title": "自選箱不是同一種貨幣", "steps": ["確認是傳奇還是史詩收藏自選，不用星星顏色判斷原生品質。", "逐箱核對期數與碎片量，不能只加總箱數。", "合計從目前星級到目標門檻的整段需求。", "同時比較套裝與典藏館是否缺一件即可生效，再決定本次投入。"]},
             {"title": "到達門檻後為何要先停？", "body": "飛彈單發傷害、暴擊傷害與條件式暴率，是不同屬性。實際收益還受無人機輸出占比、戰鬥時間與效果觸發影響；達到一個門檻後，應重新檢查其他可解鎖的效果。"},
         ],
         "caution": "這兩件是傳奇收藏的條件式路線，不是全部黃色品質收藏的通用榜單。角色面板暴率也不能直接代替戰鬥內有效暴率。",
         "faq": [("黃三星收藏，就是黃色品質嗎？", "不是。黃星是升星階段；原生品質是另一項資料。傳奇收藏也會經過黃星。"),
                 ("暗物質傀儡一定比其他收藏先升？", "不一定。先確認有使用相關技能，再比較同一批可用自選資源能跨過哪些門檻。")],
-        "related": ["epic-collectibles", "collection-hall", "twin-drone"], "keywords": "傳奇收藏 紅收藏 黃3 黃5 紅3 紅5 暴擊 爆擊 記憶編輯器 暗物質魁儡 自選箱",
+        "related": ["collectible-sets", "epic-collectibles", "collection-hall", "twin-drone"], "keywords": "傳奇收藏 紅收藏 黃3 黃5 紅3 紅5 暴擊 爆擊 記憶編輯器 暗物質魁儡 自選箱",
     },
     {
         "slug": "twin-drone", "category": "科技配件", "title": "雙生無人機：合成條件與材料確認",
@@ -151,7 +153,7 @@ GUIDES = [
         "audience": "分配黃色品質收藏自選箱與碎片的玩家", "resource": None,
         "verdict": "暴擊率不足時，先挑已接近紅3、且自選箱能選到的史詩收藏，每件紅3提供 5% 暴擊率。普通無人機主力可先看水動推力腳蹼的黃3→黃5→紅3。暴擊已足且沒有溢出轉換收益時，改補正在使用的技能／裝備效果。",
         "source_date": "2026-03-07", "checked": "2026-09-17", "status": "效果表已核對",
-        "sources": [("別說筆記｜史詩收藏效果表", "https://notalknote.xyz/survivorio-collection-hall/")],
+        "sources": [("別說筆記｜史詩收藏效果表", "https://notalknote.xyz/survivorio-collection-hall/"), ("別說筆記｜第9期火元素之珠", "https://notalknote.xyz/collectible-edition-9/")],
         "decisions": [
             {"condition": "缺暴擊率，想選下一件史詩收藏", "action": "在下表的紅3暴率收藏中，先補離紅3最近的一件。", "cost": "同為＋5%暴擊率時，比較距紅3尚缺的碎片；以你可選的期數為範圍。", "stop": "紅3先停，再算暴擊缺口，不為暴率直接追紅5。"},
             {"condition": "普通無人機是主力，腳蹼還沒到黃5", "action": "水動推力腳蹼：先黃3，再黃5。", "cost": "黃3增加飛彈單發傷害3%；黃5增加飛彈數量3%。", "stop": "黃5先比較缺口；還缺暴擊率才把紅3列為下一階。"},
@@ -165,13 +167,17 @@ GUIDES = [
                  ["克萊因瓶", "第6期", "暴擊率＋5%", "接近紅3時可補；裝備效果對應永恆戰衣"],
                  ["宇宙羅盤", "第7期", "暴擊率＋5%", "接近紅3時可補；技能效果對應力場"],
                  ["星軌乘客卡", "第8期", "暴擊率＋5%", "接近紅3時可補；裝備效果對應永恆項鍊"],
-                 ["攜帶式機甲箱", "第8期", "暴擊率＋5%", "接近紅3時可補；裝備效果對應破壞者手甲"]]},
+                 ["攜帶式機甲箱", "第8期", "暴擊率＋5%", "接近紅3時可補；裝備效果對應破壞者手甲"],
+                 ["火元素之珠", "第9期", "暴擊率＋5%", "普通／雙生榴槤主力兼顧黃3、黃5"]]},
             {"title": "腳蹼實際要停哪裡", "columns": ["星級", "效果", "何時值得追"], "rows": [
                 ["黃3", "普通無人機飛彈單發傷害＋3%", "普通無人機主力，且還沒跨此門檻"],
                 ["黃5", "普通無人機飛彈數量＋3%", "已黃3，仍用普通無人機"],
                 ["紅3", "暴擊率＋5%", "帳號仍有有效暴擊缺口"],
                 ["紅5", "飛彈數量＋5%、單發傷害＋5%", "前三個門檻完成後再比較，不自動一路升滿"]]},
             {"title": "兩件都想升時，怎麼選", "body": "假設你只缺5%暴率：腳蹼還在黃3，但克萊因瓶已紅2；先算兩者到紅3所缺的碎片，能用同一批自選箱時，優先完成成本較低的一件。若你正在用普通無人機，也把腳蹼沿途的技能效果納入比較。先完成一件，再重新算暴率。"},
+            {"title": "用榴槤：火元素之珠", "columns": ["星級", "該階效果", "適用"], "rows": [
+                ["黃3", "技能傷害＋10%", "榴槤／鐵蒺藜及雙生形態"], ["黃5", "技能傷害＋13%", "同上；使用該技能再投入"],
+                ["紅3", "暴擊率＋5%", "帳號有有效暴擊缺口"]]},
             {"title": "史詩與傳奇自選分開花", "body": "星際躍遷矩陣圖紙、暗物質傀儡與記憶編輯器屬傳奇收藏。它們不能取代黃色自選箱的候選；先看箱子原生品質與可選期數，再看升星顏色。"},
         ],
         "caution": "腳蹼來源欄位對應普通無人機；雙生形態是否繼承須看遊戲內效果。使用暴擊溢出轉換的裝備時，100%不一定是停止線。",
@@ -183,10 +189,91 @@ GUIDES = [
 ]
 
 
+# Short answers are displayed before the article; detailed tables stay in one place.
+QUICK_ANSWERS = {
+    "collection-hall": ("第二套先看 80 星，不是只開滿 8 格。", "進階第二套；8 件傳奇紅5＝80星，8件黃5只有40星。"),
+    "survivor-awakening": ("維納托 R6 → R7：30 核心＋550 碎片，另計量子。", "維納托主位、塔洛莎已 R4；未補無人機裂傷先比較塔洛莎 R4。"),
+    "gear-forging": ("SS 單路線 0→3 共 6 核心；0→5 共 19 核心。", "只算 E／V 核心；不是混沌或異星成本，其他材料另計。"),
+    "collectible-breakpoints": ("無人機主力：暗物質傀儡先黃3，再看黃5。", "普通／雙生無人機適用；記憶編輯器另看破壞者徽記。"),
+    "twin-drone": ("指定配對：精確制導系統＋能量收集器。", "一件紅配件只解鎖功能；完整合成品質、材料仍看遊戲預覽。"),
+    "event-budget": ("先扣未領的免費進度，只補目標差額。", "免費可達標就不補鑽；隨機返還只作估計。"),
+    "epic-collectibles": ("缺暴率：選離紅3最近的＋5%暴率史詩收藏。", "普通無人機另看腳蹼黃3→黃5；不同期數自選箱不能混算。"),
+}
+
+GUIDES.extend([
+    {
+        "slug": "collectible-sets", "category": "收藏典藏", "title": "SS 鞋與雙絕槍套裝：四件名單、黃3門檻",
+        "summary": "安全場地與召喚替身各要哪四件；缺一件時先補哪裡。",
+        "audience": "使用 SS 鞋永恆神鑄或雙絕槍混沌融合的玩家", "resource": None,
+        "verdict": "四件都到黃3才亮套裝效果。先補最後一件黃3，不要把其他三件先升黃5；尚未使用對應裝備技能就不急著湊套。",
+        "source_date": "2025-11-16", "checked": "2026-09-17", "status": "套裝表已核對",
+        "sources": [("別說筆記｜第9期收藏", "https://notalknote.xyz/collectible-edition-9/")],
+        "sections": [
+            {"title": "在安全的場地進行試驗 · 第7期", "columns": ["成員", "最低目標"], "rows": [
+                ["賽博圖騰柱", "黃3"], ["複製寶鏡", "黃3"], ["夢境拼圖", "黃3"], ["基因編輯器", "黃3"]],
+             "body": "四件各黃3：冰霜戰靴永恆神鑄的冰甲效果，每層冰霜血脈增加10%護盾增傷。需對應技能生效。"},
+            {"title": "召喚替身！ · 第9期", "columns": ["成員", "最低目標"], "rows": [
+                ["暗物質傀儡", "黃3"], ["時間線魔術方塊（時間軸魔術方）", "黃3"], ["百變共生體", "黃3"], ["預言塔羅牌", "黃3"]],
+             "body": "四件各黃3：雙絕槍混沌融合的隕星易傷效果額外增加30%。需已解鎖對應混沌技能。"},
+            {"title": "缺件時如何投入", "steps": ["四件星級列出來，先補最低的一件到黃3。", "若是黃3、黃3、黃3、黃2，下一筆給最後一件；前三件升黃5不會代替缺口。", "兩套都差很多時，可先完成無人機主力的暗物質黃3，再按可用期數補套。"]},
+        ],
+        "caution": "套裝效果不是整場總傷害增幅；兩套用不同期數收藏，不應視為能任意互換的資源。",
+        "faq": [("只升暗物質黃3就有召喚替身？", "沒有。暗物質的單件效果與四件套效果分開，另外三件也要黃3。")],
+        "related": ["collectible-breakpoints", "epic-collectibles", "collection-hall"],
+        "keywords": "SS鞋 冰霜戰靴 冰川戰靴 安全場地 安全的場地 召喚替身 套裝 成員 名單 雙絕槍 黃三星 黃3",
+    },
+    {
+        "slug": "link-passives", "category": "特工養成", "title": "連攜帶誰？塔洛莎 R4、楊大師 R1、金 R3 比較",
+        "summary": "分清連攜被動與主動技能，不因覺醒數字高就替換。",
+        "audience": "已有連攜槽，正在選擇覺醒被動的玩家", "resource": "覺醒核心",
+        "verdict": "無人機需要裂傷時先保留塔洛莎 R4；缺穩定暴率可看楊大師 R1。金 R3 的回血屬主動強化，不是多一條連攜增傷，不能只以 R3 高於 R1 決定。",
+        "source_date": "2026-01-24", "checked": "2026-09-17", "status": "技能表已核對",
+        "sources": [("別說筆記｜覺醒被動效果", "https://notalknote.xyz/survivor-awakening/")],
+        "sections": [
+            {"title": "三個常問選項", "columns": ["角色／門檻", "連攜被動重點", "何時使用"], "rows": [
+                ["塔洛莎 R4", "無人機命中可施加5秒裂傷", "無人機主力，缺少裂傷來源"],
+                ["楊大師 R1", "暴率＋5%、暴傷＋5%", "需要不靠暴擊次數觸發的基礎增益"],
+                ["金 R3", "沿用R2痛打：300次暴擊觸發燃燒圈，附5%易傷", "能累積觸發次數，且敵人被燃燒圈覆蓋"]]},
+            {"title": "金 R3 要不要重置", "body": "先不重置。R3新增的無敵期間暴擊回血是主動技能強化；比較連攜應看痛打，而不是R3數字。若已有楊大師R1，固定相同首領、時間與裝備，先替換測試再決定。若需要重置才能取得楊大師，先算碎片、量子與重置返還後是否完整達標。"},
+            {"title": "主位與協同別混用", "body": "本文比較可放入連攜槽的覺醒被動，不代表同調協同位的完整排名。技能必須真的裝入可用槽；主動技能與專屬武器效果不能假設全部共享。"},
+        ],
+        "caution": "這是三個已收錄選項的條件比較，不是含所有新特工的終局排行榜。短場與長場觸發覆蓋率不同。",
+        "faq": [("塔洛莎 R4 就一定勝過主位升R7？", "不同材料成熟度與裂傷覆蓋率會改變順序；不要只按角色名字排序。"),
+                ("楊大師R1一定比金R3強？", "不是。楊提供暴率／暴傷；金提供有觸發條件的易傷，不能把兩者百分比直接相加比較。")],
+        "related": ["survivor-awakening", "crit-overflow"], "keywords": "連攜 協同作戰 帶誰 維納托 維托爾 塔洛莎 楊大師 金 R3 R1 R4 重置 被動",
+    },
+    {
+        "slug": "crit-overflow", "category": "裝備神鑄", "title": "暴擊率超過100%還要升嗎？先看溢出轉換",
+        "summary": "普通暴擊與 SS 手套超暴擊分開算。",
+        "audience": "暴擊接近滿值、正在分配收藏與手套材料的玩家", "resource": None,
+        "verdict": "沒有溢出轉換時，100%之上不再增加一般暴擊發生機率。有SS手套對應超暴擊技能則可能有收益，先對照已解鎖門檻，不把所有帳號都停在100%。",
+        "source_date": "2025-02-05", "checked": "2026-09-17", "status": "舊版機制參考",
+        "sources": [("別說筆記｜暴擊率試算", "https://notalknote.xyz/【噠噠特攻】暴擊率試算表/")],
+        "sections": [
+            {"title": "先判斷是哪一種", "columns": ["條件", "下一步"], "rows": [
+                ["有效暴率不足100%", "先補穩定暴率，別把未觸發的條件暴率算常駐"],
+                ["已100%，無溢出收益", "停止只為暴率升收藏，轉看主力技能或暴傷"],
+                ["SS手套有對應超暴擊", "按遊戲目前門檻補差額；舊表列超過100／130／150%"]]},
+            {"title": "實際暴率怎麼記", "steps": ["分開記常駐暴率、戰鬥技能、血量／敵人條件及短時間效果。", "假設常駐95%、條件10%但未觸發，不能當成全程105%。", "到下一個已解鎖門檻就停；尚未解鎖的裝備效果不先計入收益。"]},
+        ],
+        "caution": "來源是舊版機制，不是最新SS手套完整數值表；是否為超過或至少、各階效果，按現有遊戲技能文字。",
+        "faq": [("面板100%就一定不用暴率收藏？", "不一定。先確認戰鬥內有效暴率，以及裝備是否能把超過門檻的暴率轉成收益。")],
+        "related": ["epic-collectibles", "link-passives"], "keywords": "爆擊率 暴擊率 超過100 100% 130% 150% 溢出 超暴擊 SS手套 月殤護手 月痕護腕",
+    },
+])
+QUICK_ANSWERS.update({
+    "collectible-sets": ("SS鞋／召喚替身：各自四件都要黃3。", "須使用對應裝備技能；一件黃5不能代替另一件未黃3。"),
+    "link-passives": ("無人機裂傷看塔洛莎 R4；穩定暴率看楊大師 R1。", "金 R3 不是直接多一條連攜增傷；需看痛打觸發覆蓋。"),
+    "crit-overflow": ("100%以上是否有用，取決於有沒有溢出轉換技能。", "沒有轉換就別只追暴率；SS手套按已解鎖超暴擊門檻。"),
+})
+
+
 def normalize(text: str) -> str:
     value = unicodedata.normalize("NFKC", text).casefold()
     for old, new in (("自定", "自訂"), ("爆擊", "暴擊"), ("魁儡", "傀儡"), ("维纳托", "維納托"),
-                     ("黃色收藏", "史詩收藏"), ("黃收藏", "史詩收藏"), ("水力推動腳蹼", "水動推力腳蹼")):
+                     ("黃色收藏", "史詩收藏"), ("黃收藏", "史詩收藏"), ("水力推動腳蹼", "水動推力腳蹼"),
+                     ("維托爾", "維納托"), ("塔洛西婭", "塔洛莎"), ("時間軸魔術方", "時間線魔術方塊"),
+                     ("金三星", "黃3"), ("黃三星", "黃3"), ("紅三星", "紅3")):
         value = value.replace(old, new)
     return re.sub(r"\s+", " ", value).strip()
 
@@ -214,12 +301,21 @@ def all_guides(legacy: list[dict] | None = None) -> list[dict]:
     return result
 
 
-def search_guides(guides: list[dict], query: str = "", category: str = "全部") -> list[dict]:
+def query_terms(query: str) -> list[str]:
     normalized = normalize(query)[:160]
-    searchable = re.sub(r"(r\s*[0-8])", r" \1 ", normalized)
-    searchable = re.sub(r"請問|幫我|我現在|我想|應該|之後|要先|先升|要升|哪些|什麼|怎麼|如何|[？?，,。]", " ", searchable)
+    searchable = re.sub(r"([rev]\s*[0-8]|[黃紅][1-5])", r" \1 ", normalized)
+    searchable = re.sub(r"請問|幫我|我現在|我想|應該|之後|要先|先升|要升|升到|有哪些|哪些|多少|什麼|怎麼|如何|還有用嗎|有用嗎|還有區別|還要|要不要|[要嗎？?，,。！!]", " ", searchable)
+    # Split recognized game terms inside a Chinese sentence without discarding unknown words.
+    vocabulary = ("史詩收藏", "暗物質傀儡", "安全場地", "召喚替身", "第二套", "80星", "暴擊率", "超過", "SS鞋", "連攜", "協同作戰")
+    for word in vocabulary:
+        searchable = searchable.replace(normalize(word), f" {normalize(word)} ")
     terms = searchable.split()
-    if normalized and not terms:
+    return terms
+
+
+def search_guides(guides: list[dict], query: str = "", category: str = "全部") -> list[dict]:
+    terms = query_terms(query)
+    if normalize(query) and not terms:
         return []
     result = []
     for guide in guides:
@@ -232,6 +328,23 @@ def search_guides(guides: list[dict], query: str = "", category: str = "全部")
         result.sort(key=lambda guide: sum((4 if term in normalize(guide["title"]) else 0) +
                     (2 if term in normalize(guide["summary"]) else 0) for term in terms), reverse=True)
     return result
+
+
+def answer_rows(guide: dict, query: str = "") -> list[list[str]]:
+    """Return the most relevant existing table rows, not a generated answer."""
+    rows = [(section["title"], row) for section in guide["sections"] for row in section.get("rows", [])]
+    terms = query_terms(query)
+    if terms:
+        rows.sort(key=lambda entry: sum(3 * (term in normalize(" ".join(entry[1]))) +
+                                       (term in normalize(entry[0])) for term in terms), reverse=True)
+    return [row for _, row in rows[:4]]
+
+
+def search_collectibles(items: list[dict], query: str) -> list[dict]:
+    terms = query_terms(query)
+    if not terms:
+        return []
+    return [item for item in items if all(term in normalize(f"{item['name']} {item['id']} {item['quality']}收藏 第{item['edition']}期") for term in terms)]
 
 
 def get_guide(slug: str, guides: list[dict]) -> dict | None:

@@ -816,6 +816,6 @@ elif 頁面 == "最新文章":
             st.link_button("閱讀原始文章", item["網址"])
     st.link_button("查看完整文章分類", 來源分類網址)
 
-st.markdown('<div class="site-footer">噠噠攻略站 · 2026.09.08 · 攻略網站版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
+st.markdown('<div class="site-footer">噠噠攻略站 · 2026.09.17 · 攻略速查版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
 台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
 st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")

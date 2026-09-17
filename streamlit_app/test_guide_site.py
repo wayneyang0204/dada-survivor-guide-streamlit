@@ -64,7 +64,7 @@ def test_new_visitor_gets_guides_without_an_account_form_or_network(monkeypatch)
     assert not a.get("form")
     assert not a.number_input
     assert "player_profile" not in a.session_state
-    assert a.button(key="featured_collection-hall")
+    assert a.button(key="home_collection-hall")
     by_label(a.text_input, "搜尋攻略").set_value("暗物質魁儡").run()
     a.button(key="home_search_collectible-breakpoints").click().run()
     assert not a.exception
@@ -105,14 +105,14 @@ def test_article_to_targeted_planner_preserves_profile():
 
 def test_category_navigation_and_return_from_article():
     a = AppTest.from_file(APP).run()
-    a.button(key="home_topic_2").click().run()
+    by_label(a.selectbox, "攻略分類").select("收藏典藏").run()
     assert not a.exception
     assert by_label(a.selectbox, "攻略分類").value == "收藏典藏"
     catalog = content.all_guides(legacy_guides())
-    visible = [content.get_guide(b.key.removeprefix("index_"), catalog) for b in a.button if b.key and b.key.startswith("index_")]
+    visible = [content.get_guide(b.key.removeprefix("home_"), catalog) for b in a.button if b.key and b.key.startswith("home_")]
     assert visible and all(g["category"] == "收藏典藏" for g in visible)
-    a.button(key="index_collection-hall").click().run()
-    by_label(a.button, "← 攻略索引").click().run()
+    a.button(key="home_collection-hall").click().run()
+    by_label(a.button, "← 攻略首頁").click().run()
     assert not a.exception
     assert "guide" not in a.query_params
     assert by_label(a.selectbox, "攻略分類").value == "收藏典藏"

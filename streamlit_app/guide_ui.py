@@ -7,6 +7,7 @@ from urllib.parse import quote
 import streamlit as st
 
 import guide_content as content
+from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 
 
@@ -39,7 +40,7 @@ def open_guide(slug: str) -> None:
         query_key = "home_guide_search" if page == "攻略首頁" else "guide_query"
         st.session_state["article_origin"] = {
             "page": page, "query": st.session_state.get(query_key, ""),
-            "category": st.session_state.get("guide_topic", "全部"),
+            "category": st.session_state.get("home_topic" if page == "攻略首頁" else "guide_topic", "全部"),
         }
     st.session_state["article_slug"] = slug
     st.session_state["pending_navigation"] = "資料庫"
@@ -65,6 +66,8 @@ def return_to_guides(category: str) -> None:
     query_key = "home_guide_search" if page == "攻略首頁" else "guide_query"
     st.session_state[query_key] = origin["query"]
     st.session_state["guide_topic"] = origin["category"]
+    if page == "攻略首頁":
+        st.session_state["home_topic"] = origin["category"]
     st.session_state["資料分類"] = "本站攻略"
     st.session_state["pending_navigation"] = page
 
@@ -87,69 +90,59 @@ def article_button(guide: dict, prefix: str, label: str | None = None) -> None:
               args=(guide["slug"],), width="stretch", type="tertiary")
 
 
-def guide_row(guide: dict, prefix: str) -> None:
+def guide_row(guide: dict, prefix: str, query: str = "") -> None:
     with st.container(key=f"guide_row_{prefix}_{guide['slug']}"):
         st.markdown(f'<div class="guide-meta">{html.escape(guide["category"])} <span>/ {html.escape(guide["status"])}</span></div>', unsafe_allow_html=True)
         article_button(guide, prefix)
-        st.write(guide["summary"])
-        date = f"來源更新 {guide['source_date']}" if guide["source_date"] else "本站計算方法"
-        st.caption(date + (" · 本站已核對來源表格" if guide["checked"] else ""))
+        answer, condition = content.QUICK_ANSWERS.get(guide["slug"], (guide["summary"], ""))
+        st.write(answer)
+        if condition:
+            st.caption("適用：" + condition)
+        if query and not guide.get("reference_only"):
+            rows = content.answer_rows(guide, query)
+            if rows:
+                facts = "".join(f'<li>{html.escape(" · ".join(row))}</li>' for row in rows)
+                st.markdown(f'<ul class="search-facts">{facts}</ul>', unsafe_allow_html=True)
+
+
+def render_catalog_matches(query: str, category: str) -> int:
+    if not query.strip() or category not in ("全部", "收藏典藏"):
+        return 0
+    matches = content.search_collectibles(load_collectible_catalog(), query)
+    if matches:
+        with st.expander(f"收藏名稱／期數 · {len(matches)} 件", expanded=True):
+            for item in matches[:12]:
+                st.markdown(f"**{item['name']}**　{item['quality']} · 第{item['edition']}期 · #{item['id']}")
+                st.link_button("查外部效果表 ↗", item["link"])
+            if len(matches) > 12:
+                st.caption("先列12件；縮小名稱或前往完整圖鑑。")
+            st.button("查完整收藏圖鑑", on_click=open_collectible_catalog)
+            st.caption("此區只核對名稱、品質與期數；外部效果表不等於本站升級推薦。")
+    return len(matches)
+
+
+def render_results(guides: list[dict], query: str, category: str, prefix: str) -> None:
+    results = content.search_guides(guides, query, category)
+    core = [guide for guide in results if not guide.get("reference_only")]
+    references = [guide for guide in results if guide.get("reference_only")]
+    st.caption(f"{len(core)} 篇詳解 · {len(references)} 篇來源摘要")
+    for guide in core:
+        guide_row(guide, prefix, query)
+    catalog_count = render_catalog_matches(query, category)
+    if references:
+        with st.expander(f"來源摘要與歷史資料（{len(references)}）", expanded=not core and not catalog_count):
+            for guide in references:
+                guide_row(guide, prefix)
+    if not results and not catalog_count:
+        st.info("尚未收錄符合的答案。試試物品名稱、別名或縮短問題；不會以不相關攻略代替。")
 
 
 def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
-    page_heading("噠噠特攻攻略", "特工養成、裝備神鑄、收藏典藏與活動投入。")
     with st.container(key="guide_search"):
-        query = st.text_input("搜尋攻略", placeholder="例如：典藏館、暗物質傀儡、雙絕槍、覺醒", max_chars=160, key="home_guide_search")
-    if not query.strip():
-        with st.container(key="answer_shortcuts"):
-            st.markdown("### 常用升級問題")
-            for slug, label in (("survivor-awakening", "維納托 R6：先升主位，還是塔洛莎？"),
-                                ("epic-collectibles", "黃色收藏：先選哪件、升到哪一星？")):
-                guide = content.get_guide(slug, guides)
-                article_button(guide, "answer", label)
-                st.caption(guide["summary"])
-    if query.strip():
-        results = content.search_guides(guides, query)
-        st.caption(f"{len(results)} 篇符合「{query}」")
-        if not results:
-            st.info("沒有符合的攻略。試試角色、裝備名稱，或清除搜尋查看分類。")
-            st.button("瀏覽攻略分類", on_click=open_index)
-        for guide in results:
-            guide_row(guide, "home_search")
-        return
-    with st.container(key="topic_directory"):
-        columns = st.columns(3)
-        for index, category in enumerate(content.CATEGORIES):
-            columns[index % 3].button(category, key=f"home_topic_{index}", on_click=open_index, args=(category,), width="stretch")
-    with st.container(key="guide_frontpage"):
-        lead, quick = st.columns([1.8, 1], gap="large")
-        with lead:
-            featured = content.GUIDES[0]
-            st.markdown(f'''<section class="frontpage-feature"><div class="guide-kicker">養成重點 / 收藏典藏</div>
-              <h2>{html.escape(featured['title'])}</h2><p>{html.escape(featured['verdict'])}</p>
-              <div class="feature-bottom"><span>普通欄位：看品質與件數</span><span>進階欄位：格數與星數都要到</span></div></section>''', unsafe_allow_html=True)
-            article_button(featured, "featured", "閱讀典藏館完整攻略 →")
-        with quick:
-            with st.container(key="frontpage_quick"):
-                st.markdown("### 門檻速查")
-                for slug, label in (("survivor-awakening", "普通六星 ≠ 覺醒 R6"), ("gear-forging", "SS 神鑄核心：單階與累計"),
-                                    ("collectible-breakpoints", "收藏星級：黃3、黃5、紅3")):
-                    guide = content.get_guide(slug, guides)
-                    article_button(guide, "quick", label)
-                st.divider()
-                st.caption("已經知道自己的配置？")
-                st.button("安排我的下一次升級", on_click=open_tool, width="stretch", type="primary")
-    st.markdown("## 核心攻略")
-    columns = st.columns(2, gap="large")
-    for index, guide in enumerate(content.GUIDES[1:]):
-        with columns[index % 2]:
-            guide_row(guide, "core")
-    st.button("瀏覽全部攻略與摘要索引 →", on_click=open_index, width="stretch")
-    with st.container(key="guide_standards"):
-        st.markdown("### 閱讀前先分清楚")
-        st.write("來源數值會標示資料日期；本站整理不代表官方公告。歷史活動保留供查機制，個人升級順序則由你填入的配置重新判斷。")
-        st.caption(f"收錄 {len(content.GUIDES)} 篇站內核心攻略，另有 {len(guides)-len(content.GUIDES)} 篇既有摘要索引。")
+        query = st.text_input("搜尋攻略", placeholder="例如：暗物質黃5、SS鞋套裝、金R3、黃收藏", max_chars=160, key="home_guide_search")
+    category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="home_topic")
+    render_results(guides, query, category, "home_search" if query.strip() else "home")
 
 
 def render_index(legacy: list[dict]) -> None:
@@ -159,13 +152,7 @@ def render_index(legacy: list[dict]) -> None:
         query = st.text_input("搜尋本站攻略", placeholder="標題、角色、裝備或內文關鍵字", max_chars=160, key="guide_query")
     with topic:
         category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="guide_topic")
-    results = content.search_guides(guides, query, category)
-    st.caption(f"找到 {len(results)} 篇 · 核心攻略提供站內詳解；摘要索引保留原文入口與版本提醒。")
-    if not results:
-        st.info("沒有符合的攻略。清除關鍵字或改選其他分類。")
-        return
-    for guide in results:
-        guide_row(guide, "index")
+    render_results(guides, query, category, "index")
 
 
 def table_markup(columns: list[str], rows: list[list[str]]) -> str:
@@ -204,10 +191,9 @@ def render_article(slug: str, legacy: list[dict]) -> None:
             st.caption("可收藏或複製此連結；連結不含個人帳號資料。")
             st.code(PUBLIC_URL + "?guide=" + quote(guide["slug"], safe=""), language=None, wrap_lines=True)
     st.caption(f"攻略 / {guide['category']} / {guide['status']}")
-    page_heading(guide["title"], guide["summary"])
+    page_heading(guide["title"], "")
     date = f"來源更新：{guide['source_date']}" if guide["source_date"] else "本站試算方法"
     checked = f" · 本站核對：{guide['checked']}" if guide["checked"] else " · 既有摘要，待重新核對" if guide.get("reference_only") else " · 非當期活動公告"
-    st.caption(date + checked)
     st.caption("適用：" + guide["audience"])
     toc = "".join(f'<a href="#guide-part-{i}" target="_self">{i:02d} {html.escape(section["title"])}</a>' for i, section in enumerate(guide["sections"], 1))
     toc += '<a href="#guide-cautions" target="_self">適用限制</a>'
@@ -229,21 +215,23 @@ def render_article(slug: str, legacy: list[dict]) -> None:
             if guide.get("editorial_note"):
                 st.caption(guide["editorial_note"])
             for index, section in enumerate(guide["sections"], 1):
-                st.markdown(f'<h2 class="article-section" id="guide-part-{index}">{index:02d} / {html.escape(section["title"])}</h2>', unsafe_allow_html=True)
-                if section.get("body"):
-                    st.write(section["body"])
-                if section.get("rows"):
-                    st.markdown(table_markup(section["columns"], section["rows"]), unsafe_allow_html=True)
-                for number, step in enumerate(section.get("steps", []), 1):
-                    st.markdown(f"{number}. {step}")
+                st.markdown(f'<div id="guide-part-{index}"></div>', unsafe_allow_html=True)
+                with st.expander(section["title"], expanded=bool(section.get("rows"))):
+                    if section.get("body"):
+                        st.write(section["body"])
+                    if section.get("rows"):
+                        st.markdown(table_markup(section["columns"], section["rows"]), unsafe_allow_html=True)
+                    for number, step in enumerate(section.get("steps", []), 1):
+                        st.markdown(f"{number}. {step}")
             st.markdown('<h2 class="article-section" id="guide-cautions">適用限制</h2>', unsafe_allow_html=True)
             st.warning(guide["caution"])
             if guide["faq"]:
                 st.markdown('<h2 class="article-section" id="guide-faq">常見問題</h2>', unsafe_allow_html=True)
                 for question, answer in guide["faq"]:
-                    st.markdown(f"### {question}")
-                    st.write(answer)
+                    with st.expander(question):
+                        st.write(answer)
             st.markdown('<h2 class="article-section" id="guide-sources">資料來源</h2>', unsafe_allow_html=True)
+            st.caption(date + checked)
             for label, url in guide["sources"]:
                 st.link_button(label + " ↗", url)
             if not guide["sources"]:
@@ -253,7 +241,6 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         with rail:
             with st.container(key="article_rail"):
                 st.markdown(f'<nav class="article-toc" aria-label="本文目錄"><strong>本文目錄</strong>{toc}</nav>', unsafe_allow_html=True)
-                st.caption("閱讀攻略不需要填帳號；需要個人化建議時再使用工具。")
     related = [content.get_guide(item, guides) for item in guide["related"]]
     if related:
         st.markdown("## 接著閱讀")

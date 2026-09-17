@@ -26,6 +26,13 @@ application is not a Cloudflare Worker.
   link starts a new session as usual; article links are not profile backups.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
+- Home is now a single searchable list with category filtering, not repeated
+  featured/quick/core sections. Search previews show matching table facts before
+  an article is opened. Historical source summaries are grouped separately.
+- The same search also looks up local collectible names, aliases and IDs. Those
+  hits are explicitly catalog metadata, not fabricated star effects or advice.
+- Set-member lists, linkage comparisons and crit-overflow guidance include their
+  source dates. Article tables remain expanded; explanatory prose and FAQs fold.
 
 ## Planner flow
 
