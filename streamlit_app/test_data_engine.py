@@ -13,6 +13,7 @@ def test_strip_html_and_classification() -> None:
     assert strip_html("<p>音樂&nbsp;圓盤</p>") == "音樂 圓盤"
     assert classify_article("音樂圓盤大作戰攻略") == "活動攻略"
     assert classify_article("水上樂園大亂鬥水槍攻略") == "活動攻略"
+    assert classify_article("鉛筆王國秘寶攻略") == "活動攻略"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
@@ -37,9 +38,27 @@ def test_water_park_uses_current_community_stop_line() -> None:
     playbook = match_event_playbook("水上樂園大亂鬥｜水槍活動")
     assert playbook["name"] == "水上樂園大亂鬥"
     assert playbook["target"] == 330
-    assert "三百三十" in playbook["verdict"]
+    assert "已於 9 月 15 日結束" in playbook["verdict"]
     assert "六百箱" in playbook["avoid"]
     assert "開寶箱任務" in playbook["free_hint"]
+
+
+def test_pencil_kingdom_uses_current_stop_line_and_cost_caveat() -> None:
+    playbook = match_event_playbook("鉛筆王國秘寶攻略")
+    assert playbook["name"] == "鉛筆王國秘寶"
+    assert playbook["target"] == 5250
+    assert "六百個寶箱" in playbook["free_hint"]
+    assert "六千六百" in playbook["avoid"]
+    assert "每日排名" in playbook["avoid"]
+
+
+def test_loki_playbook_uses_post_launch_player_testing() -> None:
+    playbook = match_event_playbook("神火特攻第三彈：洛基實測攻略")
+    assert playbook["name"] == "神火特攻"
+    assert playbook["target"] == 300
+    assert "哪吒覺醒6" in playbook["verdict"]
+    assert "洛基覺醒4" in playbook["verdict"]
+    assert "上線前" in playbook["avoid"]
 
 
 def test_reward_ranking_respects_account_stage() -> None:

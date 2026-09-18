@@ -56,6 +56,7 @@ function decodeTitle(value: string) {
   return box.value
     .replace(/^【噠噠特攻】\s*/, '')
     .replace(/^噠噠特攻[：:]?\s*/, '')
+    .replace(/SP/gi, '神火')
     .trim();
 }
 

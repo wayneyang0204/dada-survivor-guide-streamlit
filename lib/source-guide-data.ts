@@ -28,21 +28,41 @@ export const SOURCE_GUIDES: SourceGuide[] = [
   {
     id: 'version-5-2-0',
     category: '最新系統',
-    title: '5.2.0：洛基、伊蓮與主線 350 章更新判斷',
-    updated: '2026/09/11',
+    title: '5.2.0：洛基、伊狑與主線 350 章更新判斷',
+    updated: '2026/09/18',
     status: '現行',
-    summary: '台灣與美國官方蘋果商店目前皆已上架 5.2.0，新增 346–350 章、神火特工洛基與高階特工伊蓮；特工同調等級 100 與公會活動「潮霧港灣」仍是預告內容。兩名新特工的技能、覺醒與終局排名也尚未有可靠實測。',
-    actions: ['挑戰 346–350 章前先把遊戲更新到 5.2.0', '洛基與伊蓮的完整數值公開前，不先轉換主力或投入萬能碎片', '新主線先沿用已成形後期配置，卡關再依實際詞條調整'],
+    summary: '台灣與美國官方蘋果商店目前皆已上架 5.2.0，新增 346–350 章、神火特工洛基與高階特工伊狑；特工同調等級 100 與公會活動「潮汐祕境」仍是預告內容。官方確認洛基已上線，實戰配置則採用 9 月 17 日玩家測試，伊狑仍待可靠實測。',
+    actions: ['挑戰 346–350 章前先把遊戲更新到 5.2.0', '洛基先依哪吒覺醒與寶石存量判斷，不直接取代主位', '伊狑完整數值公開前，不先轉換主力或投入萬能碎片'],
     sourceUrl: 'https://apps.apple.com/us/app/survivor-io/id1528941310',
+  },
+  {
+    id: 'loki-linked-support',
+    category: '特工寵物',
+    title: '洛基實測：哪吒覺醒6後才值得補完整神火鏈',
+    updated: '2026/09/17',
+    status: '現行',
+    summary: '「別說筆記」彙整 5.2.0 上線後玩家實測：洛基偏向協同支援，單獨連攜時不能自行產生神火；哪吒覺醒6搭配洛基覺醒4，才可用神火與餘燼銜接持續覆蓋。本結論取代 9 月 15 日上線前推測。',
+    actions: ['哪吒未達覺醒6且寶石不足六萬：跳過本期', '已有哪吒覺醒6：洛基優先做到覺醒4，再評估覺醒6', '三百抽保底；社群估算免費票約一百至一百一十七張，常見缺口約五萬五至六萬寶石'],
+    sourceUrl: 'https://notalknote.xyz/survivorio-divine-fire-3-sp-loki-guide/',
+  },
+  {
+    id: 'pencil-kingdom-treasure',
+    category: '關卡活動',
+    title: '鉛筆王國秘寶：五千二百五十積分停損',
+    updated: '2026/09/17',
+    status: '現行',
+    summary: '「別說筆記」依 5.2.0 整理的社群攻略：任何頂部獎勵被推出後就立刻重置，把每次行動維持在一張票。所謂五百八十五張任務票包含開到六百個寶箱，不能算成完全免費。',
+    actions: ['下排放補給箱、配件與收藏品鑰匙；上排放史詩配件或傳奇收藏品碎片', '前四天先開二百至二百六十箱，最後一天依進度補到約三百至三百六十箱', '以五千二百五十積分的諧振晶片與傳奇收藏品自選箱為停損，不追六千六百與每日排名'],
+    sourceUrl: 'https://notalknote.xyz/survivorio-pencil-kingdom-treasure-guide/',
   },
   {
     id: 'water-park-rumble',
     category: '關卡活動',
     title: '水上樂園大亂鬥：三百三十水槍拿神器核心',
     updated: '2026/09/11',
-    status: '現行',
-    summary: '「別說筆記」依 5.2.0 整理的社群試算把三百三十累計水槍列為神器核心自選箱停損點。其三百一十八至三百二十二把是完成全部任務的總量，包含開寶箱任務，不能當成完全免費；隨機返還約三至五成也只是社群估算。',
-    actions: ['前四天先開二百至二百五十箱，最後一天依差額調整，常見總量約二百五十至三百五十箱', '累計消耗三百三十水槍拿到神器核心後停手', '不追六百三十檔；社群估算即使開六百箱仍可能缺二萬二至五萬寶石'],
+    status: '需版本核對',
+    summary: '本期已於 9 月 15 日結束。保留三百三十累計水槍與開箱成本，只供日後復刻時重新核對，不能直接當成現行活動。',
+    actions: ['復刻時先核對獎勵表與水槍返還率', '原期停損為累計消耗三百三十水槍', '不直接沿用原期的免費量與寶石缺口'],
     sourceUrl: 'https://notalknote.xyz/survivorio-water-park-brawl-guide/',
   },
   {
@@ -258,6 +278,21 @@ export const SOURCE_GUIDES: SourceGuide[] = [
 ];
 
 export const LATEST_SOURCE_FALLBACK = [
+  {
+    title: '神火特攻第三彈：洛基實測攻略',
+    date: '2026/09/17',
+    link: 'https://notalknote.xyz/survivorio-divine-fire-3-sp-loki-guide/',
+  },
+  {
+    title: '鉛筆王國秘寶攻略',
+    date: '2026/09/17',
+    link: 'https://notalknote.xyz/survivorio-pencil-kingdom-treasure-guide/',
+  },
+  {
+    title: '洛基特工完整攻略',
+    date: '2026/09/15',
+    link: 'https://notalknote.xyz/loki/',
+  },
   {
     title: '水上樂園大亂鬥攻略',
     date: '2026/09/11',
