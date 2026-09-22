@@ -36,7 +36,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {outline:2px solid 
 .st-key-main_nav {border-bottom:1px solid var(--line);margin-bottom:1.55rem;overflow-x:auto;scrollbar-width:thin;}
 .st-key-main_nav [role="radiogroup"] {display:flex;flex-wrap:nowrap;gap:.35rem;width:max-content;}
 .st-key-main_nav label[data-testid="stRadioOption"] {display:flex;flex:none;min-width:max-content;justify-content:center;margin:0;padding:.8rem 1rem .7rem;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;}
-.st-key-main_nav label[data-testid="stRadioOption"] > div > div > div:first-child {display:none;}
+.st-key-main_nav label[data-testid="stRadioOption"] > div > div:first-child {display:none;}
 .st-key-main_nav label p {font-size:.95rem;font-weight:650;color:var(--muted);white-space:nowrap;}
 .st-key-main_nav label:has(input:checked) {border-bottom-color:var(--accent);}
 .st-key-main_nav label:has(input:checked) p {color:var(--accent);}
