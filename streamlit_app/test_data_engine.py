@@ -14,6 +14,7 @@ def test_strip_html_and_classification() -> None:
     assert classify_article("音樂圓盤大作戰攻略") == "活動攻略"
     assert classify_article("水上樂園大亂鬥水槍攻略") == "活動攻略"
     assert classify_article("鉛筆王國秘寶攻略") == "活動攻略"
+    assert classify_article("金秋海岸釣魚攻略") == "活動攻略"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
@@ -47,9 +48,17 @@ def test_pencil_kingdom_uses_current_stop_line_and_cost_caveat() -> None:
     playbook = match_event_playbook("鉛筆王國秘寶攻略")
     assert playbook["name"] == "鉛筆王國秘寶"
     assert playbook["target"] == 5250
+    assert "已於 9 月 21 日結束" in playbook["verdict"]
     assert "六百個寶箱" in playbook["free_hint"]
     assert "六千六百" in playbook["avoid"]
     assert "每日排名" in playbook["avoid"]
+
+
+def test_autumn_coast_has_no_unverified_target() -> None:
+    playbook = match_event_playbook("金秋海岸狂歡")
+    assert playbook["target"] == 0
+    assert "免費魚餌總量" in playbook["free_hint"]
+    assert "截止時間以遊戲內倒數為準" in playbook["period"]
 
 
 def test_loki_playbook_uses_post_launch_player_testing() -> None:

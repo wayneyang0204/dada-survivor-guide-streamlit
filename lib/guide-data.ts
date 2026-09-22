@@ -35,7 +35,7 @@ export type Guide = {
 
 export const OFFICIAL_UPDATE = {
   version: '5.2.0',
-  checkedAt: '2026-09-18 09:05',
+  checkedAt: '2026-09-22 16:48',
   headline: '5.2.0 已在台灣與美國商店上架',
   summary:
     '台灣與美國官方蘋果商店目前皆顯示 5.2.0：新增 346–350 章、神火特工洛基與高階特工伊狑；安卓商店也已列出同版更新內容。',
@@ -44,6 +44,7 @@ export const OFFICIAL_UPDATE = {
     '官方確認神火特工洛基已上線；9 月 17 日玩家實測顯示他偏向協同支援，不建議當上場主位',
     '特工同調等級 100、公會活動「潮汐祕境」仍標示為即將推出',
     '新增「雲中塔」與「秋日海底探險」等活動',
+    '官方活動卡新增「金秋海岸狂歡」：任務取得魚餌、解鎖釣魚圖鑑，再以釣魚積分兌獎；停損門檻與期限以遊戲內為準',
   ],
   sources: [
     {
@@ -53,6 +54,10 @@ export const OFFICIAL_UPDATE = {
     {
       name: '台灣版本狀態｜官方蘋果商店',
       url: 'https://apps.apple.com/tw/app/survivor-io/id1528941310',
+    },
+    {
+      name: '金秋海岸狂歡｜官方活動卡',
+      url: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6806954050',
     },
     {
       name: '安卓商店｜官方',
