@@ -125,7 +125,12 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
     results = content.search_guides(guides, query, category)
     core = [guide for guide in results if not guide.get("reference_only")]
     references = [guide for guide in results if guide.get("reference_only")]
-    st.caption(f"{len(core)} 篇詳解 · {len(references)} 篇來源摘要")
+    heading = "搜尋結果" if query.strip() else "攻略速覽"
+    st.markdown(
+        f'<div class="guide-results-head"><h2>{heading}</h2>'
+        f'<span>{len(core)} 篇詳解 · {len(references)} 篇來源摘要</span></div>',
+        unsafe_allow_html=True,
+    )
     for guide in (core[:1] if query.strip() else core):
         guide_row(guide, prefix, query)
     if query.strip() and len(core) > 1:
@@ -143,9 +148,16 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
 
 def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
-    with st.container(key="guide_search"):
-        query = st.text_input("搜尋攻略", placeholder="例如：暗物質黃5、SS鞋套裝、金R3、黃收藏", max_chars=160, key="home_guide_search")
-    category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="home_topic")
+    with st.container(key="guide_search_panel"):
+        st.markdown('<div class="guide-hero-kicker">SURVIVOR.IO <span>／</span> 玩家攻略</div>'
+                    '<h1 class="guide-hero-title">找你現在需要的答案。</h1>'
+                    '<p class="guide-hero-deck">輸入角色、裝備、星級或問題，直接查看可用門檻。</p>',
+                    unsafe_allow_html=True)
+        search, topic = st.columns([2.25, 1], gap="medium")
+        with search:
+            query = st.text_input("搜尋攻略", placeholder="暗物質黃5、SS鞋套裝、金R3……", max_chars=160, key="home_guide_search")
+        with topic:
+            category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="home_topic")
     render_results(guides, query, category, "home_search" if query.strip() else "home")
 
 
@@ -186,14 +198,15 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         page_heading("找不到這篇攻略", "連結可能已變更，請返回攻略索引查找。")
         st.button("返回攻略索引", on_click=open_index, type="primary")
         return
-    back, link = st.columns([4, 1])
-    origin = st.session_state.get("article_origin", {})
-    back_label = "← 搜尋結果" if origin.get("query") else "← 攻略首頁" if origin.get("page") == "攻略首頁" else "← 攻略索引"
-    back.button(back_label, on_click=return_to_guides, args=(guide["category"],))
-    with link:
-        with st.popover("文章連結", width="stretch"):
-            st.caption("可收藏或複製此連結；連結不含個人帳號資料。")
-            st.code(PUBLIC_URL + "?guide=" + quote(guide["slug"], safe=""), language=None, wrap_lines=True)
+    with st.container(key="article_actions"):
+        back, link = st.columns([4, 1])
+        origin = st.session_state.get("article_origin", {})
+        back_label = "← 搜尋結果" if origin.get("query") else "← 攻略首頁" if origin.get("page") == "攻略首頁" else "← 攻略索引"
+        back.button(back_label, on_click=return_to_guides, args=(guide["category"],))
+        with link:
+            with st.popover("文章連結", width="stretch"):
+                st.caption("可收藏或複製此連結；連結不含個人帳號資料。")
+                st.code(PUBLIC_URL + "?guide=" + quote(guide["slug"], safe=""), language=None, wrap_lines=True)
     st.caption(f"攻略 / {guide['category']} / {guide['status']}")
     page_heading(guide["title"], "")
     date = f"來源更新：{guide['source_date']}" if guide["source_date"] else "本站試算方法"

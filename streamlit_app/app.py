@@ -540,7 +540,7 @@ st.markdown(
         <span class="brand-mark" aria-hidden="true">噠</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
-      <div class="masthead-edition">升級路線 / 活動試算 / 攻略索引</div>
+      <div class="masthead-edition">攻略速查 · 升級規劃 · 活動試算</div>
     </div>
     """,
     unsafe_allow_html=True,

@@ -47,8 +47,8 @@ def test_cloud_theme_matches_the_single_shared_stylesheet():
     a = boot()
     styles = [m.value for m in a.markdown if "<style>" in m.value]
     assert len(styles) == 1
-    assert "--accent:#2449d8" in styles[0]
-    assert "gradient(" not in styles[0]
+    assert "--accent:#14604f" in styles[0]
+    assert ".st-key-guide_search_panel" in styles[0]
 
 
 def test_text_can_scale_and_layouts_have_narrow_screen_fallbacks():
