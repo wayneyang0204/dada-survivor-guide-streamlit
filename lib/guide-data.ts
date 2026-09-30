@@ -35,7 +35,7 @@ export type Guide = {
 
 export const OFFICIAL_UPDATE = {
   version: '5.2.0',
-  checkedAt: '2026-09-29 13:45',
+  checkedAt: '2026-09-30 09:01',
   headline: '5.2.0 已在台灣與美國商店上架',
   summary:
     '台灣與美國官方蘋果商店目前皆顯示 5.2.0：新增 346–350 章、神火特工洛基與高階特工伊狑；安卓商店也已列出同版更新內容。',
@@ -44,8 +44,8 @@ export const OFFICIAL_UPDATE = {
     '官方確認神火特工洛基已上線；9 月 17 日玩家實測顯示他偏向協同支援，不建議當上場主位',
     '高階特工伊狑已有 9 月 26 日玩家實測：覺醒1開雙異獸，覺醒5可常駐雙形態增益；一般帳號不要因此重置現有主位',
     '特工同調等級 100、公會活動「潮汐祕境」仍標示為即將推出',
-    '新增「雲中塔」與「秋日海底探險」等活動',
-    '官方活動卡新增「金秋海岸狂歡」：任務取得魚餌、解鎖釣魚圖鑑，再以釣魚積分兌獎；停損門檻與期限以遊戲內為準',
+    '「雲中塔」活動已於 9 月 29 日開始、10 月 3 日結束；官方確認任務取得建築吊鉤，封頂可領取整座塔的窗戶獎勵',
+    '金秋海岸狂歡已於 9 月 29 日凌晨結束，原期資料只供復刻時重新核對',
   ],
   sources: [
     {
@@ -61,6 +61,10 @@ export const OFFICIAL_UPDATE = {
       url: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6806954050',
     },
     {
+      name: '雲中塔活動預告｜官方社群',
+      url: 'https://www.facebook.com/SurvivorHabbyTW/posts/pfbid0MZYbN8wxTDBqQC9nqXZXJXj8spCn65aAdoMLZiiCcHyc53BipMvdExCbg9YK6jX4l',
+    },
+    {
       name: '安卓商店｜官方',
       url: 'https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=en_US',
     },
@@ -68,6 +72,17 @@ export const OFFICIAL_UPDATE = {
 };
 
 export const GUIDES: Guide[] = [
+  {
+    id: 'cloud-tower-event',
+    category: '關卡',
+    title: '雲中塔：先看二千三百五十扇窗，再決定補不補吊鉤',
+    description: '官方確認活動到 10 月 3 日；社群任務表合計四百八十四個吊鉤，但含開箱任務，不能把鑰匙成本當成免費。',
+    level: '進階',
+    readTime: '6 分鐘',
+    updated: '9/30',
+    tags: ['雲中塔', '神器核心', '活動停損'],
+    takeaways: ['二千三百五十扇窗是神器核心自選箱的主要停損', '任務表共四百八十四個吊鉤，但窗戶產量隨機且開箱任務有成本', '每天做免費進度並看分組差距，最後一天只補能確定跨過的里程碑'],
+  },
   {
     id: 'drone-evolution',
     category: '技能',

@@ -15,6 +15,7 @@ def test_strip_html_and_classification() -> None:
     assert classify_article("水上樂園大亂鬥水槍攻略") == "活動攻略"
     assert classify_article("鉛筆王國秘寶攻略") == "活動攻略"
     assert classify_article("金秋海岸釣魚攻略") == "活動攻略"
+    assert classify_article("雲中塔建築吊鉤攻略") == "活動攻略"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
@@ -58,7 +59,18 @@ def test_autumn_coast_has_no_unverified_target() -> None:
     playbook = match_event_playbook("金秋海岸狂歡")
     assert playbook["target"] == 0
     assert "免費魚餌總量" in playbook["free_hint"]
-    assert "截止時間以遊戲內倒數為準" in playbook["period"]
+    assert "9/29 00:00" in playbook["period"]
+    assert "已於 9 月 29 日" in playbook["verdict"]
+
+
+def test_cloud_tower_uses_verified_target_and_cost_caveat() -> None:
+    playbook = match_event_playbook("雲中塔活動全攻略")
+    assert playbook["name"] == "雲中塔"
+    assert playbook["target"] == 2350
+    assert "四百八十四" in playbook["free_hint"]
+    assert "開寶箱任務" in playbook["free_hint"]
+    assert "10/3 23:59" in playbook["period"]
+    assert "神器核心" in playbook["verdict"]
 
 
 def test_loki_playbook_uses_post_launch_player_testing() -> None:
