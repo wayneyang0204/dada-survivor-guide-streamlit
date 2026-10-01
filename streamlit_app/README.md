@@ -57,6 +57,9 @@ application is not a Cloudflare Worker.
   effect milestones. The article can calculate the next listed skill effect,
   separately from generic stat thresholds. It requires an exact twinborn shape
   and keeps source verification distinct from permission/readiness to spend.
+- Cloud startup refreshes direction/tech leaf modules before importing UI
+  consumers; a warm-cache regression removes new symbols to reproduce old
+  cached helpers meeting a newly deployed interface.
 
 ## Planner flow
 

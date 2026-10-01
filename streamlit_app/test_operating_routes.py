@@ -106,3 +106,18 @@ def test_planner_shows_game_entry_without_marking_upgrade_done():
 @pytest.mark.parametrize("query", ["雙生雷電1600", "雷電1650", "相位輔助器"])
 def test_tech_effect_queries_find_the_specific_table_first(query):
     assert content.search_guides(content.GUIDES, query)[0]["slug"] == "twin-tech-milestones"
+
+
+def test_warm_cloud_cache_refreshes_leaf_helpers_before_new_consumers(monkeypatch):
+    import direction_tools
+    import tech_routes
+    # Model a prior helper version in the same long-lived Python process.
+    monkeypatch.delattr(direction_tools, "operating_steps")
+    monkeypatch.delattr(tech_routes, "next_tech_effect")
+    a = AppTest.from_file(APP)
+    a.query_params["guide"] = "twin-tech-milestones"
+    a.run(timeout=15)
+    assert not a.exception
+    assert callable(direction_tools.operating_steps)
+    assert callable(tech_routes.next_tech_effect)
+    assert any("雙生無人機／雷電諧振" in item.value for item in a.markdown)

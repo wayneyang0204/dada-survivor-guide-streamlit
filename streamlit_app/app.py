@@ -9,6 +9,16 @@ from zoneinfo import ZoneInfo
 
 import streamlit as st
 
+# Refresh leaf helpers before importing/reloading their consumers. Cloud updates
+# can leave the previous helpers cached while loading a new UI import surface.
+import direction_tools as _direction_tools
+import tech_routes as _tech_routes
+import direction_content as _direction_content
+
+_direction_tools = importlib.reload(_direction_tools)
+_tech_routes = importlib.reload(_tech_routes)
+_direction_content = importlib.reload(_direction_content)
+
 import data_engine as _data_engine
 import next_step as _next_step
 import decision_ui as _decision_ui
