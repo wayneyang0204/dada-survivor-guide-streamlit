@@ -117,7 +117,8 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     a = boot()
     a.radio[0].set_value("活動").run()
     assert not a.exception
-    assert next(e for e in a.expander if e.label == "查看這篇活動的30秒重點").proto.expanded
+    assert not next(e for e in a.expander if e.label == "查看這篇活動的30秒重點").proto.expanded
+    assert any('class="event-verdict"' in m.value for m in a.markdown)
     for label in ("01 / 活動目標", "02 / 免費進度", "03 / 寶石成本"):
         assert any(label in m.value for m in a.markdown)
     by_label(a.button, "一鍵判斷這次活動").click().run()

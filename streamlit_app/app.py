@@ -571,6 +571,7 @@ with st.container(key="main_nav"):
         horizontal=True,
         label_visibility="collapsed",
         key="主導覽",
+        format_func=lambda value: {"下一步": "升級路線", "我的帳號": "我的配置", "活動": "活動試算", "資料庫": "攻略索引"}.get(value, value),
         on_change=_guide_ui.clear_article,
     )
 
@@ -580,7 +581,7 @@ elif 主頁面 == "資料庫":
     if st.session_state.get("article_slug"):
         頁面 = "閱讀攻略"
     else:
-        _decision_ui.page_heading("攻略索引", "按系統或關鍵字查找；升級路線、機制門檻與來源分開標示。")
+        _decision_ui.page_heading("攻略索引", "本站詳解、收藏圖鑑與外部來源。")
         頁面 = st.selectbox("要查什麼", ["本站攻略", "完整攻略庫", "收藏圖鑑", "最新文章", "配裝參考"], key="資料分類")
     if 頁面 == "配裝參考":
         頁面 = "終局配裝"
@@ -629,8 +630,10 @@ elif 頁面 == "活動最佳解":
         }
     活動模型 = match_event_playbook(已選活動["title"])
 
-    st.info("文章日期不等於活動仍開放。請先核對遊戲內名稱、截止時間與獎勵表；下方可試算歷史活動。")
-    with st.expander("查看這篇活動的30秒重點", expanded=True):
+    st.caption("先核對遊戲內活動名稱與截止時間。文章日期不代表活動仍開放。")
+    活動結論 = str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
+    st.markdown(f'<div class="event-verdict"><strong>本活動先做什麼</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
+    with st.expander("查看這篇活動的30秒重點"):
         顯示活動重點(
             str(已選活動["title"]),
             str(已選活動["date"]),
@@ -651,6 +654,7 @@ elif 頁面 == "活動最佳解":
         st.markdown(f"**免費資源依據：** {活動模型['free_hint']}")
         st.markdown(f"**停損提醒：** {活動模型['avoid']}")
 
+    st.markdown('<div class="workflow-strip" aria-label="活動試算流程"><span class="active">1 選目標</span><span>2 填進度</span><span>3 看補鑽成本</span></div>', unsafe_allow_html=True)
     st.markdown("### 01 / 活動目標")
     a1, a2, a3 = st.columns(3)
     with a1:
@@ -694,18 +698,19 @@ elif 頁面 == "活動最佳解":
     with st.expander("這些數字怎麼填？"):
         st.write("免費進度包含剩餘登入、每日任務、廣告、免費票與預計開箱任務；付費進度只填需要用寶石補的部分。若遊戲顯示每次十連抽，請把進度與成本都換算成單次或都用十連，兩邊單位一致即可。")
 
+    試算輸入 = dict(
+        current_progress=目前進度, days_remaining=剩餘天數,
+        free_progress_per_day=每日免費進度, target_progress=目標進度,
+        progress_per_paid_action=每次付費進度, gems_per_paid_action=每次寶石成本,
+        gems_owned=現有寶石, spending_style=消費風格, target_reward=目標獎勵,
+    )
+    試算識別 = {"event": 已選活動["title"], "inputs": 試算輸入}
     if st.button("一鍵判斷這次活動", type="primary", width="stretch"):
-        判斷 = assess_event_plan(
-            current_progress=目前進度,
-            days_remaining=剩餘天數,
-            free_progress_per_day=每日免費進度,
-            target_progress=目標進度,
-            progress_per_paid_action=每次付費進度,
-            gems_per_paid_action=每次寶石成本,
-            gems_owned=現有寶石,
-            spending_style=消費風格,
-            target_reward=目標獎勵,
-        )
+        st.session_state["event_plan"] = {"identity": 試算識別, "result": assess_event_plan(**試算輸入)}
+    已存試算 = st.session_state.get("event_plan")
+    if 已存試算 and 已存試算["identity"] == 試算識別:
+        判斷 = 已存試算["result"]
+        st.markdown("### 試算結果")
         getattr(st, 判斷["tone"])(f"{判斷['verdict']}｜{判斷['reason']}")
         r1, r2, r3, r4 = st.columns(4)
         r1.metric("免費期末進度", f"{判斷['projected_free']:,}")
@@ -716,6 +721,8 @@ elif 頁面 == "活動最佳解":
         st.progress(免費達成率, text=f"免費進度可完成目標的 {免費達成率 * 100:.0f}%")
         st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
         st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
+    elif 已存試算:
+        st.caption("活動或輸入已變更，請重新按「一鍵判斷這次活動」。舊結果不再顯示。")
 
     st.markdown("### 兌換優先項")
     st.write(f"**{獎勵排序[0]['name']}**")
@@ -879,6 +886,4 @@ elif 頁面 == "最新文章":
             st.link_button("閱讀原始文章", item["網址"])
     st.link_button("查看完整文章分類", 來源分類網址)
 
-st.markdown('<div class="site-footer">噠噠攻略站 · 2026.09.17 · 攻略速查版<br>社群攻略整理，非官方網站；本站不會登入或操作你的遊戲。</div>', unsafe_allow_html=True)
-台北現在 = datetime.now(ZoneInfo("Asia/Taipei"))
-st.caption(f"頁面時間（不是資料查核日期）：{台北現在.strftime('%Y/%m/%d %H:%M')}（台北）｜攻略僅供遊戲決策參考，版本變動時以遊戲內公告與官方商店為準。")
+st.markdown('<div class="site-footer">噠噠攻略站 · 非官方玩家指南<br>資料查核日期見各篇攻略。版本變動以遊戲內公告為準；本站不登入或操作遊戲。</div>', unsafe_allow_html=True)

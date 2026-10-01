@@ -26,9 +26,14 @@ application is not a Cloudflare Worker.
   link starts a new session as usual; article links are not profile backups.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
-- Home is now a single searchable list with category filtering, not repeated
-  featured/quick/core sections. Search previews show matching table facts before
-  an article is opened. Historical source summaries are grouped separately.
+- Home offers three task entries (upgrade planning, event budgeting, collectible
+  lookup), then a collapsed directory by system. Search replaces the directory
+  with a matching answer and table facts; it does not mix browsing and results.
+  Historical source summaries remain separately grouped in search and the index.
+- Visible navigation uses task names (升級路線、我的配置、活動試算、攻略索引).
+  Internal page IDs remain stable for saved session state and article return paths.
+- Event results survive reruns within a session, but are hidden when the selected
+  event or any calculator input changes. Recalculation never shows a stale result.
 - The same search also looks up local collectible names, aliases and IDs. Those
   hits are explicitly catalog metadata, not fabricated star effects or advice.
 - Set-member lists, linkage comparisons and crit-overflow guidance include their

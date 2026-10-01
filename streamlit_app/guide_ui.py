@@ -150,15 +150,53 @@ def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
     with st.container(key="guide_search_panel"):
         st.markdown('<div class="guide-hero-kicker">SURVIVOR.IO <span>／</span> 玩家攻略</div>'
-                    '<h1 class="guide-hero-title">找你現在需要的答案。</h1>'
-                    '<p class="guide-hero-deck">輸入角色、裝備、星級或問題，直接查看可用門檻。</p>',
+                    '<h1 class="guide-hero-title">查攻略，決定下一步。</h1>'
+                    '<p class="guide-hero-deck">搜尋門檻與材料，或按你的目標開始。</p>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
             query = st.text_input("搜尋攻略", placeholder="暗物質黃5、SS鞋套裝、金R3……", max_chars=160, key="home_guide_search")
         with topic:
             category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="home_topic")
-    render_results(guides, query, category, "home_search" if query.strip() else "home")
+    if query.strip():
+        render_results(guides, query, category, "home_search")
+        return
+    if category == "全部":
+        with st.container(key="task_entries"):
+            upgrade, event, catalog = st.columns(3, gap="medium")
+            for column, title, detail, callback, kwargs in (
+                (upgrade, "先升什麼？", "填配置 → 看一個優先目標", open_tool, {}),
+                (event, "活動要補鑽嗎？", "填進度 → 算免費達標與成本", open_tool, {"activity": True}),
+                (catalog, "查收藏品", "名稱、品質、期數一次查", open_collectible_catalog, {}),
+            ):
+                with column:
+                    with st.container(key=f"task_entry_{title}"):
+                        st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
+                        st.caption(detail)
+    render_directory(guides, category, "home")
+
+
+def render_directory(guides: list[dict], category: str, prefix: str) -> None:
+    """Browse by system; detailed answers appear only after a deliberate choice."""
+    core = [g for g in guides if not g.get("reference_only")]
+    st.markdown('<div class="guide-results-head"><h2>攻略目錄</h2><span>選系統，再看門檻與詳解</span></div>', unsafe_allow_html=True)
+    categories = content.CATEGORIES if category == "全部" else (category,)
+    columns = st.columns(2, gap="large")
+    for index, topic in enumerate(categories):
+        entries = [g for g in core if g["category"] == topic]
+        references = [g for g in guides if g.get("reference_only") and g["category"] == topic]
+        with columns[index % 2]:
+            count = f"{len(entries)} 篇" if entries else f"{len(references)} 篇來源摘要"
+            with st.expander(f"{topic} · {count}", expanded=category != "全部"):
+                if not entries:
+                    st.caption("目前收錄外部來源摘要，尚無本站門檻詳解。")
+                    st.button(f"查{topic}來源 →", key=f"directory_sources_{prefix}_{topic}",
+                              on_click=open_index, args=(topic,), width="stretch")
+                for guide in entries:
+                    with st.container(key=f"directory_{prefix}_{guide['slug']}"):
+                        article_button(guide, prefix)
+                        st.caption(content.QUICK_ANSWERS.get(guide["slug"], (guide["summary"], ""))[0])
+    st.caption("本站詳解整理門檻與判斷；歷史文章、外部來源與配裝參考收在「攻略索引」。")
 
 
 def render_index(legacy: list[dict]) -> None:

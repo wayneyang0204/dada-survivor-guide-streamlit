@@ -202,6 +202,12 @@ def page_heading(title: str, description: str) -> None:
                 unsafe_allow_html=True)
 
 
+def workflow(active: int) -> None:
+    labels = ("1 建立配置", "2 看優先目標", "3 核對材料")
+    spans = "".join(f'<span class="{"active" if index == active else ""}">{label}</span>' for index, label in enumerate(labels))
+    st.markdown(f'<div class="workflow-strip" aria-label="升級規劃流程">{spans}</div>', unsafe_allow_html=True)
+
+
 def render_completion(p: dict, step: dict) -> None:
     if not step.get("update"):
         return
@@ -290,6 +296,7 @@ def render_home() -> None:
         page_heading("升級路線", "依目前配置，安排下一個有效門檻。")
     with backup:
         render_backup(p, first_visit=first_visit)
+    workflow(0 if first_visit else 1)
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
     if previous := st.session_state.get("completion_undo"):
@@ -302,7 +309,7 @@ def render_home() -> None:
     if first_visit:
         with st.container(key="onboarding"):
             st.markdown('<h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
-            st.write("從主位與模式開始。裝備、典藏館與收藏品可稍後補齊。")
+            st.caption("先填這三項。其他系統只在需要時補上，不必一次填完。")
             with st.form("quick_profile", border=False):
                 mode = st.selectbox("主要模式", engine.MODES)
                 hero_col, level_col = st.columns(2)
@@ -339,7 +346,7 @@ def render_home() -> None:
 
 def render_profile() -> None:
     p = profile()
-    page_heading("我的配置", "留白表示未知，0 表示確定沒有。儲存後會重排升級路線。")
+    page_heading("我的配置", "選一個系統更新，儲存後回到升級路線。留白＝未知；0＝沒有。")
     if p["estimated_balances"]:
         st.caption("部分庫存為推算值。核對遊戲現況後儲存，即以你確認的數值接續。")
     if notice := st.session_state.pop("profile_notice", None):
