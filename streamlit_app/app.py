@@ -15,6 +15,7 @@ import decision_ui as _decision_ui
 import ui_theme as _ui_theme
 import guide_content as _guide_content
 import guide_ui as _guide_ui
+from ui_art import GUIDE_BUDDY
 
 _next_step = importlib.reload(_next_step)
 _decision_ui = importlib.reload(_decision_ui)
@@ -552,10 +553,10 @@ if st.session_state.get("資料分類") == "終局配裝":
     st.session_state["資料分類"] = "配裝參考"
 
 st.markdown(
-    """
+    f"""
     <div class="masthead">
       <div class="masthead-brand">
-        <span class="brand-mark" aria-hidden="true">噠</span>
+        <span class="brand-mark" aria-hidden="true">{GUIDE_BUDDY}</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
       <div class="masthead-edition">攻略速查 · 升級規劃 · 活動試算</div>

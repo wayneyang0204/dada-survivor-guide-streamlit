@@ -1,7 +1,18 @@
 from streamlit.testing.v1 import AppTest
+import pytest
 
 import guide_content as content
 from test_decision_ui import APP, by_label
+
+
+@pytest.fixture
+def offline_sources(monkeypatch):
+    import urllib.request
+
+    def offline(*args, **kwargs):
+        raise OSError("Deterministic UI test; use local source fallback")
+
+    monkeypatch.setattr(urllib.request, "urlopen", offline)
 
 
 def test_yellow_collectible_question_finds_epic_answer_first():
@@ -38,7 +49,7 @@ def test_home_search_shows_answers_without_category_wall():
     assert app.button(key="home_epic-collectibles")
 
 
-def test_home_task_routes_and_collapsed_directory():
+def test_home_task_routes_and_collapsed_directory(offline_sources):
     app = AppTest.from_file(APP).run()
     directory = [e for e in app.expander if "篇" in e.label]
     assert directory and not any(e.proto.expanded for e in directory)
@@ -54,7 +65,7 @@ def test_home_task_routes_and_collapsed_directory():
     assert not app.exception
 
 
-def test_event_result_survives_rerun_but_never_uses_stale_inputs():
+def test_event_result_survives_rerun_but_never_uses_stale_inputs(offline_sources):
     app = AppTest.from_file(APP).run()
     app.radio[0].set_value("活動").run()
     by_label(app.button, "一鍵判斷這次活動").click().run()

@@ -26,6 +26,10 @@ application is not a Cloudflare Worker.
   link starts a new session as usual; article links are not profile backups.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
+- The cute visual layer uses a cream-white canvas, pastel task cards and rounded
+  controls. `ui_art.py` contains the decorative sprout guide-buddy SVG; it needs
+  no downloaded images, external fonts or new dependencies. Text and status
+  colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
   lookup), then a collapsed directory by system. Search replaces the directory
   with a matching answer and table facts; it does not mix browsing and results.

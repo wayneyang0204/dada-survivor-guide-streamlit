@@ -7,6 +7,7 @@ from urllib.parse import quote
 import streamlit as st
 
 import guide_content as content
+from ui_art import GUIDE_BUDDY
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 
@@ -149,9 +150,11 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
 def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
     with st.container(key="guide_search_panel"):
-        st.markdown('<div class="guide-hero-kicker">SURVIVOR.IO <span>／</span> 玩家攻略</div>'
-                    '<h1 class="guide-hero-title">查攻略，決定下一步。</h1>'
-                    '<p class="guide-hero-deck">搜尋門檻與材料，或按你的目標開始。</p>',
+        st.markdown('<div class="hero-intro"><div class="hero-copy">'
+                    '<div class="guide-hero-kicker">SURVIVOR.IO <span>／</span> 玩家攻略</div>'
+                    '<h1 class="guide-hero-title"><span class="hero-title-part">查攻略，</span><span class="hero-title-part">決定下一步。</span></h1>'
+                    '<p class="guide-hero-deck">門檻、材料，一次查清楚。</p></div>'
+                    f'<div class="hero-companion" aria-hidden="true">{GUIDE_BUDDY}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
