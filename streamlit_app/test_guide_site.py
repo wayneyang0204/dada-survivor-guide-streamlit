@@ -84,7 +84,10 @@ def test_every_core_article_has_a_working_direct_link_and_full_content(slug):
     assert "先看結論" in text and "常見問題" in text and "資料來源" in text
     assert "本文目錄" in text and "guide-part-1" in text
     assert a.warning
-    assert not a.number_input
+    if slug == "resonance-planning":
+        assert [item.value for item in a.number_input] == [None, None]
+    else:
+        assert not a.number_input
     assert not a.get("form")
 
 

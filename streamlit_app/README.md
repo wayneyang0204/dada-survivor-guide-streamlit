@@ -42,6 +42,14 @@ application is not a Cloudflare Worker.
   hits are explicitly catalog metadata, not fabricated star effects or advice.
 - Set-member lists, linkage comparisons and crit-overflow guidance include their
   source dates. Article tables remain expanded; explanatory prose and FAQs fold.
+- `direction_content.py` adds an upgrade roadmap, selector-box decision tree and
+  resonance planning guide. Editorial methods are not labelled as newly verified
+  meta rankings. The resonance references remain explicitly dated and do not
+  transfer ordinary-drone thresholds to twinborn or lightning parts.
+- `direction_tools.py` generates a concise next action from the current step's
+  material ledger, retaining every shortage and unknown condition. Its resonance
+  calculator takes a player-supplied in-game target; blanks stay unknown, no fixed
+  box/chip costs or damage gains are invented, and it never changes the profile.
 
 ## Planner flow
 

@@ -222,6 +222,10 @@ button[data-testid^="stBaseButton-primary"]:hover {background:var(--accent-deep)
 .scenario-answer {border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:.85rem 1rem;margin:.5rem 0 1rem;background:var(--paper);}
 .scenario-answer h3 {font-size:1.15rem;margin:0 0 .5rem;}
 .scenario-answer p {margin:.4rem 0;}
+.action-brief {border:1px solid #cddfd1;border-radius:18px;background:#f0f7f1;padding:1rem 1.2rem;margin:.4rem 0 1.2rem;}
+.action-brief h3 {font-size:.9375rem;color:var(--accent);margin:0 0 .4rem;}
+.action-brief p {font-size:1.06rem;line-height:1.65;margin:.35rem 0;}
+.action-brief span {display:block;font-size:.875rem;color:var(--muted);margin-top:.65rem;line-height:1.6;}
 .search-facts {padding:.75rem 1rem .75rem 2rem;margin:.6rem 0;background:var(--wash);border-radius:8px;}
 [data-testid="stMarkdownContainer"] .search-facts li {font-size:.9375rem;line-height:1.65;margin:.2rem 0;}
 .page-deck:empty {display:none;}

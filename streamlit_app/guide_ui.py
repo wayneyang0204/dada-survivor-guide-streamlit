@@ -10,6 +10,7 @@ import guide_content as content
 from ui_art import GUIDE_BUDDY
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
+from direction_tools import resonance_gap
 
 
 PUBLIC_URL = "https://dada-survivor-guide.streamlit.app/"
@@ -250,8 +251,8 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                 st.code(PUBLIC_URL + "?guide=" + quote(guide["slug"], safe=""), language=None, wrap_lines=True)
     st.caption(f"攻略 / {guide['category']} / {guide['status']}")
     page_heading(guide["title"], "")
-    date = f"來源更新：{guide['source_date']}" if guide["source_date"] else "本站試算方法"
-    checked = f" · 本站核對：{guide['checked']}" if guide["checked"] else " · 既有摘要，待重新核對" if guide.get("reference_only") else " · 非當期活動公告"
+    date = f"來源更新：{guide['source_date']}" if guide["source_date"] else "本站方法說明"
+    checked = f" · 本站核對：{guide['checked']}" if guide["checked"] else " · 既有摘要，待重新核對" if guide.get("reference_only") else " · 非官方規則／排行"
     st.caption("適用：" + guide["audience"])
     toc = "".join(f'<a href="#guide-part-{i}" target="_self">{i:02d} {html.escape(section["title"])}</a>' for i, section in enumerate(guide["sections"], 1))
     toc += '<a href="#guide-cautions" target="_self">適用限制</a>'
@@ -270,6 +271,15 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                 st.button("查完整收藏圖鑑", on_click=open_collectible_catalog, width="stretch")
             elif guide["slug"] == "event-budget":
                 st.button("開啟活動投入試算", on_click=open_tool, kwargs={"activity": True}, width="stretch", type="primary")
+            elif guide["slug"] in ("upgrade-roadmap", "red-choice-box"):
+                st.button("用我的配置找下一個門檻", on_click=open_tool, args=("自動排序",), width="stretch", type="primary")
+            elif guide["slug"] == "resonance-planning":
+                with st.popover("試算諧振差額", width="stretch"):
+                    st.caption("門檻請查遊戲的對應配件效果；不預設普通或雙生。這裡不會修改帳號配置。")
+                    current = st.number_input("目前諧振能量", min_value=0, max_value=1000000, value=None, key="resonance_current")
+                    target = st.number_input("遊戲顯示的目標能量", min_value=1, max_value=1000000, value=None, key="resonance_target")
+                    result = resonance_gap(current, target)
+                    st.info(result["message"])
             if guide.get("editorial_note"):
                 st.caption(guide["editorial_note"])
             for index, section in enumerate(guide["sections"], 1):
@@ -293,7 +303,7 @@ def render_article(slug: str, legacy: list[dict]) -> None:
             for label, url in guide["sources"]:
                 st.link_button(label + " ↗", url)
             if not guide["sources"]:
-                st.caption("本文為本站計算說明，不是對當期活動數值的查核。")
+                st.caption("本文為本站決策／計算方法；遊戲數值請依相關機制攻略與本次遊戲預覽核對。")
             else:
                 st.caption("由本站重新整理判斷條件；來源為社群攻略，非官方保證。版本有差異時，以遊戲內資料為準。")
         with rail:

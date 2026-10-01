@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import re
 import unicodedata
+from direction_content import DIRECTION_GUIDES, DIRECTION_ANSWERS
 
 
 CATEGORIES = ("特工養成", "裝備神鑄", "收藏典藏", "科技配件", "活動玩法", "寵物與關卡")
@@ -266,6 +267,10 @@ QUICK_ANSWERS.update({
     "link-passives": ("無人機裂傷看塔洛莎 R4；穩定暴率看楊大師 R1。", "金 R3 不是直接多一條連攜增傷；需看痛打觸發覆蓋。"),
     "crit-overflow": ("100%以上是否有用，取決於有沒有溢出轉換技能。", "沒有轉換就別只追暴率；SS手套按已解鎖超暴擊門檻。"),
 })
+
+
+GUIDES.extend(DIRECTION_GUIDES)
+QUICK_ANSWERS.update(DIRECTION_ANSWERS)
 
 
 def normalize(text: str) -> str:

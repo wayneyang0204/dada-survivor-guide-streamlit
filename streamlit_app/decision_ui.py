@@ -5,6 +5,7 @@ from datetime import datetime
 import html
 import streamlit as st
 import next_step as engine
+from direction_tools import execution_plan, related_guide
 
 
 
@@ -236,9 +237,14 @@ def render_decision(p: dict, step: dict) -> None:
             st.markdown(f'''<section aria-label="優先升級目標">
               <div class="decision-lead"><span class="section-index">01</span>{lead} / {esc('resource')}
               <span class="decision-state {state_class}">{esc('status')}</span></div>
-              <h2 class="decision-title">{esc('title')}</h2><p class="decision-intro">{esc('why')}</p>
+              <h2 class="decision-title">{esc('title')}</h2>
               <dl class="decision-facts"><div><dt>目標門檻</dt><dd>{esc('target')}</dd></div>
               <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
+            plan = execution_plan(step)
+            verify = f'<p>{html.escape(plan["verify"])}</p>' if plan["verify"] else ""
+            st.markdown(f'''<section class="action-brief" aria-label="現在要做什麼">
+                <h3>現在就做這一件</h3><p>{html.escape(plan['action'])}</p>{verify}
+                <span>{html.escape(plan['after'])}</span></section>''', unsafe_allow_html=True)
             if step.get("checks"):
                 indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
                 rows = "".join(f'<div class="decision-check {c["state"]}" role="listitem"><b>{indicators[c["state"]]} · {html.escape(c["label"])}</b><span>{html.escape(c["detail"])}</span></div>' for c in step["checks"])
@@ -255,13 +261,21 @@ def render_decision(p: dict, step: dict) -> None:
                 st.markdown(f'<aside aria-label="執行備忘"><h3 class="notes-heading">執行備忘</h3>{note_rows}</aside>', unsafe_allow_html=True)
                 render_completion(p, step)
                 st.button("補上這一步的資料", width="stretch", on_click=edit_resource, args=(step["resource"],))
+                st.button("看這一步的做法與取捨", width="stretch", on_click=read_direction_guide, args=(related_guide(step),))
                 st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
                 st.caption("規則排序，非實測傷害排名。未確認材料前，先不要投入。")
+
+
+def read_direction_guide(slug: str) -> None:
+    # Import at callback time: guide_ui shares page_heading from this module.
+    from guide_ui import open_guide
+    open_guide(slug)
 
 
 def render_reasoning(result: dict) -> None:
     with st.expander("排序依據與其他候選"):
         if result["primary"]:
+            st.write(result["primary"]["why"])
             st.write(engine.ranking_reason(result))
             st.caption("不同資源可分別安排；收藏之心不足，不會阻止你用覺醒核心升主位。只比較已填資料涵蓋的路線。")
             if result["primary"]["caution"]:
@@ -323,6 +337,7 @@ def render_home() -> None:
                     else:
                         save({"mode": mode, "survivor": hero, "awakening": level})
             st.markdown('<p class="setup-note">不需要遊戲帳號密碼。資料只保留於本次連線；離開前可從「備份與匯入」下載紀錄。</p>', unsafe_allow_html=True)
+            st.button("還不確定怎麼選？先看升級判斷流程", on_click=read_direction_guide, args=("upgrade-roadmap",), width="stretch", type="tertiary")
         return
     with st.container(key="route_toolbar"):
         left, context, edit = st.columns([2, 1.4, 1.2], vertical_alignment="bottom")
