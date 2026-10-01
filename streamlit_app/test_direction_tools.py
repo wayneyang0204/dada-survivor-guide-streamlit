@@ -58,7 +58,7 @@ def test_resonance_gap_does_not_assume_a_fixed_next_threshold(current, target, s
     ("下一步先升什麼", "upgrade-roadmap"),
     ("紅色自選箱要選什麼", "red-choice-box"),
     ("諧振要升多少", "resonance-planning"),
-    ("無人機3000", "resonance-planning"),
+    ("無人機3000", "twin-tech-milestones"),
 ])
 def test_new_decision_questions_have_a_relevant_first_result(query, slug):
     assert content.search_guides(content.GUIDES, query)[0]["slug"] == slug

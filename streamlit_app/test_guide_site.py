@@ -86,6 +86,8 @@ def test_every_core_article_has_a_working_direct_link_and_full_content(slug):
     assert a.warning
     if slug == "resonance-planning":
         assert [item.value for item in a.number_input] == [None, None]
+    elif slug == "twin-tech-milestones":
+        assert [item.value for item in a.number_input] == [None]
     else:
         assert not a.number_input
     assert not a.get("form")

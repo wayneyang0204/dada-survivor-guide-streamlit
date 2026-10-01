@@ -226,6 +226,9 @@ button[data-testid^="stBaseButton-primary"]:hover {background:var(--accent-deep)
 .action-brief h3 {font-size:.9375rem;color:var(--accent);margin:0 0 .4rem;}
 .action-brief p {font-size:1.06rem;line-height:1.65;margin:.35rem 0;}
 .action-brief span {display:block;font-size:.875rem;color:var(--muted);margin-top:.65rem;line-height:1.6;}
+.operation-entry {font-size:.9375rem;font-weight:650;border-top:1px solid #cddfd1;padding-top:.7rem;margin-top:.8rem;}
+.operation-steps {margin:.6rem 0 0;padding-left:1.35rem;}
+[data-testid="stMarkdownContainer"] .operation-steps li {font-size:.9375rem;line-height:1.7;padding:.2rem 0;}
 .search-facts {padding:.75rem 1rem .75rem 2rem;margin:.6rem 0;background:var(--wash);border-radius:8px;}
 [data-testid="stMarkdownContainer"] .search-facts li {font-size:.9375rem;line-height:1.65;margin:.2rem 0;}
 .page-deck:empty {display:none;}

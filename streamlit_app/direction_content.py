@@ -113,7 +113,7 @@ DIRECTION_GUIDES = [
         "caution": "沒有當前形態的完整效果、配件庫存與戰鬥占比，不能計算每箱DPS收益或宣稱固定『無人機→雷電』最優順序。此工具只算能量差額，不代表晶片需求或傷害增幅。",
         "faq": [("3000就是畢業嗎？", "不是通用上限。先看已解鎖效果，再看更高檔的完整成本與收益；到了既定門檻可先停下，不代表已全滿。"),
                 ("能量差50，就一定只差一個配件嗎？", "不能直接換算。支援品質、主配件倍數和晶片都會影響能量，必須看本次替換預覽。")],
-        "related": ["twin-drone", "red-choice-box", "collectible-breakpoints"],
+        "related": ["twin-tech-milestones", "twin-drone", "red-choice-box", "collectible-breakpoints"],
         "keywords": "諧振 共振 振協 能量 晶片 支援配件 無人機3000 雷電1600 下一個效果 門檻 缺額",
     },
 ]

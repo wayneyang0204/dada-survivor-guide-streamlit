@@ -5,6 +5,7 @@ import hashlib
 import re
 import unicodedata
 from direction_content import DIRECTION_GUIDES, DIRECTION_ANSWERS
+from tech_routes import TECH_GUIDE
 
 
 CATEGORIES = ("特工養成", "裝備神鑄", "收藏典藏", "科技配件", "活動玩法", "寵物與關卡")
@@ -270,7 +271,26 @@ QUICK_ANSWERS.update({
 
 
 GUIDES.extend(DIRECTION_GUIDES)
+GUIDES.append(TECH_GUIDE)
 QUICK_ANSWERS.update(DIRECTION_ANSWERS)
+QUICK_ANSWERS["twin-tech-milestones"] = ("雙生雷電1600→1650：差50能量，該檔列技能傷害＋30%。", "先確認雷電態與遊戲效果；不要為補50而拆掉無人機3000的現役門檻。")
+
+# Targeted read-back additions; older article-wide check dates are not relabelled.
+next(g for g in GUIDES if g["slug"] == "collection-hall")["sections"].append({
+    "title": "缺收藏之心：實際去哪裡補", "columns": ["缺什麼", "可以做", "不能混用"],
+    "rows": [
+        ["普通收藏之心", "查看試煉之路排名戰目前獎勵；來源另列滿等收藏的多餘碎片可分解", "先確認滿等與多餘，不分解尚需升星的碎片"],
+        ["高級收藏之心", "在本期遊戲獎勵／兌換清單找完整名稱；未提供就保留資源等待", "普通收藏之心不能直接算成高級庫存"],
+    ],
+    "body": "本節於2026-10-02讀取典藏館來源補入；未確認固定每週產量或高級之心通用兌換比例。只為一個可亮起的目標格補差額。"})
+next(g for g in GUIDES if g["slug"] == "survivor-awakening")["sections"].append({
+    "title": "缺材料：選獎勵時照這張表", "columns": ["缺口", "實際做", "不要選錯"],
+    "rows": [
+        ["覺醒核心", "本期活動若提供核心，先算免費可達進度，再選與缺額相符的里程碑／兌換", "覺醒核心不是神器核心；不為未確認的本期規則直接補鑽"],
+        ["主位S特工碎片", "打開獎勵自選清單，確認可選主位角色或可用S碎片", "普通特工碎片取得途徑不能當作S特工碎片保證來源"],
+        ["量子碎片", "查看本次升級預覽與分解頁返還，先保留主位及現役連攜仍需的碎片", "未核對就分解，可能補了量子卻造成角色碎片新缺口"],
+    ],
+    "body": "2026-10-02重新讀取覺醒材料頁：來源載量子可由特工碎片分解，但本文不沿用歷史活動固定300次等兌換數，也不承諾本期有指定S角色。"})
 
 
 def normalize(text: str) -> str:

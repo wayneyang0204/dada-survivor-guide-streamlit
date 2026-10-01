@@ -50,6 +50,13 @@ application is not a Cloudflare Worker.
   material ledger, retaining every shortage and unknown condition. Its resonance
   calculator takes a player-supplied in-game target; blanks stay unknown, no fixed
   box/chip costs or damage gains are invented, and it never changes the profile.
+- Every supported planner route now has a game entry and three conditional
+  operating steps, including exact missing set members. These instructions do
+  not bypass readiness checks or cause game actions.
+- `tech_routes.py` contains selected, source-dated twinborn drone/lightning
+  effect milestones. The article can calculate the next listed skill effect,
+  separately from generic stat thresholds. It requires an exact twinborn shape
+  and keeps source verification distinct from permission/readiness to spend.
 
 ## Planner flow
 

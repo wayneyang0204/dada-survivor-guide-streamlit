@@ -5,7 +5,7 @@ from datetime import datetime
 import html
 import streamlit as st
 import next_step as engine
-from direction_tools import execution_plan, related_guide
+from direction_tools import execution_plan, related_guide, operating_steps
 
 
 
@@ -242,9 +242,12 @@ def render_decision(p: dict, step: dict) -> None:
               <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
             plan = execution_plan(step)
             verify = f'<p>{html.escape(plan["verify"])}</p>' if plan["verify"] else ""
+            operation = operating_steps(step)
+            instructions = "".join(f"<li>{html.escape(item)}</li>" for item in operation["steps"])
             st.markdown(f'''<section class="action-brief" aria-label="現在要做什麼">
                 <h3>現在就做這一件</h3><p>{html.escape(plan['action'])}</p>{verify}
-                <span>{html.escape(plan['after'])}</span></section>''', unsafe_allow_html=True)
+                <div class="operation-entry">去哪裡：{html.escape(operation['entry'])}</div>
+                <ol class="operation-steps">{instructions}</ol></section>''', unsafe_allow_html=True)
             if step.get("checks"):
                 indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
                 rows = "".join(f'<div class="decision-check {c["state"]}" role="listitem"><b>{indicators[c["state"]]} · {html.escape(c["label"])}</b><span>{html.escape(c["detail"])}</span></div>' for c in step["checks"])

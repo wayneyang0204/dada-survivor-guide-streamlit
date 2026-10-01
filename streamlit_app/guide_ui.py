@@ -11,6 +11,7 @@ from ui_art import GUIDE_BUDDY
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
+from tech_routes import TECH_ROUTES, next_tech_effect
 
 
 PUBLIC_URL = "https://dada-survivor-guide.streamlit.app/"
@@ -280,6 +281,24 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                     target = st.number_input("遊戲顯示的目標能量", min_value=1, max_value=1000000, value=None, key="resonance_target")
                     result = resonance_gap(current, target)
                     st.info(result["message"])
+                st.button("查雙生無人機／雷電的實際效果", on_click=open_guide, args=("twin-tech-milestones",), width="stretch")
+            elif guide["slug"] == "twin-tech-milestones":
+                with st.popover("找我的下一個諧振效果", width="stretch"):
+                    st.caption("只選已持有且正在使用的紅品質以上雙生形態；不套用普通配件，也不改動帳號紀錄。")
+                    part = st.selectbox("目前使用的雙生形態", tuple(TECH_ROUTES), index=None, placeholder="選實際形態", key="tech_route_part")
+                    energy = st.number_input("這件目前的諧振能量", min_value=0, max_value=1000000, value=None, key="tech_route_energy")
+                    unverified = next_tech_effect(part, energy)
+                    confirmed = st.checkbox("我已對照遊戲，下一檔效果與來源表一致",
+                                            key=f"tech_route_verified_{part}_{unverified.get('target')}",
+                                            disabled=not bool(unverified.get("target")))
+                result = next_tech_effect(part, energy, confirmed)
+                if result.get("target"):
+                    st.info(result["message"])
+                    st.markdown(f'''<section class="scenario-answer" aria-label="諧振操作目標">
+                        <h3>{html.escape(result['effect'])}</h3><p>{html.escape(result['action'])}</p>
+                        <p>{html.escape(result['stop'])}</p></section>''', unsafe_allow_html=True)
+                else:
+                    st.caption(result["message"])
             if guide.get("editorial_note"):
                 st.caption(guide["editorial_note"])
             for index, section in enumerate(guide["sections"], 1):
