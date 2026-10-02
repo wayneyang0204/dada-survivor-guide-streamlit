@@ -186,10 +186,7 @@ button[data-testid^="stBaseButton-primary"]:hover {background:var(--accent-deep)
 .event-verdict {border-left:3px solid var(--accent);background:var(--wash);padding:.9rem 1.1rem;border-radius:0 10px 10px 0;}
 .event-verdict strong {color:var(--accent);font-size:.875rem;}
 .event-verdict p {margin:.35rem 0 0!important;}
-.guide-hero-kicker {color:var(--accent);font-size:.875rem;font-weight:800;letter-spacing:.16em;}
-.guide-hero-kicker span {color:#b98b47;padding:0 .25rem;}
 .guide-hero-title {font-size:clamp(1.6rem,2.5vw,2.4rem)!important;line-height:1.35;letter-spacing:-.04em;font-weight:800;padding:0!important;margin:.45rem 0 .3rem!important;}
-.guide-hero-title .hero-title-part {display:inline-block;white-space:nowrap;}
 [data-testid="stMarkdownContainer"] .guide-hero-deck {font-size:.95rem;line-height:1.6;color:var(--muted);margin:0 0 .45rem;}
 .st-key-guide_search_panel [data-testid="stWidgetLabel"] p {font-size:.875rem;letter-spacing:.04em;}
 .st-key-guide_search_panel [data-baseweb="input"],
@@ -242,8 +239,6 @@ button[data-testid^="stBaseButton-primary"]:hover {background:var(--accent-deep)
   .st-key-guide_search_panel {padding:1.2rem 1rem 1rem;border-radius:22px;margin-bottom:1.2rem;}
   .hero-intro {gap:.6rem;align-items:flex-start;}
   .hero-companion {flex-basis:64px;padding:.1rem;}
-  .hero-copy .guide-hero-kicker {letter-spacing:.04em;}
-  .hero-copy .hero-title-part {display:block;}
   .st-key-guide_search_panel [data-testid="stHorizontalBlock"] {flex-direction:column;gap:.4rem;}
   .st-key-guide_search_panel [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {width:100%!important;flex:1 1 100%;min-width:0;}
   .guide-hero-title {font-size:1.65rem!important;}
@@ -324,14 +319,11 @@ _FIELD_GUIDE = """
 .st-key-guide_search_panel {position:relative;background:var(--paper);border:1px solid #e8e4d9;border-radius:28px;padding:1.6rem 1.8rem 1.35rem;box-shadow:0 6px 20px var(--shadow);overflow:hidden;}
 .st-key-guide_search_panel::before {content:"";position:absolute;left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,#e7c17b 0% 45%,#c5d8e6 45% 73%,#e8cebb 73%);}
 .hero-intro {gap:1rem;margin-bottom:.85rem;}
-.guide-hero-kicker {font-size:.875rem;font-weight:650;letter-spacing:.04em;color:var(--muted);}
 .guide-hero-title {font-size:clamp(1.8rem,3.1vw,2.7rem)!important;line-height:1.5;margin:.45rem 0!important;}
-.hero-emphasis {color:var(--accent);background:linear-gradient(transparent 66%,#f5e3bb 66% 90%,transparent 90%);}
 .hero-library-note {font-size:.875rem;color:var(--muted);margin-top:.9rem;line-height:1.6;font-variant-numeric:tabular-nums;}
 .hero-library-note span {padding:0 .6rem;color:#a5ab98;}
 .hero-companion {position:relative;flex:0 0 220px;background:#eff5f8;border:0;border-radius:46% 45% 40% 44%;padding:.35rem .1rem;transform:none;}
 .hero-companion svg {width:100%;height:auto;}
-.buddy-note {position:absolute;right:.1rem;top:-.3rem;padding:.4rem .65rem;background:#fff;border:1px solid #eaded0;border-radius:12px 12px 3px 12px;font-size:.875rem;color:var(--muted);transform:rotate(4deg);white-space:nowrap;}
 .st-key-guide_search_panel [data-baseweb="input"] {border:1px solid #c5d3c7!important;box-shadow:none;background:#fff!important;}
 .st-key-guide_search_panel input {background:#fff!important;}
 [data-testid="stTextInputRootElement"], [data-testid="stTextAreaRootElement"] {border:1px solid var(--field);border-radius:12px;background:var(--paper);min-height:3rem;}
@@ -430,9 +422,7 @@ button[data-testid^="stBaseButton-primary"]:active {box-shadow:none;}
   .st-key-guide_search_panel {padding:1.3rem 1rem 1rem;border-radius:23px;margin-bottom:.6rem;}
   .hero-intro {gap:.1rem;margin-bottom:.4rem;align-items:center;}
   .hero-companion {flex-basis:110px;padding:0;}
-  .buddy-note {display:none;}
   .guide-hero-title {font-size:1.8rem!important;line-height:1.45;}
-  .guide-hero-kicker {font-size:.875rem;letter-spacing:0;}
   .hero-library-note {font-size:.875rem;margin-top:.5rem;}
   .hero-library-note span {padding:0 .2rem;}
   .st-key-task_entries [data-testid="stHorizontalBlock"] {flex-direction:column;gap:.6rem;}
@@ -462,7 +452,7 @@ button[data-testid^="stBaseButton-primary"]:active {box-shadow:none;}
 @media(max-width:380px) {
   .block-container {padding-left:.75rem;padding-right:.75rem;}
   .st-key-main_nav [role="radiogroup"] {grid-template-columns:repeat(3,minmax(0,1fr));gap:.2rem;}
-  .hero-companion {flex-basis:78px;}.guide-hero-title {font-size:1.65rem!important;}
+  .hero-companion {flex-basis:64px;}.guide-hero-title {font-size:1.5rem!important;}
   .topic-count {white-space:normal;max-width:4rem;}
 }
 @media(prefers-reduced-motion:reduce) {* {transition:none!important;animation:none!important;}}

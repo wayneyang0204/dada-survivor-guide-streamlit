@@ -137,7 +137,7 @@ def test_account_diagnosis_returns_mode_specific_plan() -> None:
         divine_stage="只有哪吒",
     )
     assert result["phase"] == "現在先存，不要轉"
-    assert result["build"] == "長戰疊層傷害極限"
+    assert result["build"] == "長場疊層配裝範例"
     assert result["next_breakpoint"] == "混沌18"
     assert len(result["priorities"]) == 3
 
@@ -147,7 +147,7 @@ def test_account_diagnosis_returns_mode_specific_plan() -> None:
         play_mode="區域行動",
         divine_stage="哪吒R4＋伏爾坎R4支援鏈",
     )
-    assert zone["build"] == "新版區域行動路線最優解"
+    assert zone["build"] == "新版區域行動參考路線"
     assert "不帶入局外裝備" in zone["mode_instruction"]
 
 

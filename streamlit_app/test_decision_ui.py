@@ -100,7 +100,7 @@ def test_remaining_pages_work_when_sources_are_offline(monkeypatch):
     a = boot()
     a.radio[0].set_value("活動").run()
     assert not a.exception
-    by_label(a.button, "一鍵判斷這次活動").click().run()
+    by_label(a.button, "計算補鑽成本").click().run()
     assert not a.exception
     a.radio[0].set_value("資料庫").run()
     assert not a.exception

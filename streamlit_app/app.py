@@ -142,7 +142,7 @@ rank_rewards = _data_engine.rank_rewards
         "標題": "音樂圓盤大作戰：九百八十進度停損線",
         "日期": "2026/08/30",
         "狀態": "歷史活動｜已於9/3結束",
-        "摘要": "活動到 9 月 3 日結束。社群實測約可取得九百張免費麥克風，盤面返還會放大實際進度；先跑免費資源，九百八十進度是目前最平衡的停損點。",
+        "摘要": "本期已於 9 月 3 日結束。來源記錄約九百張免費麥克風，盤面返還可增加累計進度，建議目標為九百八十；票數與獎勵需在復刻時重新核對。",
         "行動": ["先完成登入、每日任務與免費麥克風", "寶箱先開二百至三百箱，最後一天再補差額", "商店先換傳奇收藏品自選箱、萬能神火特工碎片與高級收藏之心"],
         "來源": "https://notalknote.xyz/survivor-io-music-disc-clash-guide/",
     },
@@ -321,7 +321,7 @@ rank_rewards = _data_engine.rank_rewards
 
 終局配置 = [
     {
-        "名稱": "短時首領爆發天花板",
+        "名稱": "短時首領配裝範例",
         "適用": "末世反響／公會遠征／短場首領",
         "角色": "維納托覺醒7～8主位｜塔洛莎覺醒4協同保留裂傷觸發｜梅塔莉亞／楊大師覺醒1協同｜哪吒／伏爾坎支援以 R4 有效門檻核對",
         "寵物": "幽冥之魂覺醒5｜共鳴增益＋共鳴傷害",
@@ -333,7 +333,7 @@ rank_rewards = _data_engine.rank_rewards
         "評分": {"清怪": 84, "首領": 100, "生存": 82},
     },
     {
-        "名稱": "長戰疊層傷害極限",
+        "名稱": "長場疊層配裝範例",
         "適用": "長線首領／完整疊層場景",
         "角色": "維納托覺醒7～8主位｜塔洛莎覺醒4＋梅塔莉亞／楊大師覺醒1協同",
         "寵物": "幽冥之魂覺醒5｜保護＋共鳴增益＋共鳴傷害",
@@ -345,7 +345,7 @@ rank_rewards = _data_engine.rank_rewards
         "評分": {"清怪": 88, "首領": 99, "生存": 90},
     },
     {
-        "名稱": "新版區域行動路線最優解",
+        "名稱": "新版區域行動參考路線",
         "適用": "2026/08/27 新版四區域／區域首領",
         "角色標籤": "帶入規則",
         "角色": "局外角色、裝備與寵物不帶入；新版勝負取決於手操、局內技能與路線 Buff。",
@@ -522,7 +522,7 @@ def 取得活動重點區塊(活動模型: dict) -> list[dict]:
     ]
 
 
-def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str = "30 秒攻略") -> None:
+def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str = "活動重點") -> None:
     重點區塊 = ""
     for index, section in enumerate(取得活動重點區塊(活動模型), 1):
         條目 = "".join(
@@ -580,7 +580,7 @@ st.markdown(
         <span class="brand-mark" aria-hidden="true">{GUIDE_BUDDY}</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
-      <div class="masthead-edition"><span class="edition-label">PLAYER HANDBOOK</span><span>門檻 · 材料 · 升級路線</span></div>
+      <div class="masthead-edition"><span class="edition-label">非官方攻略</span><span>資料日期見各篇文章</span></div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -621,7 +621,7 @@ elif 頁面 == "下一步":
 elif 頁面 == "我的帳號":
     _decision_ui.render_profile()
 elif 頁面 == "活動最佳解":
-    _decision_ui.page_heading("活動試算", "免費進度、里程碑與補鑽成本，一起核對。")
+    _decision_ui.page_heading("活動試算", "計算免費期末進度、目標缺口與補鑽成本。")
     全部文章, 文章即時 = 取得完整文章庫()
     活動備援文章 = [
         {
@@ -651,7 +651,7 @@ elif 頁面 == "活動最佳解":
             0,
         )
         活動選項 = [f"{item['date']}｜{item['title']}" for item in 活動文章[:40]]
-        活動標籤 = st.selectbox("自動偵測到的近期／歷史活動", 活動選項, index=min(預設活動索引, len(活動選項) - 1))
+        活動標籤 = st.selectbox("來源文章中的近期／歷史活動", 活動選項, index=min(預設活動索引, len(活動選項) - 1))
         已選活動 = 活動文章[活動選項.index(活動標籤)]
     else:
         已選活動 = {
@@ -665,8 +665,8 @@ elif 頁面 == "活動最佳解":
 
     st.caption("先核對遊戲內活動名稱與截止時間。文章日期不代表活動仍開放。")
     活動結論 = str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
-    st.markdown(f'<div class="event-verdict"><strong>本活動先做什麼</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
-    with st.expander("查看這篇活動的30秒重點"):
+    st.markdown(f'<div class="event-verdict"><strong>活動投入建議</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
+    with st.expander("活動規則與獎勵重點"):
         顯示活動重點(
             str(已選活動["title"]),
             str(已選活動["date"]),
@@ -738,7 +738,7 @@ elif 頁面 == "活動最佳解":
         gems_owned=現有寶石, spending_style=消費風格, target_reward=目標獎勵,
     )
     試算識別 = {"event": 已選活動["title"], "inputs": 試算輸入}
-    if st.button("一鍵判斷這次活動", type="primary", width="stretch"):
+    if st.button("計算補鑽成本", type="primary", width="stretch"):
         st.session_state["event_plan"] = {"identity": 試算識別, "result": assess_event_plan(**試算輸入)}
     已存試算 = st.session_state.get("event_plan")
     if 已存試算 and 已存試算["identity"] == 試算識別:
@@ -752,10 +752,10 @@ elif 頁面 == "活動最佳解":
         r4.metric("每天至少要拿", f"{判斷['daily_needed']:,}")
         免費達成率 = min(1.0, 判斷["projected_free"] / max(目標進度, 1))
         st.progress(免費達成率, text=f"免費進度可完成目標的 {免費達成率 * 100:.0f}%")
-        st.write(f"建議保留寶石安全線：**{判斷['reserve']:,}**；目前可安全動用：**{判斷['spendable']:,}**；此獎勵對你帳號的估算補鑽上限：**{判斷['value_cap']:,}**。")
+        st.write(f"預留寶石：**{判斷['reserve']:,}**；扣除預留後可用：**{判斷['spendable']:,}**；獎勵估算補鑽上限：**{判斷['value_cap']:,}**。")
         st.caption("價值上限是用帳號缺口與長期稀缺度估算的決策門檻，不是官方定價；活動結束時間與實際機率仍以遊戲內公告為準。")
     elif 已存試算:
-        st.caption("活動或輸入已變更，請重新按「一鍵判斷這次活動」。舊結果不再顯示。")
+        st.caption("活動或輸入已變更，請重新按「計算補鑽成本」。")
 
     st.markdown("### 兌換優先項")
     st.write(f"**{獎勵排序[0]['name']}**")
@@ -771,7 +771,7 @@ elif 頁面 == "活動最佳解":
 
 elif 頁面 == "終局配裝":
     st.subheader("配裝參考")
-    st.warning("以下為舊版整理的配裝範例，不是你的升級順位；名稱、神鑄與版本可能需重新核對。個人下一步請回首頁，高階六件配置請用情境計算器比較。")
+    st.warning("以下為舊版配裝範例，並非個人升級順位。請核對名稱、神鑄與版本；個人目標見「升級路線」，高階六件配置可使用下方計算器比較。")
     st.link_button("開啟完整傷害配置比較", "https://sio-tools.exp0.dev/")
     選擇配置名稱 = st.selectbox("展開完整配置", [build["名稱"] for build in 終局配置])
     選擇配置 = next(build for build in 終局配置 if build["名稱"] == 選擇配置名稱)
@@ -820,7 +820,7 @@ elif 頁面 == "完整攻略庫":
         for item in 當頁精選:
             顯示攻略卡片(item)
         if not 結果:
-            st.info("沒有符合的精選主題，請改到『全部來源文章』搜尋。")
+            st.info("沒有符合的主題。請切換到「來源文章」搜尋。")
 
     with 全部頁:
         全部文章, 即時 = 取得完整文章庫()

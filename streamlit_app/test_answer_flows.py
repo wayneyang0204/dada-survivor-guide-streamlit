@@ -54,14 +54,14 @@ def test_home_task_routes_and_collapsed_directory(offline_sources):
     directory = [e for e in app.expander if e.label.startswith("瀏覽")]
     assert len(directory) == len(content.CATEGORIES)
     assert not any(e.proto.expanded for e in directory)
-    by_label(app.button, "先升什麼？ →").click().run()
+    by_label(app.button, "查升級順序 →").click().run()
     assert app.radio[0].value == "下一步"
     assert by_label(app.button, "建立我的升級路線")
     app.radio[0].set_value("攻略首頁").run()
-    by_label(app.button, "查收藏品 →").click().run()
+    by_label(app.button, "收藏品圖鑑 →").click().run()
     assert by_label(app.selectbox, "要查什麼").value == "收藏圖鑑"
     app.radio[0].set_value("攻略首頁").run()
-    by_label(app.button, "活動要補鑽嗎？ →").click().run()
+    by_label(app.button, "計算活動成本 →").click().run()
     assert app.radio[0].value == "活動"
     assert not app.exception
 
@@ -69,7 +69,7 @@ def test_home_task_routes_and_collapsed_directory(offline_sources):
 def test_event_result_survives_rerun_but_never_uses_stale_inputs(offline_sources):
     app = AppTest.from_file(APP).run()
     app.radio[0].set_value("活動").run()
-    by_label(app.button, "一鍵判斷這次活動").click().run()
+    by_label(app.button, "計算補鑽成本").click().run()
     assert len(app.metric) == 4
     original = app.session_state["event_plan"]["result"].copy()
     app.run()
@@ -78,7 +78,7 @@ def test_event_result_survives_rerun_but_never_uses_stale_inputs(offline_sources
     progress = by_label(app.number_input, "目前活動進度")
     progress.set_value(progress.value + 1).run()
     assert len(app.metric) == 0
-    by_label(app.button, "一鍵判斷這次活動").click().run()
+    by_label(app.button, "計算補鑽成本").click().run()
     assert len(app.metric) == 4
     assert not app.exception
 

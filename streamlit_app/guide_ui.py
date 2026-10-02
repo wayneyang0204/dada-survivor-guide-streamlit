@@ -146,7 +146,7 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
             for guide in references:
                 guide_row(guide, prefix)
     if not results and not catalog_count:
-        st.info("尚未收錄符合的答案。試試物品名稱、別名或縮短問題；不會以不相關攻略代替。")
+        st.info("沒有符合的結果。請改用物品名稱、別名或較短的關鍵字。")
 
 
 def render_home(legacy: list[dict]) -> None:
@@ -154,11 +154,10 @@ def render_home(legacy: list[dict]) -> None:
     detailed_count = sum(not guide.get("reference_only") for guide in guides)
     with st.container(key="guide_search_panel"):
         st.markdown('<div class="hero-intro"><div class="hero-copy">'
-                    '<div class="guide-hero-kicker">養成有方向，資源不白花。</div>'
-                    '<h1 class="guide-hero-title"><span class="hero-title-part">查攻略，</span><span class="hero-title-part hero-emphasis">決定下一步。</span></h1>'
-                    '<p class="guide-hero-deck">升什麼、缺多少、何時停手。</p>'
+                    '<h1 class="guide-hero-title">噠噠特攻攻略</h1>'
+                    '<p class="guide-hero-deck">特工覺醒、裝備神鑄、收藏與科技配件</p>'
                     f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
-                    f'<div class="hero-companion" aria-hidden="true"><span class="buddy-note">小鷹陪你，找下一步。</span>{FIELD_BUDDY}</div></div>',
+                    f'<div class="hero-companion" aria-hidden="true">{FIELD_BUDDY}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
@@ -172,9 +171,9 @@ def render_home(legacy: list[dict]) -> None:
         with st.container(key="task_entries"):
             upgrade, event, catalog = st.columns(3, gap="medium")
             for column, title, detail, artwork, tag, callback, kwargs in (
-                (upgrade, "先升什麼？", "只排一個優先目標，附操作步驟", "upgrade", "升級規劃", open_tool, {}),
-                (event, "活動要補鑽嗎？", "先算免費進度，再看補鑽成本", "event", "活動試算", open_tool, {"activity": True}),
-                (catalog, "查收藏品", "查名稱、品質、期數與效果來源", "collection", "收藏圖鑑", open_collectible_catalog, {}),
+                (upgrade, "查升級順序", "填入配置，查看目標與材料缺額", "upgrade", "配置與材料", open_tool, {}),
+                (event, "計算活動成本", "輸入進度，計算達標所需寶石", "event", "進度與寶石", open_tool, {"activity": True}),
+                (catalog, "收藏品圖鑑", "按名稱、品質或期數查詢", "collection", "名稱與效果", open_collectible_catalog, {}),
             ):
                 with column:
                     with st.container(key=f"task_entry_{title}"):
@@ -187,7 +186,7 @@ def render_home(legacy: list[dict]) -> None:
 def render_directory(guides: list[dict], category: str, prefix: str) -> None:
     """Browse by system; detailed answers appear only after a deliberate choice."""
     core = [g for g in guides if not g.get("reference_only")]
-    st.markdown('<div class="guide-results-head"><h2>攻略目錄</h2><span>選系統，再看門檻與詳解</span></div>', unsafe_allow_html=True)
+    st.markdown('<div class="guide-results-head"><h2>攻略目錄</h2><span>按系統分類</span></div>', unsafe_allow_html=True)
     categories = content.CATEGORIES if category == "全部" else (category,)
     with st.container(key="guide_directory"):
         # Build rows in reading order: phone stacking must not reorder 1,3,5,2,4,6.
@@ -211,7 +210,7 @@ def render_directory(guides: list[dict], category: str, prefix: str) -> None:
                                 with st.container(key=f"directory_{prefix}_{guide['slug']}"):
                                     article_button(guide, prefix)
                                     st.caption(content.QUICK_ANSWERS.get(guide["slug"], (guide["summary"], ""))[0])
-    st.caption("本站詳解整理門檻與判斷；歷史文章、外部來源與配裝參考收在「攻略索引」。")
+    st.caption("歷史文章、外部來源與配裝參考：攻略索引。")
 
 
 def render_index(legacy: list[dict]) -> None:
@@ -235,7 +234,7 @@ def render_quick_decision(guide: dict) -> None:
     if not decisions:
         return
     selected = st.selectbox("選擇目前狀況", [decision["condition"] for decision in decisions],
-                            index=None, placeholder="選相符情境，直接看投入與停手點", key=f"guide_scenario_{guide['slug']}")
+                            index=None, placeholder="選擇符合目前配置的條件", key=f"guide_scenario_{guide['slug']}")
     if selected is None:
         return
     decision = next(item for item in decisions if item["condition"] == selected)
@@ -332,9 +331,9 @@ def render_article(slug: str, legacy: list[dict]) -> None:
             for label, url in guide["sources"]:
                 st.link_button(label + " ↗", url)
             if not guide["sources"]:
-                st.caption("本文為本站決策／計算方法；遊戲數值請依相關機制攻略與本次遊戲預覽核對。")
+                st.caption("本文說明計算與排序方法。遊戲數值請對照相關來源及本次升級預覽。")
             else:
-                st.caption("由本站重新整理判斷條件；來源為社群攻略，非官方保證。版本有差異時，以遊戲內資料為準。")
+                st.caption("來源為社群攻略。版本有差異時，以遊戲內資料為準。")
         with rail:
             with st.container(key="article_rail"):
                 st.markdown(f'<nav class="article-toc" aria-label="本文目錄"><strong>本文目錄</strong>{toc}</nav>', unsafe_allow_html=True)

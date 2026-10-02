@@ -50,7 +50,7 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
         st.session_state["player_profile"] = combined
         st.session_state["profile_updated"] = datetime.now().isoformat(timespec="minutes")
         st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0)+1
-        st.session_state["profile_notice"] = "已更新，下一步建議已重新計算。"
+        st.session_state["profile_notice"] = "配置已儲存，升級順序已重算。"
         st.session_state["pending_navigation"] = "下一步"
         st.rerun()
     except ValueError as exc:
@@ -246,8 +246,8 @@ def render_decision(p: dict, step: dict) -> None:
             operation = operating_steps(step)
             instructions = "".join(f"<li>{html.escape(item)}</li>" for item in operation["steps"])
             st.markdown(f'''<section class="action-brief" aria-label="現在要做什麼">
-                <h3>現在就做這一件</h3><p>{html.escape(plan['action'])}</p>{verify}
-                <div class="operation-entry">去哪裡：{html.escape(operation['entry'])}</div>
+                <h3>操作步驟</h3><p>{html.escape(plan['action'])}</p>{verify}
+                <div class="operation-entry">遊戲入口：{html.escape(operation['entry'])}</div>
                 <ol class="operation-steps">{instructions}</ol></section>''', unsafe_allow_html=True)
             if step.get("checks"):
                 indicators = {"ready": "已足", "short": "缺", "unknown": "待確認"}
@@ -267,7 +267,7 @@ def render_decision(p: dict, step: dict) -> None:
                 st.button("補上這一步的資料", width="stretch", on_click=edit_resource, args=(step["resource"],))
                 st.button("看這一步的做法與取捨", width="stretch", on_click=read_direction_guide, args=(related_guide(step),))
                 st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
-                st.caption("規則排序，非實測傷害排名。未確認材料前，先不要投入。")
+                st.caption("按已收錄門檻排序，非實測傷害排名。投入前須核對材料。")
 
 
 def read_direction_guide(slug: str) -> None:
@@ -281,7 +281,7 @@ def render_reasoning(result: dict) -> None:
         if result["primary"]:
             st.write(result["primary"]["why"])
             st.write(engine.ranking_reason(result))
-            st.caption("不同資源可分別安排；收藏之心不足，不會阻止你用覺醒核心升主位。只比較已填資料涵蓋的路線。")
+            st.caption("各種資源分開比較；排序範圍限於已填配置與已收錄路線。")
             if result["primary"]["caution"]:
                 st.warning(result["primary"]["caution"])
             st.caption(f"規則核對：{engine.CHECKED}；來源為社群攻略。材料以遊戲內本次預覽為準。")
@@ -311,7 +311,7 @@ def render_home() -> None:
     first_visit = not st.session_state.get("player_profile")
     heading, backup = st.columns([4, 1.2], vertical_alignment="center")
     with heading:
-        page_heading("升級路線", "依目前配置，安排下一個有效門檻。")
+        page_heading("升級路線", "依配置比較升級目標、材料需求與缺額。")
     with backup:
         render_backup(p, first_visit=first_visit)
     workflow(0 if first_visit else 1)
@@ -327,7 +327,7 @@ def render_home() -> None:
     if first_visit:
         with st.container(key="onboarding"):
             st.markdown(f'<span class="setup-art" aria-hidden="true">{guide_icon("profile")}</span><h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
-            st.caption("先填這三項。其他系統只在需要時補上，不必一次填完。")
+            st.caption("必填：主要模式、主位特工、覺醒等級。其他配置可稍後補充。")
             with st.form("quick_profile", border=False):
                 mode = st.selectbox("主要模式", engine.MODES)
                 hero_col, level_col = st.columns(2)
@@ -341,7 +341,7 @@ def render_home() -> None:
                     else:
                         save({"mode": mode, "survivor": hero, "awakening": level})
             st.markdown('<p class="setup-note">不需要遊戲帳號密碼。資料只保留於本次連線；離開前可從「備份與匯入」下載紀錄。</p>', unsafe_allow_html=True)
-            st.button("還不確定怎麼選？先看升級判斷流程", on_click=read_direction_guide, args=("upgrade-roadmap",), width="stretch", type="tertiary")
+            st.button("查看升級排序方法", on_click=read_direction_guide, args=("upgrade-roadmap",), width="stretch", type="tertiary")
         return
     with st.container(key="route_toolbar"):
         left, context, edit = st.columns([2, 1.4, 1.2], vertical_alignment="bottom")
@@ -367,7 +367,7 @@ def render_profile() -> None:
     p = profile()
     page_heading("我的配置", "選一個系統更新，儲存後回到升級路線。留白＝未知；0＝沒有。")
     if p["estimated_balances"]:
-        st.caption("部分庫存為推算值。核對遊戲現況後儲存，即以你確認的數值接續。")
+        st.caption("部分庫存為推算值；請核對遊戲內數量後重新儲存。")
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
     sections = ("角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技")
@@ -376,7 +376,7 @@ def render_profile() -> None:
         with nav:
             with st.container(key="profile_nav"):
                 section = st.radio("這次更新哪一項", sections, key="profile_section", label_visibility="collapsed")
-            st.button("← 回到我的下一步", on_click=navigate, args=("下一步",), width="stretch")
+            st.button("← 回到升級路線", on_click=navigate, args=("下一步",), width="stretch")
             render_backup(p)
         with editor:
             with st.container(key="profile_editor"):
@@ -425,7 +425,7 @@ def render_profile_form(p: dict, section: str) -> None:
             values["ss_boots"] = choice("是否使用SS冰霜戰靴", "ss_boots", (True, False), p)
             bs = stars("SS鞋套裝星數：賽博圖騰柱、複製寶鏡、夢境拼圖、基因編輯器", "boot_stars", p)
             values["red_boxes"] = number("傳奇收藏自選箱庫存", "red_boxes", p, 10000)
-            st.caption("每箱碎片量與可選期數不同，本站不會只看箱數就判定必定能升星。")
+            st.caption("升星需求須按可選期數及每箱碎片量核對，不能只看箱數。")
         else:
             values["weapon"] = choice("主武器", "weapon", ("雙絕槍", "其他"), p)
             l, r = st.columns(2)
@@ -437,7 +437,7 @@ def render_profile_form(p: dict, section: str) -> None:
             values["gear_materials_ready"] = choice("E1所需S裝及其他材料是否齊全", "gear_materials_ready", (True, False), p)
             for label, key in (("已有雙生無人機", "twin_drone"), ("已有紅無人機配件", "drone_red"), ("已有紅力場配件", "forcefield_red")):
                 values[key] = choice(label, key, (True, False), p)
-            st.caption("高階神鑄需要完整六件裝備比較；本站不會只憑武器就要求你拆掉其他裝備。")
+            st.caption("高階神鑄需比較六件裝備；拆解前須計入現役裝備的效果損失。")
         if st.form_submit_button("儲存並重新排序", type="primary", width="stretch"):
             try:
                 if section == "進階典藏館":

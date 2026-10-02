@@ -119,11 +119,11 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     a = boot()
     a.radio[0].set_value("活動").run()
     assert not a.exception
-    assert not next(e for e in a.expander if e.label == "查看這篇活動的30秒重點").proto.expanded
+    assert not next(e for e in a.expander if e.label == "活動規則與獎勵重點").proto.expanded
     assert any('class="event-verdict"' in m.value for m in a.markdown)
     for label in ("01 / 活動目標", "02 / 免費進度", "03 / 寶石成本"):
         assert any(label in m.value for m in a.markdown)
-    by_label(a.button, "一鍵判斷這次活動").click().run()
+    by_label(a.button, "計算補鑽成本").click().run()
     assert not a.exception
     assert len(a.metric) == 4
 
@@ -142,7 +142,7 @@ def test_illustrated_home_has_real_counts_and_accessible_native_routes():
     positions = [text.index(f'<h3>{topic}</h3>') for topic in content.CATEGORIES]
     assert positions == sorted(positions)
     assert text.count('class="task-card-head"') == 3
-    assert 'class="buddy-note"' in text
+    assert '<h1 class="guide-hero-title">噠噠特攻攻略</h1>' in text
     assert a.radio[0].options == ["攻略首頁", "升級路線", "我的配置", "活動試算", "攻略索引"]
     assert not a.get("form") and "player_profile" not in a.session_state
 
@@ -175,7 +175,7 @@ def test_eagle_mascot_is_shared_by_brand_and_home():
     a.radio[0].set_value("攻略首頁").run()
     text = "\n".join(item.value for item in a.markdown if "<style>" not in item.value)
     assert text.count('data-mascot="eagle"') == 2
-    assert "小鷹陪你，找下一步。" in text
+    assert "小鷹陪你" not in text
 
 
 def test_warm_cache_refreshes_art_before_theme_and_ui(monkeypatch):

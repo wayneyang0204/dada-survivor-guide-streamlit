@@ -72,7 +72,7 @@ def test_result_has_clear_action_and_opens_relevant_guide_without_mutation():
     a.run()
     assert not a.exception
     text = "\n".join(item.value for item in a.markdown)
-    assert "現在就做這一件" in text and "核心缺 10" in text and "碎片缺 150" in text
+    assert "操作步驟" in text and "核心缺 10" in text and "碎片缺 150" in text
     by_label(a.button, "看這一步的做法與取捨").click().run()
     assert not a.exception
     assert a.query_params["guide"] == ["survivor-awakening"]

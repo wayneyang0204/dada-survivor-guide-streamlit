@@ -98,7 +98,7 @@ def test_planner_shows_game_entry_without_marking_upgrade_done():
     a.session_state["player_profile"] = deepcopy(raw)
     a.run()
     text = "\n".join(item.value for item in a.markdown)
-    assert "去哪裡：" in text and "角色的覺醒頁" in text
+    assert "遊戲入口：" in text and "角色的覺醒頁" in text
     assert "不使用其他角色的報價" in text
     assert a.session_state["player_profile"] == raw
 
