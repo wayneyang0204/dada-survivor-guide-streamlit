@@ -302,6 +302,7 @@ _FIELD_GUIDE = """
 :root {--canvas:#fcfaf6;--peach:#fff0e8;--mint:#edf5e9;--lilac:#f2edf9;--shadow:#26372e0b;}
 .block-container {padding-top:2rem;}
 [data-testid="stHeader"] {display:none;}
+[data-testid="stElementContainer"] [data-testid="stCaptionContainer"] {opacity:1;}
 .masthead {padding:0 0 1.1rem;}
 .brand-mark {width:3.6rem;height:3.6rem;border-radius:20px;background:#edf5e9;transform:none;border:1px solid #dce7d4;}
 .brand-mark svg {width:3.2rem;height:3.2rem;}

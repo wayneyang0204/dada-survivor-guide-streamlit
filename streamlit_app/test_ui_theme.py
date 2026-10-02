@@ -36,6 +36,8 @@ def test_text_tokens_meet_normal_text_contrast(foreground, background):
 def test_controls_and_primary_button_have_sufficient_contrast():
     assert contrast(COLORS["paper"], COLORS["accent"]) >= 4.5
     assert contrast(COLORS["field"], COLORS["paper"]) >= 3
+    # Streamlit dims the caption wrapper to 0.6, regardless of our text token.
+    assert '[data-testid="stElementContainer"] [data-testid="stCaptionContainer"] {opacity:1;}' in STYLE
 
 
 def test_cloud_theme_matches_the_single_shared_stylesheet():
