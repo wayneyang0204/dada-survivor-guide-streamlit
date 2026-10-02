@@ -7,7 +7,7 @@ from urllib.parse import quote
 import streamlit as st
 
 import guide_content as content
-from ui_art import GUIDE_BUDDY
+from ui_art import FIELD_BUDDY, TOPIC_ART, guide_icon
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
@@ -151,12 +151,14 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
 
 def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
+    detailed_count = sum(not guide.get("reference_only") for guide in guides)
     with st.container(key="guide_search_panel"):
         st.markdown('<div class="hero-intro"><div class="hero-copy">'
-                    '<div class="guide-hero-kicker">SURVIVOR.IO <span>／</span> 玩家攻略</div>'
-                    '<h1 class="guide-hero-title"><span class="hero-title-part">查攻略，</span><span class="hero-title-part">決定下一步。</span></h1>'
-                    '<p class="guide-hero-deck">門檻、材料，一次查清楚。</p></div>'
-                    f'<div class="hero-companion" aria-hidden="true">{GUIDE_BUDDY}</div></div>',
+                    '<div class="guide-hero-kicker">養成有方向，資源不白花。</div>'
+                    '<h1 class="guide-hero-title"><span class="hero-title-part">查攻略，</span><span class="hero-title-part hero-emphasis">決定下一步。</span></h1>'
+                    '<p class="guide-hero-deck">升什麼、缺多少、何時停手。</p>'
+                    f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
+                    f'<div class="hero-companion" aria-hidden="true"><span class="buddy-note">先查清楚，再投入。</span>{FIELD_BUDDY}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
@@ -169,13 +171,14 @@ def render_home(legacy: list[dict]) -> None:
     if category == "全部":
         with st.container(key="task_entries"):
             upgrade, event, catalog = st.columns(3, gap="medium")
-            for column, title, detail, callback, kwargs in (
-                (upgrade, "先升什麼？", "填配置 → 看一個優先目標", open_tool, {}),
-                (event, "活動要補鑽嗎？", "填進度 → 算免費達標與成本", open_tool, {"activity": True}),
-                (catalog, "查收藏品", "名稱、品質、期數一次查", open_collectible_catalog, {}),
+            for column, title, detail, artwork, tag, callback, kwargs in (
+                (upgrade, "先升什麼？", "只排一個優先目標，附操作步驟", "upgrade", "升級規劃", open_tool, {}),
+                (event, "活動要補鑽嗎？", "先算免費進度，再看補鑽成本", "event", "活動試算", open_tool, {"activity": True}),
+                (catalog, "查收藏品", "查名稱、品質、期數與效果來源", "collection", "收藏圖鑑", open_collectible_catalog, {}),
             ):
                 with column:
                     with st.container(key=f"task_entry_{title}"):
+                        st.markdown(f'<div class="task-card-head"><span class="task-tag">{tag}</span><span class="task-art">{guide_icon(artwork)}</span></div>', unsafe_allow_html=True)
                         st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
                         st.caption(detail)
     render_directory(guides, category, "home")
@@ -186,21 +189,28 @@ def render_directory(guides: list[dict], category: str, prefix: str) -> None:
     core = [g for g in guides if not g.get("reference_only")]
     st.markdown('<div class="guide-results-head"><h2>攻略目錄</h2><span>選系統，再看門檻與詳解</span></div>', unsafe_allow_html=True)
     categories = content.CATEGORIES if category == "全部" else (category,)
-    columns = st.columns(2, gap="large")
-    for index, topic in enumerate(categories):
-        entries = [g for g in core if g["category"] == topic]
-        references = [g for g in guides if g.get("reference_only") and g["category"] == topic]
-        with columns[index % 2]:
-            count = f"{len(entries)} 篇" if entries else f"{len(references)} 篇來源摘要"
-            with st.expander(f"{topic} · {count}", expanded=category != "全部"):
-                if not entries:
-                    st.caption("目前收錄外部來源摘要，尚無本站門檻詳解。")
-                    st.button(f"查{topic}來源 →", key=f"directory_sources_{prefix}_{topic}",
-                              on_click=open_index, args=(topic,), width="stretch")
-                for guide in entries:
-                    with st.container(key=f"directory_{prefix}_{guide['slug']}"):
-                        article_button(guide, prefix)
-                        st.caption(content.QUICK_ANSWERS.get(guide["slug"], (guide["summary"], ""))[0])
+    with st.container(key="guide_directory"):
+        # Build rows in reading order: phone stacking must not reorder 1,3,5,2,4,6.
+        for row_start in range(0, len(categories), 2):
+            columns = st.columns(2, gap="medium")
+            for offset, topic in enumerate(categories[row_start:row_start + 2]):
+                index = row_start + offset
+                entries = [g for g in core if g["category"] == topic]
+                references = [g for g in guides if g.get("reference_only") and g["category"] == topic]
+                with columns[offset]:
+                    count = f"{len(entries)} 篇詳解" if entries else f"{len(references)} 篇來源摘要"
+                    artwork, description = TOPIC_ART.get(topic, ("book", "門檻與判斷詳解"))
+                    with st.container(key=f"topic_cover_{index}"):
+                        st.markdown(f'<div class="topic-heading"><span class="topic-art">{guide_icon(artwork)}</span><div><h3>{html.escape(topic)}</h3><p>{html.escape(description)}</p></div><span class="topic-count">{count}</span></div>', unsafe_allow_html=True)
+                        with st.expander(f"瀏覽{topic}", expanded=category != "全部"):
+                            if not entries:
+                                st.caption("目前收錄外部來源摘要，尚無本站門檻詳解。")
+                                st.button(f"查{topic}來源 →", key=f"directory_sources_{prefix}_{topic}",
+                                          on_click=open_index, args=(topic,), width="stretch")
+                            for guide in entries:
+                                with st.container(key=f"directory_{prefix}_{guide['slug']}"):
+                                    article_button(guide, prefix)
+                                    st.caption(content.QUICK_ANSWERS.get(guide["slug"], (guide["summary"], ""))[0])
     st.caption("本站詳解整理門檻與判斷；歷史文章、外部來源與配裝參考收在「攻略索引」。")
 
 

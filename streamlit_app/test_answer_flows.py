@@ -51,8 +51,9 @@ def test_home_search_shows_answers_without_category_wall():
 
 def test_home_task_routes_and_collapsed_directory(offline_sources):
     app = AppTest.from_file(APP).run()
-    directory = [e for e in app.expander if "篇" in e.label]
-    assert directory and not any(e.proto.expanded for e in directory)
+    directory = [e for e in app.expander if e.label.startswith("瀏覽")]
+    assert len(directory) == len(content.CATEGORIES)
+    assert not any(e.proto.expanded for e in directory)
     by_label(app.button, "先升什麼？ →").click().run()
     assert app.radio[0].value == "下一步"
     assert by_label(app.button, "建立我的升級路線")

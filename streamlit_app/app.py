@@ -14,10 +14,12 @@ import streamlit as st
 import direction_tools as _direction_tools
 import tech_routes as _tech_routes
 import direction_content as _direction_content
+import ui_art as _ui_art
 
 _direction_tools = importlib.reload(_direction_tools)
 _tech_routes = importlib.reload(_tech_routes)
 _direction_content = importlib.reload(_direction_content)
+_ui_art = importlib.reload(_ui_art)
 
 import data_engine as _data_engine
 import next_step as _next_step
@@ -578,7 +580,7 @@ st.markdown(
         <span class="brand-mark" aria-hidden="true">{GUIDE_BUDDY}</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
-      <div class="masthead-edition">攻略速查 · 升級規劃 · 活動試算</div>
+      <div class="masthead-edition"><span class="edition-label">PLAYER HANDBOOK</span><span>門檻 · 材料 · 升級路線</span></div>
     </div>
     """,
     unsafe_allow_html=True,

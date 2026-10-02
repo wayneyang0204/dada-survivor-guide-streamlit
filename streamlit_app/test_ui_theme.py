@@ -28,7 +28,7 @@ def contrast(a, b):
 
 
 @pytest.mark.parametrize("foreground", ["ink", "muted", "accent", "ready", "pending", "blocked"])
-@pytest.mark.parametrize("background", ["paper", "wash"])
+@pytest.mark.parametrize("background", ["paper", "wash", "mint", "peach", "lilac"])
 def test_text_tokens_meet_normal_text_contrast(foreground, background):
     assert contrast(COLORS[foreground], COLORS[background]) >= 4.5
 
@@ -124,3 +124,51 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     by_label(a.button, "一鍵判斷這次活動").click().run()
     assert not a.exception
     assert len(a.metric) == 4
+
+
+def test_illustrated_home_has_real_counts_and_accessible_native_routes():
+    import guide_content as content
+    from ui_art import TOPIC_ART
+
+    a = boot()
+    a.radio[0].set_value("攻略首頁").run()
+    assert not a.exception
+    text = "\n".join(m.value for m in a.markdown if "<style>" not in m.value)
+    assert f'{len(content.GUIDES)} 篇門檻詳解' in text
+    assert set(TOPIC_ART) == set(content.CATEGORIES)
+    assert text.count('class="topic-heading"') == len(content.CATEGORIES)
+    positions = [text.index(f'<h3>{topic}</h3>') for topic in content.CATEGORIES]
+    assert positions == sorted(positions)
+    assert text.count('class="task-card-head"') == 3
+    assert 'class="buddy-note"' in text
+    assert a.radio[0].options == ["攻略首頁", "升級路線", "我的配置", "活動試算", "攻略索引"]
+    assert not a.get("form") and "player_profile" not in a.session_state
+
+
+def test_original_vector_art_is_decorative_and_has_no_remote_assets():
+    from xml.etree import ElementTree as ET
+    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, TOPIC_ART, guide_icon
+
+    artwork = [GUIDE_BUDDY, FIELD_BUDDY, *(guide_icon(item[0]) for item in TOPIC_ART.values())]
+    for item in artwork:
+        root = ET.fromstring(item)
+        assert root.attrib["aria-hidden"] == "true"
+        assert root.attrib["focusable"] == "false"
+        assert root.attrib.get("viewBox")
+        assert not any(node.tag.endswith(("image", "script", "foreignObject")) for node in root.iter())
+    assert guide_icon('<script>') == guide_icon("book")
+    assert STYLE.count("data:image/svg+xml,") == 5
+    assert "grid-template-columns:repeat(5,minmax(0,1fr))" in STYLE
+
+
+def test_warm_cache_refreshes_art_before_theme_and_ui(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+    from test_decision_ui import APP
+    import ui_art
+
+    for symbol in ("FIELD_BUDDY", "guide_icon", "TOPIC_ART"):
+        monkeypatch.delattr(ui_art, symbol)
+    a = AppTest.from_file(APP).run(timeout=15)
+    assert not a.exception
+    assert callable(ui_art.guide_icon)
+    assert any('class="task-art"' in item.value for item in a.markdown)

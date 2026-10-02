@@ -127,3 +127,17 @@ are not exposed as competing personalized recommendations.
 
 Run tests from the repository root with an environment containing Streamlit and
 pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
+
+## Illustrated field-guide UI
+
+- Original, decorative SVG mascot and icons are in `ui_art.py`; no remote images,
+  font downloads or third-party scripts are needed. They are not game assets.
+- `ui_theme.py` is the single stylesheet for home, planner, profile, activity and
+  article routes. Pale mint, peach and lavender surfaces retain dark text.
+- Home topic shelves show actual article counts and remain collapsed until a
+  deliberate choice. Responsive row stacking preserves category reading order.
+- The five native radio routes remain keyboard accessible. Phone navigation uses
+  five columns, with a three-column fallback below 380 px; no sideways menu.
+- Contrast checks cover all five reading surfaces. App tests also cover original
+  artwork, real counts, topic order and warm-cache reload of the shared artwork.
+  Automated checks do not replace rendered desktop and phone inspection.

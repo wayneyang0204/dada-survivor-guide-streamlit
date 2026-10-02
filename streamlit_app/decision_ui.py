@@ -6,6 +6,7 @@ import html
 import streamlit as st
 import next_step as engine
 from direction_tools import execution_plan, related_guide, operating_steps
+from ui_art import guide_icon
 
 
 
@@ -204,7 +205,7 @@ def page_heading(title: str, description: str) -> None:
 
 
 def workflow(active: int) -> None:
-    labels = ("1 建立配置", "2 看優先目標", "3 核對材料")
+    labels = ("1 填配置", "2 看目標", "3 核材料")
     spans = "".join(f'<span class="{"active" if index == active else ""}">{label}</span>' for index, label in enumerate(labels))
     st.markdown(f'<div class="workflow-strip" aria-label="升級規劃流程">{spans}</div>', unsafe_allow_html=True)
 
@@ -325,7 +326,7 @@ def render_home() -> None:
                 undo_completion()
     if first_visit:
         with st.container(key="onboarding"):
-            st.markdown('<h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
+            st.markdown(f'<span class="setup-art" aria-hidden="true">{guide_icon("profile")}</span><h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
             st.caption("先填這三項。其他系統只在需要時補上，不必一次填完。")
             with st.form("quick_profile", border=False):
                 mode = st.selectbox("主要模式", engine.MODES)
