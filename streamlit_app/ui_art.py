@@ -8,17 +8,18 @@ _EAGLE = '''<g stroke="#674936" stroke-width="2.7" stroke-linecap="round" stroke
 <path d="m64 132-7 16 12-5 12 7 7-17" fill="#c08b5e"/>
 <path d="M42 92c-4-29 13-46 39-46s43 18 40 47l-3 28c-2 18-16 28-37 28s-35-10-37-28z" fill="#af7c54"/>
 <path d="M64 96q17-10 34 0l-2 33q-15 15-30 0z" fill="#f5dfb7" stroke="none"/>
-<path d="M45 85c-20 6-23 31-11 43l18-21m65-22c20 6 23 31 11 43l-18-21" fill="#af7c54"/>
-<path d="m32 112 11-9m87 9-11-9" stroke="#8c603f"/>
+<g class="eagle-wings"><g class="eagle-wing-left"><path d="M45 85c-20 6-23 31-11 43l18-21" fill="#af7c54"/>
+<path d="m32 112 11-9" stroke="#8c603f"/></g><g class="eagle-wing-right"><path d="M117 85c20 6 23 31 11 43l-18-21" fill="#af7c54"/>
+<path d="m130 112-11-9" stroke="#8c603f"/></g></g>
 <path d="M29 70c-1-24 15-43 38-47l-2-8 14 6 10-9 4 11c24 4 40 23 39 47-1 17-11 28-25 30l-9-5-9 8-9-6-9 6-10-8-9 5c-15-3-23-14-23-30z" fill="#fffdf7"/>
 <path d="M40 48c6-11 16-17 27-19" stroke="#fff" stroke-width="4"/>
 <ellipse cx="51" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/><ellipse cx="111" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/>
-<ellipse cx="62" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/><ellipse cx="102" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/>
-<circle cx="60.5" cy="63" r="1.7" fill="#fff" stroke="none"/><circle cx="100.5" cy="63" r="1.7" fill="#fff" stroke="none"/>
+<g class="eagle-eyes"><ellipse cx="62" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/><ellipse cx="102" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/>
+<circle cx="60.5" cy="63" r="1.7" fill="#fff" stroke="none"/><circle cx="100.5" cy="63" r="1.7" fill="#fff" stroke="none"/></g>
 <path d="M75 76c4-5 14-6 21-2l10 7c-8 0-11 3-11 10l-10-4-6-4z" fill="#efbd59"/>
 <path d="m87 78 7 3" stroke="#d29a3d" stroke-width="1.6"/>
-<path d="M56 109q13-5 25 1 12-6 25-1v26q-13-4-25 1-12-5-25-1z" fill="#fffdf7"/>
-<path d="M81 111v24m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b9cbd1" stroke-width="2"/>
+<g class="eagle-book"><path d="M56 109q13-5 25 1 12-6 25-1v26q-13-4-25 1-12-5-25-1z" fill="#fffdf7"/>
+<path d="M81 111v24m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b9cbd1" stroke-width="2"/></g>
 <path d="M50 114c1-8 12-7 15 0l-9 9c-5 1-9-4-6-9zm62 0c-1-8-12-7-15 0l9 9c5 1 9-4 6-9z" fill="#af7c54"/>
 <path d="M62 145v6m-5 0h12m28-6v6m-5 0h12" stroke="#d69c42" stroke-width="3.5"/>
 </g>'''

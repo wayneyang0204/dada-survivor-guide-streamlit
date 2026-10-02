@@ -7,7 +7,8 @@ from urllib.parse import quote
 import streamlit as st
 
 import guide_content as content
-from ui_art import FIELD_BUDDY, TOPIC_ART, guide_icon
+from ui_art import TOPIC_ART, guide_icon
+from ui_interactions import eagle_markup, render_playground
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
@@ -153,11 +154,11 @@ def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
     detailed_count = sum(not guide.get("reference_only") for guide in guides)
     with st.container(key="guide_search_panel"):
-        st.markdown('<div class="hero-intro"><div class="hero-copy">'
+        st.markdown('<div class="hero-intro" data-ui-region="home-search" data-ui-motion="true"><div class="hero-copy">'
                     '<h1 class="guide-hero-title">噠噠特攻攻略</h1>'
                     '<p class="guide-hero-deck">特工覺醒、裝備神鑄、收藏與科技配件</p>'
                     f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
-                    f'<div class="hero-companion" aria-hidden="true">{FIELD_BUDDY}</div></div>',
+                    f'<div class="hero-companion" aria-hidden="true">{eagle_markup()}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
@@ -177,9 +178,10 @@ def render_home(legacy: list[dict]) -> None:
             ):
                 with column:
                     with st.container(key=f"task_entry_{title}"):
-                        st.markdown(f'<div class="task-card-head"><span class="task-tag">{tag}</span><span class="task-art">{guide_icon(artwork)}</span></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="task-card-head" data-ui-region="tool-{artwork}" data-ui-motion="true"><span class="task-tag">{tag}</span><span class="task-art">{guide_icon(artwork)}</span></div>', unsafe_allow_html=True)
                         st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
                         st.caption(detail)
+    render_playground(open_guide)
     render_directory(guides, category, "home")
 
 
@@ -200,7 +202,7 @@ def render_directory(guides: list[dict], category: str, prefix: str) -> None:
                     count = f"{len(entries)} 篇詳解" if entries else f"{len(references)} 篇來源摘要"
                     artwork, description = TOPIC_ART.get(topic, ("book", "門檻與判斷詳解"))
                     with st.container(key=f"topic_cover_{index}"):
-                        st.markdown(f'<div class="topic-heading"><span class="topic-art">{guide_icon(artwork)}</span><div><h3>{html.escape(topic)}</h3><p>{html.escape(description)}</p></div><span class="topic-count">{count}</span></div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="topic-heading" data-ui-region="topic-{index}" data-ui-motion="true"><span class="topic-art">{guide_icon(artwork)}</span><div><h3>{html.escape(topic)}</h3><p>{html.escape(description)}</p></div><span class="topic-count">{count}</span></div>', unsafe_allow_html=True)
                         with st.expander(f"瀏覽{topic}", expanded=category != "全部"):
                             if not entries:
                                 st.caption("目前收錄外部來源摘要，尚無本站門檻詳解。")

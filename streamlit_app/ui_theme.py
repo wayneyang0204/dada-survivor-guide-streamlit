@@ -463,4 +463,73 @@ _NAV_ART = "\n".join(
     f'{{background-image:url("data:image/svg+xml,{quote(guide_icon(name), safe="")}");}}'
     for index, name in enumerate(("home", "upgrade", "profile", "event", "book"))
 )
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + "\n</style>")
+_MOTION_GUIDE = """
+/* Motion is decorative and local. No scrolling takeover, sound, or remote player. */
+.st-key-motion_controls {margin:-1rem 0 .35rem;}
+.st-key-motion_controls [data-testid="stPopover"] {display:flex;justify-content:flex-end;}
+.st-key-motion_controls > [data-testid="stVerticalBlock"] {align-items:flex-end;}
+.st-key-motion_controls button {min-height:44px;background:#fffdf9;border-color:var(--line);}
+[data-testid="stElementContainer"]:has(.motion-preferences),
+[data-testid="stElementContainer"]:has(.practice-region) {display:none;}
+.eagle-eyes, .eagle-wings, .eagle-wing-right, .eagle-book {transform-box:view-box;}
+.eagle-eyes {transform-origin:81px 65px;}
+.eagle-wings {transform-origin:81px 90px;}
+.eagle-wing-right {transform-origin:117px 88px;}
+.eagle-book {transform-origin:81px 123px;}
+.eagle-animated[data-eagle-pose="sleep"] .eagle-eyes {transform:scaleY(.13);}
+body:has([data-motion-enabled="on"]) .eagle-animated:not([data-eagle-pose="sleep"]) .eagle-eyes {animation:eagle-blink 6s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="read"] .eagle-book {animation:eagle-page 3.4s ease-in-out 3;}
+body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="wave"] .eagle-wing-right {animation:eagle-wave .8s ease-in-out 4;}
+body:has([data-motion-enabled="on"]) .hero-companion > svg {animation:eagle-bob 3.8s ease-in-out 3;}
+body:has([data-motion-enabled="on"]) .hero-companion:hover .eagle-wing-right {animation:eagle-wave .8s ease-in-out 2;}
+body:has([data-motion-enabled="on"]) .st-key-guide_search_panel:focus-within .eagle-book {animation:eagle-page 1.2s ease-in-out 2;}
+body:has([data-motion-enabled="on"]) .st-key-main_nav label:has(input:checked)::before {animation:icon-hop .38s ease-out;}
+body:has([data-motion-enabled="on"]) .st-key-main_nav label:hover::before {animation:icon-wave .5s ease-out;}
+body:has([data-motion-enabled="on"]) [class*="st-key-task_entry_"] {transition:transform .2s ease,box-shadow .2s ease;}
+body:has([data-motion-enabled="on"]) [class*="st-key-task_entry_"]:is(:hover,:focus-within) {transform:translateY(-3px);box-shadow:0 7px 18px var(--shadow)!important;}
+body:has([data-motion-enabled="on"]) [class*="st-key-task_entry_"]:is(:hover,:focus-within) .task-art {animation:icon-hop .45s ease-out;}
+body:has([data-motion-enabled="on"]) [class*="st-key-topic_cover_"] {transition:border-color .2s ease,box-shadow .2s ease;}
+[class*="st-key-topic_cover_"]:is(:hover,:focus-within), [class*="st-key-topic_cover_"]:has(details[open]) {border-color:#b79972;}
+body:has([data-motion-enabled="on"]) [class*="st-key-topic_cover_"]:is(:hover,:focus-within) .topic-art,
+body:has([data-motion-enabled="on"]) [class*="st-key-topic_cover_"]:has(details[open]) .topic-art {animation:icon-wave .55s ease-out;}
+body:has([data-motion-enabled="on"]) :is(.guide-verdict,.scenario-answer,.action-brief,.practice-feedback,.event-verdict) {animation:panel-arrive .32s ease-out;}
+body:has([data-motion-enabled="on"]) .workflow-strip .active {animation:step-glow .65s ease-out;}
+body:has([data-motion-enabled="on"]) .st-key-profile_editor {animation:panel-arrive .28s ease-out;}
+body:has([data-motion-enabled="on"]) [data-testid="stExpander"] details[open] [data-testid="stExpanderDetails"] {animation:panel-arrive .25s ease-out;}
+body:has([data-motion-enabled="on"]) .st-key-onboarding:focus-within .setup-art {animation:icon-wave .5s ease-out;}
+.decision-check.ready b::before {content:"✓";display:inline-block;margin-right:.35rem;}
+body:has([data-motion-enabled="on"]) .decision-check.ready b::before {animation:icon-hop .4s ease-out;}
+body:has([data-motion-enabled="on"]) button:active:not(:disabled) {transform:translateY(1px);}
+.guide-table tbody tr:hover {background:#f6eedc;}
+.st-key-interaction_practice {margin:.5rem 0 1rem;}
+.st-key-interaction_practice [data-testid="stExpander"] {background:#f6f9fb;border:1px solid #d8e5ee;border-radius:20px;}
+.st-key-interaction_practice [data-testid="stExpander"] summary {padding:.8rem 1rem;}
+.practice-feedback {position:relative;overflow:hidden;background:#fffcf4;border:1px solid #eaddc4;border-radius:17px;padding:1rem 3rem 1rem 1rem;margin:.6rem 0;}
+.practice-feedback.correct {background:#f2f8f2;border-color:#c9dfcd;}
+.practice-feedback h3 {font-size:1.05rem;margin:0 0 .3rem;}
+.practice-feedback p {margin:0;font-size:.9375rem!important;}
+.feedback-feather {position:absolute;right:1rem;top:.7rem;color:#996e23;font-size:1.6rem;}
+body:has([data-motion-enabled="on"]) .practice-feedback.correct .feedback-feather {animation:feather-pop .7s ease-out;}
+.material-flight {height:4.5rem;position:relative;margin:0 2rem;}
+.flight-track {position:absolute;left:0;right:0;bottom:1.1rem;border-bottom:2px dashed #c5d8e6;}
+.flight-eagle {position:absolute;bottom:0;width:3.6rem;height:3.6rem;transform:translateX(-50%);}
+.flight-eagle svg {display:block;width:100%;height:auto;}
+body:has([data-motion-enabled="on"]) .flight-eagle {transition:left .4s ease-out;}
+@keyframes eagle-blink {0%,43%,47%,100% {transform:scaleY(1);}45% {transform:scaleY(.12);}}
+@keyframes eagle-page {0%,100% {transform:rotate(0deg) scaleX(1);}45% {transform:rotate(-3deg) scaleX(.91);}60% {transform:rotate(2deg) scaleX(1.02);}}
+@keyframes eagle-wave {0%,100% {transform:rotate(0deg);}30%,70% {transform:rotate(-22deg) translateY(-2px);}50% {transform:rotate(-10deg);}}
+@keyframes eagle-bob {0%,100% {transform:translateY(0);}50% {transform:translateY(-4px);}}
+@keyframes icon-hop {0%,100% {transform:translateY(0);}45% {transform:translateY(-4px) rotate(-4deg);}}
+@keyframes icon-wave {0%,100% {transform:rotate(0deg);}30% {transform:rotate(-7deg);}65% {transform:rotate(5deg);}}
+@keyframes panel-arrive {from {transform:translateY(5px);}to {transform:translateY(0);}}
+@keyframes step-glow {0%,100% {box-shadow:0 0 0 0 #e7c17b00;}45% {box-shadow:0 0 0 4px #e7c17b30;}}
+@keyframes feather-pop {0% {transform:scale(.75) rotate(-12deg);}55% {transform:scale(1.2) rotate(8deg);}100% {transform:scale(1) rotate(0deg);}}
+/* Keep controls and static state cues usable when motion is disabled. */
+body:has([data-motion-enabled="off"]) * {animation:none!important;transition:none!important;}
+body:has([data-motion-enabled="off"]) [class*="st-key-task_entry_"]:is(:hover,:focus-within),
+body:has([data-motion-enabled="off"]) button:active {transform:none;}
+@media(max-width:760px) {.st-key-motion_controls {margin:-.7rem 0 .25rem;}}
+@media(prefers-reduced-motion:reduce) {* {animation:none!important;transition:none!important;} [class*="st-key-task_entry_"]:is(:hover,:focus-within),button:active {transform:none!important;}}
+"""
+
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + "\n</style>")

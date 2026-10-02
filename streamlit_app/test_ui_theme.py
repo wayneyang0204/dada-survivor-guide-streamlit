@@ -91,7 +91,7 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert sum(attrs.get("role") == "listitem" for _, attrs in markup.tags) == 3
     assert any(attrs.get("aria-label") == "執行備忘" for _, attrs in markup.tags)
     assert [e.label for e in a.expander] == ["只核對這一步的材料", "排序依據與其他候選"]
-    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成"}
+    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成", "老鷹・動畫"}
     # Opening the page never records an in-game completion.
     assert a.session_state["player_profile"]["awakening"] == 6
 
@@ -174,7 +174,7 @@ def test_eagle_mascot_is_shared_by_brand_and_home():
     a = boot()
     a.radio[0].set_value("攻略首頁").run()
     text = "\n".join(item.value for item in a.markdown if "<style>" not in item.value)
-    assert text.count('data-mascot="eagle"') == 2
+    assert text.count('data-mascot="eagle"') == 3  # Brand, hero and material practice.
     assert "小鷹陪你" not in text
 
 

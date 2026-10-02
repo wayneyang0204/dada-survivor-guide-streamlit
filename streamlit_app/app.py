@@ -21,13 +21,15 @@ _tech_routes = importlib.reload(_tech_routes)
 _direction_content = importlib.reload(_direction_content)
 _ui_art = importlib.reload(_ui_art)
 
+import ui_interactions as _ui_interactions
+_ui_interactions = importlib.reload(_ui_interactions)
+
 import data_engine as _data_engine
 import next_step as _next_step
 import decision_ui as _decision_ui
 import ui_theme as _ui_theme
 import guide_content as _guide_content
 import guide_ui as _guide_ui
-from ui_art import GUIDE_BUDDY
 
 _next_step = importlib.reload(_next_step)
 _decision_ui = importlib.reload(_decision_ui)
@@ -577,7 +579,7 @@ st.markdown(
     f"""
     <div class="masthead">
       <div class="masthead-brand">
-        <span class="brand-mark" aria-hidden="true">{GUIDE_BUDDY}</span>
+        <span class="brand-mark" aria-hidden="true">{_ui_interactions.eagle_markup("brand")}</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
       <div class="masthead-edition"><span class="edition-label">非官方攻略</span><span>資料日期見各篇文章</span></div>
@@ -596,6 +598,8 @@ with st.container(key="main_nav"):
         format_func=lambda value: {"下一步": "升級路線", "我的帳號": "我的配置", "活動": "活動試算", "資料庫": "攻略索引"}.get(value, value),
         on_change=_guide_ui.clear_article,
     )
+
+_ui_interactions.render_preferences()
 
 if 主頁面 == "活動":
     頁面 = "活動最佳解"
