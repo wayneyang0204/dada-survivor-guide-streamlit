@@ -35,7 +35,7 @@ export type Guide = {
 
 export const OFFICIAL_UPDATE = {
   version: '5.2.0',
-  checkedAt: '2026-09-30 09:01',
+  checkedAt: '2026-10-02 09:00',
   headline: '5.2.0 已在台灣與美國商店上架',
   summary:
     '台灣與美國官方蘋果商店目前皆顯示 5.2.0：新增 346–350 章、神火特工洛基與高階特工伊狑；安卓商店也已列出同版更新內容。',
@@ -43,7 +43,8 @@ export const OFFICIAL_UPDATE = {
     '新增主線 346–350 章與對應挑戰章節',
     '官方確認神火特工洛基已上線；9 月 17 日玩家實測顯示他偏向協同支援，不建議當上場主位',
     '高階特工伊狑已有 9 月 26 日玩家實測：覺醒1開雙異獸，覺醒5可常駐雙形態增益；一般帳號不要因此重置現有主位',
-    '特工同調等級 100、公會活動「潮汐祕境」仍標示為即將推出',
+    '公會活動「潮汐祕境」已開放：官方合作資料確認以公會幣兌換探索券、雙擊格子找秘境寶鑽，數字代表周圍八格的寶鑽數',
+    '10 月 1 日社群實測記錄每期兩週、一千二百顆公會寶鑽為滿額；精確票價與獎勵仍以遊戲內當期畫面為準',
     '「雲中塔」活動已於 9 月 29 日開始、10 月 3 日結束；官方確認任務取得建築吊鉤，封頂可領取整座塔的窗戶獎勵',
     '金秋海岸狂歡已於 9 月 29 日凌晨結束，原期資料只供復刻時重新核對',
   ],
@@ -65,6 +66,10 @@ export const OFFICIAL_UPDATE = {
       url: 'https://www.facebook.com/SurvivorHabbyTW/posts/pfbid0MZYbN8wxTDBqQC9nqXZXJXj8spCn65aAdoMLZiiCcHyc53BipMvdExCbg9YK6jX4l',
     },
     {
+      name: '潮汐祕境玩法｜官方合作發布',
+      url: 'https://www.gaoshouyou.com/zhuanqu/987980.html',
+    },
+    {
       name: '安卓商店｜官方',
       url: 'https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=en_US',
     },
@@ -72,6 +77,17 @@ export const OFFICIAL_UPDATE = {
 };
 
 export const GUIDES: Guide[] = [
+  {
+    id: 'tidemyst-haven',
+    category: '關卡',
+    title: '潮汐祕境：先解線索，再決定要不要用公會幣補券',
+    description: '官方合作資料確認反向踩地雷規則；一千二百顆滿額、免費券與票價屬 10 月 1 日社群實測，先以遊戲內本期畫面覆核。',
+    level: '高難',
+    readTime: '7 分鐘',
+    updated: '10/2',
+    tags: ['潮汐祕境', '公會活動', '核心自選'],
+    takeaways: ['雙擊格子消耗探索券；數字代表周圍八格的寶鑽數，確定沒有寶鑽才打叉', '先用免費券並至少找到三顆寶鑽取得週榜資格，不為個人前十硬燒公會幣', '公會商店固定核心物資優先；只有確認能幫公會跨過下一個高價值門檻時才補券'],
+  },
   {
     id: 'cloud-tower-event',
     category: '關卡',

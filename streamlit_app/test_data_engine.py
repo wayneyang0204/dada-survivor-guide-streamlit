@@ -73,6 +73,17 @@ def test_cloud_tower_uses_verified_target_and_cost_caveat() -> None:
     assert "神器核心" in playbook["verdict"]
 
 
+def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:
+    assert classify_article("潮汐秘境全攻略") == "活動攻略"
+    playbook = match_event_playbook("潮汐秘境全攻略")
+    assert playbook["name"] == "潮汐祕境"
+    assert playbook["target"] == 1200
+    assert "雙擊" in playbook["mechanic"]
+    assert "三顆" in playbook["verdict"]
+    assert "遊戲內" in playbook["free_hint"]
+    assert "盲目清空公會幣" in playbook["avoid"]
+
+
 def test_loki_playbook_uses_post_launch_player_testing() -> None:
     playbook = match_event_playbook("神火特攻第三彈：洛基實測攻略")
     assert playbook["name"] == "神火特攻"
