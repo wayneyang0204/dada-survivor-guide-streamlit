@@ -27,7 +27,7 @@ application is not a Cloudflare Worker.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
 - The cute visual layer uses a cream-white canvas, pastel task cards and rounded
-  controls. `ui_art.py` contains the decorative sprout guide-buddy SVG; it needs
+  controls. `ui_art.py` contains the decorative little-eagle guide SVG; it needs
   no downloaded images, external fonts or new dependencies. Text and status
   colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
@@ -130,10 +130,11 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 
 ## Illustrated field-guide UI
 
-- Original, decorative SVG mascot and icons are in `ui_art.py`; no remote images,
+- Original, decorative eagle SVG mascot and icons are in `ui_art.py`; no remote images,
   font downloads or third-party scripts are needed. They are not game assets.
 - `ui_theme.py` is the single stylesheet for home, planner, profile, activity and
-  article routes. Pale mint, peach and lavender surfaces retain dark text.
+  article routes. Cream-white, caramel, peach and pale-sky surfaces retain dark
+  text. The nest/sky surfaces keep the legacy mint/lilac token names for compatibility.
 - Home topic shelves show actual article counts and remain collapsed until a
   deliberate choice. Responsive row stacking preserves category reading order.
 - The five native radio routes remain keyboard accessible. Phone navigation uses

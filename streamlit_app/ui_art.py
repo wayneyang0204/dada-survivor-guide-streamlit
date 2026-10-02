@@ -1,49 +1,45 @@
 """Original handbook illustrations; SVG only, with no external asset requests.
 
-The sprout guide is our own mascot, not an in-game character. All artwork is
+The little eagle guide is our own mascot, not an in-game character. All artwork is
 decorative: nearby native controls and headings carry the accessible names.
 """
 
-GUIDE_BUDDY = '''<svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-<ellipse cx="81" cy="146" rx="49" ry="8" fill="#dbe9d8"/>
-<path d="M35 92c-5-38 13-64 46-64s53 28 46 65l-6 34c-2 13-17 20-39 20s-39-8-41-21z" fill="#c7e8bf" stroke="#315d49" stroke-width="3"/>
-<path d="M79 29c-7-17-1-24 12-24 2 13-2 21-12 24z" fill="#76b48c" stroke="#315d49" stroke-width="2.5"/>
-<path d="M80 28c-1-13-12-19-22-14 1 11 10 17 22 14z" fill="#e6e9a5" stroke="#315d49" stroke-width="2.5"/>
-<ellipse cx="58" cy="79" rx="11" ry="7" fill="#f3b7a2"/><ellipse cx="108" cy="79" rx="11" ry="7" fill="#f3b7a2"/>
-<ellipse cx="65" cy="69" rx="4" ry="5" fill="#315d49"/><ellipse cx="101" cy="69" rx="4" ry="5" fill="#315d49"/>
-<path d="M76 81q7 8 14 0" stroke="#315d49" stroke-width="3" stroke-linecap="round"/>
-<path d="M59 108q13-5 24 1 12-6 25-1v27q-13-4-25 1-11-5-24-1z" fill="#fffaf0" stroke="#315d49" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="M83 110v25m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b5c9b4" stroke-width="2" stroke-linecap="round"/>
-<ellipse cx="53" cy="112" rx="9" ry="7" fill="#c7e8bf" stroke="#315d49" stroke-width="2.5"/><ellipse cx="112" cy="112" rx="9" ry="7" fill="#c7e8bf" stroke="#315d49" stroke-width="2.5"/>
-<path d="m133 24 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#f1cd7a"/><circle cx="25" cy="51" r="4" fill="#d5c8ed"/>
-</svg>'''
+_EAGLE = '''<g stroke="#674936" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+<path d="m64 132-7 16 12-5 12 7 7-17" fill="#c08b5e"/>
+<path d="M42 92c-4-29 13-46 39-46s43 18 40 47l-3 28c-2 18-16 28-37 28s-35-10-37-28z" fill="#af7c54"/>
+<path d="M64 96q17-10 34 0l-2 33q-15 15-30 0z" fill="#f5dfb7" stroke="none"/>
+<path d="M45 85c-20 6-23 31-11 43l18-21m65-22c20 6 23 31 11 43l-18-21" fill="#af7c54"/>
+<path d="m32 112 11-9m87 9-11-9" stroke="#8c603f"/>
+<path d="M29 70c-1-24 15-43 38-47l-2-8 14 6 10-9 4 11c24 4 40 23 39 47-1 17-11 28-25 30l-9-5-9 8-9-6-9 6-10-8-9 5c-15-3-23-14-23-30z" fill="#fffdf7"/>
+<path d="M40 48c6-11 16-17 27-19" stroke="#fff" stroke-width="4"/>
+<ellipse cx="51" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/><ellipse cx="111" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/>
+<ellipse cx="62" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/><ellipse cx="102" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/>
+<circle cx="60.5" cy="63" r="1.7" fill="#fff" stroke="none"/><circle cx="100.5" cy="63" r="1.7" fill="#fff" stroke="none"/>
+<path d="M75 76c4-5 14-6 21-2l10 7c-8 0-11 3-11 10l-10-4-6-4z" fill="#efbd59"/>
+<path d="m87 78 7 3" stroke="#d29a3d" stroke-width="1.6"/>
+<path d="M56 109q13-5 25 1 12-6 25-1v26q-13-4-25 1-12-5-25-1z" fill="#fffdf7"/>
+<path d="M81 111v24m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b9cbd1" stroke-width="2"/>
+<path d="M50 114c1-8 12-7 15 0l-9 9c-5 1-9-4-6-9zm62 0c-1-8-12-7-15 0l9 9c5 1 9-4 6-9z" fill="#af7c54"/>
+<path d="M62 145v6m-5 0h12m28-6v6m-5 0h12" stroke="#d69c42" stroke-width="3.5"/>
+</g>'''
 
 
-FIELD_BUDDY = '''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-<ellipse cx="124" cy="170" rx="90" ry="12" fill="#eadfd3"/>
-<rect x="154" y="38" width="60" height="93" rx="9" transform="rotate(12 154 38)" fill="#fff" stroke="#dfccba" stroke-width="2"/>
-<path d="m169 64 18 4m-21 8 29 6m-32 7 18 4" stroke="#dbc7b4" stroke-width="3" stroke-linecap="round"/>
-<path d="M164 111h16m-13 9h21" stroke="#93ba9e" stroke-width="3" stroke-linecap="round"/>
-<path d="M71 122c-16 0-20-17-12-28l19-14" fill="#a2cdae" stroke="#345c4f" stroke-width="2.5" stroke-linecap="round"/>
-<path d="M73 93c-3-38 18-64 54-64 35 0 54 28 48 63l-8 46c-3 20-20 30-45 30s-42-11-46-28z" fill="#cce8c4" stroke="#345c4f" stroke-width="2.8"/>
-<path d="M80 67c8-17 23-27 43-27" stroke="#eaf6e4" stroke-width="6" stroke-linecap="round"/>
-<path d="M119 30c-12-2-21-12-19-22 15-1 23 7 19 22z" fill="#e8cd85" stroke="#345c4f" stroke-width="2.5"/>
-<path d="M119 29c-2-16 8-26 21-23 0 15-7 22-21 23z" fill="#89bc98" stroke="#345c4f" stroke-width="2.5"/>
-<ellipse cx="96" cy="87" rx="11" ry="7" fill="#efbba9"/><ellipse cx="156" cy="87" rx="11" ry="7" fill="#efbba9"/>
-<ellipse cx="104" cy="75" rx="4" ry="5.5" fill="#345c4f"/><ellipse cx="146" cy="75" rx="4" ry="5.5" fill="#345c4f"/>
-<path d="M119 88q7 9 14 0" stroke="#345c4f" stroke-width="2.8" stroke-linecap="round"/>
-<path d="M93 118h58l-4 38H97z" fill="#eaf1df"/>
-<path d="m86 112 31 5 10 33-30-5z" fill="#fffaf0" stroke="#345c4f" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="m117 117 32-13 11 33-33 13z" fill="#fff" stroke="#345c4f" stroke-width="2.5" stroke-linejoin="round"/>
-<path d="m95 123 15 3m-12 6 13 2m17-12 15-6m-12 15 14-5" stroke="#c9d6be" stroke-width="2.4" stroke-linecap="round"/>
-<ellipse cx="87" cy="120" rx="9" ry="7" transform="rotate(15 87 120)" fill="#cce8c4" stroke="#345c4f" stroke-width="2.5"/>
-<ellipse cx="153" cy="118" rx="9" ry="7" transform="rotate(-25 153 118)" fill="#cce8c4" stroke="#345c4f" stroke-width="2.5"/>
-<rect x="36" y="139" width="30" height="25" rx="6" fill="#e3d8f2" stroke="#817390" stroke-width="2"/>
-<path d="M40 147h22m-11-7v23" stroke="#a695b8" stroke-width="2"/><rect x="47" y="146" width="8" height="6" rx="2" fill="#fff5db"/>
-<path d="m198 16 3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#e8cd85"/>
-<path d="m42 48 2 7 7 2-7 2-2 7-2-7-7-2 7-2z" fill="#bfaed9"/>
-<circle cx="213" cy="153" r="4" fill="#efbba9"/><circle cx="61" cy="29" r="3" fill="#cce8c4"/>
-</svg>'''
+GUIDE_BUDDY = ('<svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" '
+               'data-mascot="eagle" aria-hidden="true" focusable="false">'
+               '<ellipse cx="81" cy="153" rx="48" ry="5" fill="#e9dac1"/>' + _EAGLE + '</svg>')
+
+
+FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" data-mascot="eagle" aria-hidden="true" focusable="false">
+<ellipse cx="125" cy="176" rx="85" ry="9" fill="#eadbc7"/>
+<path d="M17 49c0-7 6-12 13-11 4-12 21-12 25-1 11-2 17 11 11 16H23c-4 0-6-1-6-4z" fill="#fff"/>
+<rect x="171" y="47" width="51" height="78" rx="8" transform="rotate(12 171 47)" fill="#fff" stroke="#d9c5ac" stroke-width="2"/>
+<path d="m184 70 18 4m-20 8 23 5m-26 6 16 3" stroke="#d9c5ac" stroke-width="2.5" stroke-linecap="round"/>
+<path d="m182 106 5 5 10-10" stroke="#86a5b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="m206 20 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#efc875"/>
+<circle cx="24" cy="113" r="4" fill="#abc4d1"/><circle cx="223" cy="149" r="3" fill="#efbea7"/>
+<g transform="translate(36 9) scale(1.08)">''' + _EAGLE + '''</g>
+<path d="M26 156q7-12 14-5-1 11-14 13m14-13q8-9 14-1-3 9-14 9" fill="#c8d7df" stroke="#86a5b7" stroke-width="2" stroke-linejoin="round"/>
+</svg>''')
 
 
 _SHAPES = {
@@ -62,9 +58,14 @@ _SHAPES = {
 def guide_icon(name: str) -> str:
     """An allowlisted decorative icon; never interpolate user-authored SVG."""
     shape = _SHAPES.get(name, _SHAPES["book"])
-    return ('<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" '
-            'aria-hidden="true" focusable="false"><g stroke="#345c4f" stroke-width="2.4" '
+    icon = ('<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" '
+            'aria-hidden="true" focusable="false"><g stroke="#674936" stroke-width="2.4" '
             'stroke-linecap="round" stroke-linejoin="round">' + shape + '</g></svg>')
+    # Keep the established icon vocabulary, adapted to the eagle's nest/sky palette.
+    for old, new in (("#345c4f", "#674936"), ("#d7eccc", "#f0dfba"),
+                     ("#e3d8f2", "#dceaf2"), ("#817390", "#638198")):
+        icon = icon.replace(old, new)
+    return icon
 
 
 TOPIC_ART = {

@@ -557,7 +557,7 @@ def 顯示活動重點(標題: str, 日期: str, 活動模型: dict, 狀態: str
 標題攻略 = _guide_content.get_guide(st.query_params.get("guide", ""), _guide_content.all_guides(攻略資料))
 st.set_page_config(
     page_title=f"{標題攻略['title']}｜噠噠攻略站" if 標題攻略 else "噠噠特攻攻略站 · 養成與活動攻略",
-    page_icon="📖",
+    page_icon="🦅",
     layout="wide",
     initial_sidebar_state="collapsed",
 )

@@ -49,7 +49,7 @@ def test_cloud_theme_matches_the_single_shared_stylesheet():
     a = boot()
     styles = [m.value for m in a.markdown if "<style>" in m.value]
     assert len(styles) == 1
-    assert "--accent:#14604f" in styles[0]
+    assert f'--accent:{COLORS["accent"]}' in styles[0]
     assert ".st-key-guide_search_panel" in styles[0]
 
 
@@ -164,6 +164,18 @@ def test_original_vector_art_is_decorative_and_has_no_remote_assets():
     for index in range(5):
         assert f'label[data-testid="stRadioOption"]:has(input[value="{index}"])::before' in STYLE
     assert "grid-template-columns:repeat(5,minmax(0,1fr))" in STYLE
+
+
+def test_eagle_mascot_is_shared_by_brand_and_home():
+    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _EAGLE
+
+    assert _EAGLE in GUIDE_BUDDY and _EAGLE in FIELD_BUDDY
+    assert 'data-mascot="eagle"' in GUIDE_BUDDY and 'data-mascot="eagle"' in FIELD_BUDDY
+    a = boot()
+    a.radio[0].set_value("攻略首頁").run()
+    text = "\n".join(item.value for item in a.markdown if "<style>" not in item.value)
+    assert text.count('data-mascot="eagle"') == 2
+    assert "小鷹陪你，找下一步。" in text
 
 
 def test_warm_cache_refreshes_art_before_theme_and_ui(monkeypatch):

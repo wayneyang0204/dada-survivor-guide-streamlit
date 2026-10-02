@@ -158,7 +158,7 @@ def render_home(legacy: list[dict]) -> None:
                     '<h1 class="guide-hero-title"><span class="hero-title-part">查攻略，</span><span class="hero-title-part hero-emphasis">決定下一步。</span></h1>'
                     '<p class="guide-hero-deck">升什麼、缺多少、何時停手。</p>'
                     f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
-                    f'<div class="hero-companion" aria-hidden="true"><span class="buddy-note">先查清楚，再投入。</span>{FIELD_BUDDY}</div></div>',
+                    f'<div class="hero-companion" aria-hidden="true"><span class="buddy-note">小鷹陪你，找下一步。</span>{FIELD_BUDDY}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:
