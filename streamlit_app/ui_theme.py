@@ -468,8 +468,8 @@ button[data-testid^="stBaseButton-primary"]:active {box-shadow:none;}
 """
 
 _NAV_ART = "\n".join(
-    f'.st-key-main_nav label[data-testid="stRadioOption"]:nth-child({index})::before '
+    f'.st-key-main_nav label[data-testid="stRadioOption"]:has(input[value="{index}"])::before '
     f'{{background-image:url("data:image/svg+xml,{quote(guide_icon(name), safe="")}");}}'
-    for index, name in enumerate(("home", "upgrade", "profile", "event", "book"), 1)
+    for index, name in enumerate(("home", "upgrade", "profile", "event", "book"))
 )
 STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + "\n</style>")

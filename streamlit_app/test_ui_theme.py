@@ -160,6 +160,9 @@ def test_original_vector_art_is_decorative_and_has_no_remote_assets():
         assert not any(node.tag.endswith(("image", "script", "foreignObject")) for node in root.iter())
     assert guide_icon('<script>') == guide_icon("book")
     assert STYLE.count("data:image/svg+xml,") == 5
+    # Cloud may wrap each radio in its own div: nth-child would show five homes.
+    for index in range(5):
+        assert f'label[data-testid="stRadioOption"]:has(input[value="{index}"])::before' in STYLE
     assert "grid-template-columns:repeat(5,minmax(0,1fr))" in STYLE
 
 
