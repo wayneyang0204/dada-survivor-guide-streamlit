@@ -8,7 +8,7 @@ import streamlit as st
 
 import guide_content as content
 from ui_art import TOPIC_ART, guide_icon
-from ui_interactions import eagle_markup, render_playground
+from ui_interactions import eagle_markup
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
@@ -181,7 +181,6 @@ def render_home(legacy: list[dict]) -> None:
                         st.markdown(f'<div class="task-card-head" data-ui-region="tool-{artwork}" data-ui-motion="true"><span class="task-tag">{tag}</span><span class="task-art">{guide_icon(artwork)}</span></div>', unsafe_allow_html=True)
                         st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
                         st.caption(detail)
-    render_playground(open_guide)
     render_directory(guides, category, "home")
 
 

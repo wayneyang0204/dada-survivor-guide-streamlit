@@ -4,22 +4,23 @@ The little eagle guide is our own mascot, not an in-game character. All artwork 
 decorative: nearby native controls and headings carry the accessible names.
 """
 
-_EAGLE = '''<g stroke="#674936" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+_EAGLE = '''<g class="eagle-character" stroke="#674936" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
 <path d="m64 132-7 16 12-5 12 7 7-17" fill="#c08b5e"/>
 <path d="M42 92c-4-29 13-46 39-46s43 18 40 47l-3 28c-2 18-16 28-37 28s-35-10-37-28z" fill="#af7c54"/>
 <path d="M64 96q17-10 34 0l-2 33q-15 15-30 0z" fill="#f5dfb7" stroke="none"/>
 <g class="eagle-wings"><g class="eagle-wing-left"><path d="M45 85c-20 6-23 31-11 43l18-21" fill="#af7c54"/>
 <path d="m32 112 11-9" stroke="#8c603f"/></g><g class="eagle-wing-right"><path d="M117 85c20 6 23 31 11 43l-18-21" fill="#af7c54"/>
 <path d="m130 112-11-9" stroke="#8c603f"/></g></g>
-<path d="M29 70c-1-24 15-43 38-47l-2-8 14 6 10-9 4 11c24 4 40 23 39 47-1 17-11 28-25 30l-9-5-9 8-9-6-9 6-10-8-9 5c-15-3-23-14-23-30z" fill="#fffdf7"/>
+<g class="eagle-head"><path d="M29 70c-1-24 15-43 38-47l-2-8 14 6 10-9 4 11c24 4 40 23 39 47-1 17-11 28-25 30l-9-5-9 8-9-6-9 6-10-8-9 5c-15-3-23-14-23-30z" fill="#fffdf7"/>
 <path d="M40 48c6-11 16-17 27-19" stroke="#fff" stroke-width="4"/>
 <ellipse cx="51" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/><ellipse cx="111" cy="80" rx="9" ry="6" fill="#efbea7" stroke="none"/>
 <g class="eagle-eyes"><ellipse cx="62" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/><ellipse cx="102" cy="65" rx="5" ry="6.5" fill="#40342c" stroke="none"/>
 <circle cx="60.5" cy="63" r="1.7" fill="#fff" stroke="none"/><circle cx="100.5" cy="63" r="1.7" fill="#fff" stroke="none"/></g>
 <path d="M75 76c4-5 14-6 21-2l10 7c-8 0-11 3-11 10l-10-4-6-4z" fill="#efbd59"/>
-<path d="m87 78 7 3" stroke="#d29a3d" stroke-width="1.6"/>
+<path d="m87 78 7 3" stroke="#d29a3d" stroke-width="1.6"/></g>
 <g class="eagle-book"><path d="M56 109q13-5 25 1 12-6 25-1v26q-13-4-25 1-12-5-25-1z" fill="#fffdf7"/>
-<path d="M81 111v24m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b9cbd1" stroke-width="2"/></g>
+<path d="M81 111v24m-17-16h9m16 0h9m-34 6h9m16 0h9" stroke="#b9cbd1" stroke-width="2"/>
+<path class="eagle-page-leaf" d="M82 111q12-6 24-2v26q-13-4-24 1z" fill="#fff7e2" stroke="#d9c5ac" stroke-width="1.4"/></g>
 <path d="M50 114c1-8 12-7 15 0l-9 9c-5 1-9-4-6-9zm62 0c-1-8-12-7-15 0l9 9c5 1 9-4 6-9z" fill="#af7c54"/>
 <path d="M62 145v6m-5 0h12m28-6v6m-5 0h12" stroke="#d69c42" stroke-width="3.5"/>
 </g>'''
@@ -27,17 +28,18 @@ _EAGLE = '''<g stroke="#674936" stroke-width="2.7" stroke-linecap="round" stroke
 
 GUIDE_BUDDY = ('<svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" '
                'data-mascot="eagle" aria-hidden="true" focusable="false">'
-               '<ellipse cx="81" cy="153" rx="48" ry="5" fill="#e9dac1"/>' + _EAGLE + '</svg>')
+               '<ellipse class="eagle-shadow" cx="81" cy="153" rx="48" ry="5" fill="#e9dac1"/>' + _EAGLE + '</svg>')
 
 
 FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" data-mascot="eagle" aria-hidden="true" focusable="false">
-<ellipse cx="125" cy="176" rx="85" ry="9" fill="#eadbc7"/>
+<ellipse class="eagle-shadow" cx="125" cy="176" rx="70" ry="7" fill="#eadbc7"/>
 <path d="M17 49c0-7 6-12 13-11 4-12 21-12 25-1 11-2 17 11 11 16H23c-4 0-6-1-6-4z" fill="#fff"/>
 <rect x="171" y="47" width="51" height="78" rx="8" transform="rotate(12 171 47)" fill="#fff" stroke="#d9c5ac" stroke-width="2"/>
 <path d="m184 70 18 4m-20 8 23 5m-26 6 16 3" stroke="#d9c5ac" stroke-width="2.5" stroke-linecap="round"/>
 <path d="m182 106 5 5 10-10" stroke="#86a5b7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="m206 20 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#efc875"/>
-<circle cx="24" cy="113" r="4" fill="#abc4d1"/><circle cx="223" cy="149" r="3" fill="#efbea7"/>
+<path class="eagle-sparkle" d="m206 20 3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#efc875"/>
+<circle class="eagle-sparkle sparkle-late" cx="24" cy="113" r="4" fill="#abc4d1"/><circle cx="223" cy="149" r="3" fill="#efbea7"/>
+<g class="eagle-sleep-marks" stroke="#86a5b7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M161 40h10l-10 10h10m7-26h13l-13 13h13"/></g>
 <g transform="translate(36 9) scale(1.08)">''' + _EAGLE + '''</g>
 <path d="M26 156q7-12 14-5-1 11-14 13m14-13q8-9 14-1-3 9-14 9" fill="#c8d7df" stroke="#86a5b7" stroke-width="2" stroke-linejoin="round"/>
 </svg>''')

@@ -142,3 +142,9 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 - Contrast checks cover all five reading surfaces. App tests also cover original
   artwork, real counts, topic order and warm-cache reload of the shared artwork.
   Automated checks do not replace rendered desktop and phone inspection.
+- The eagle automatically waves, stretches its wings, tilts its head, hops and
+  turns a page. Native mascot preferences also offer waving, flapping, reading
+  and sleeping poses. Animation repeats while enabled; the global toggle and
+  OS reduced-motion preference stop it. These controls never edit player data.
+- The mascot is enlarged on narrow phones. Motion stays in decorative SVG groups,
+  not reading text; no practice quiz or sample-material playground is displayed.

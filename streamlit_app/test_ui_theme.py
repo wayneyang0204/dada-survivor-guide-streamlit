@@ -174,7 +174,7 @@ def test_eagle_mascot_is_shared_by_brand_and_home():
     a = boot()
     a.radio[0].set_value("攻略首頁").run()
     text = "\n".join(item.value for item in a.markdown if "<style>" not in item.value)
-    assert text.count('data-mascot="eagle"') == 3  # Brand, hero and material practice.
+    assert text.count('data-mascot="eagle"') == 2  # Brand and hero; no practice panel.
     assert "小鷹陪你" not in text
 
 
