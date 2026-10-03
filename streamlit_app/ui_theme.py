@@ -465,46 +465,31 @@ _NAV_ART = "\n".join(
 )
 _MOTION_GUIDE = """
 /* Motion is decorative and local. No scrolling takeover, sound, or remote player. */
-.st-key-motion_controls {margin:-1rem 0 .35rem;}
-.st-key-motion_controls [data-testid="stPopover"] {display:flex;justify-content:flex-end;}
-.st-key-motion_controls > [data-testid="stVerticalBlock"] {align-items:flex-end;}
-.st-key-motion_controls button {min-height:44px;background:#fffdf9;border-color:var(--line);}
 [data-testid="stElementContainer"]:has(.motion-preferences) {display:none;}
-.eagle-character, .eagle-head, .eagle-eyes, .eagle-wings, .eagle-wing-left, .eagle-wing-right, .eagle-book, .eagle-page-leaf {transform-box:view-box;}
-.eagle-character {transform-origin:81px 140px;}
-.eagle-head {transform-origin:81px 92px;}
-.eagle-eyes {transform-origin:81px 65px;}
-.eagle-wings {transform-origin:81px 90px;}
-.eagle-wing-left {transform-origin:45px 88px;}
-.eagle-wing-right {transform-origin:117px 88px;}
-.eagle-book {transform-origin:81px 123px;}
-.eagle-page-leaf {transform-origin:82px 123px;}
-.eagle-shadow, .eagle-sparkle {transform-box:fill-box;transform-origin:center;}
-.eagle-sleep-marks {opacity:0;}
-.eagle-animated[data-eagle-pose="sleep"] .eagle-sleep-marks {opacity:1;}
-.eagle-animated[data-eagle-pose="sleep"] .eagle-eyes {transform:scaleY(.13);}
-body:has([data-motion-enabled="on"]) .eagle-animated:not([data-eagle-pose="sleep"]) .eagle-eyes {animation:eagle-blink 4.8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated:is([data-eagle-pose="auto"],[data-eagle-pose="read"]) .eagle-page-leaf {animation:eagle-page 2.6s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated:not([data-eagle-pose="sleep"]) .eagle-head {animation:eagle-look 8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="auto"] .eagle-character {animation:eagle-hop 8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="auto"] .eagle-wing-right {animation:eagle-greet 8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="auto"] .eagle-wing-left {animation:eagle-stretch 8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="wave"] .eagle-wing-right {animation:eagle-wave 1.5s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="flap"] .eagle-wing-right {animation:eagle-flap-right .85s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="flap"] .eagle-wing-left {animation:eagle-flap-left .85s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="flap"] .eagle-character {animation:eagle-float 1.7s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated:is([data-eagle-pose="read"],[data-eagle-pose="wave"]) .eagle-character {animation:eagle-breathe 3s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="sleep"] .eagle-character {animation:eagle-breathe 4s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="sleep"] .eagle-sleep-marks {animation:eagle-dream 2.8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated:not([data-eagle-pose="sleep"]) .eagle-sparkle {animation:eagle-twinkle 3s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated .sparkle-late {animation-delay:1.2s;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="auto"] .eagle-shadow {animation:eagle-hop-shadow 8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .eagle-animated[data-eagle-pose="flap"] .eagle-shadow {animation:eagle-shadow 1.7s ease-in-out infinite;}
-/* The tiny header eagle stays seated; the larger home eagle gets the full hop. */
-body:has([data-motion-enabled="on"]) .brand-mark .eagle-character {animation:eagle-breathe 4s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .hero-companion:hover .eagle-animated:is([data-eagle-pose="auto"],[data-eagle-pose="read"],[data-eagle-pose="wave"]) .eagle-wing-right {animation:eagle-wave 1.1s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .hero-companion:hover .eagle-animated:is([data-eagle-pose="auto"],[data-eagle-pose="read"],[data-eagle-pose="wave"]) .eagle-head {animation:eagle-curious 1.8s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .st-key-guide_search_panel:focus-within .eagle-page-leaf {animation:eagle-page 1.4s ease-in-out infinite;}
+.kite-flight,.kite-character,.kite-head,.kite-eyes,.kite-wing-left,.kite-wing-right,.kite-tail {transform-box:view-box;}
+.kite-character {transform-origin:120px 100px;transform:scale(.78);}
+.kite-head {transform-origin:120px 102px;}
+.kite-eyes {transform-origin:120px 77px;}
+.kite-wing-left {transform-origin:99px 105px;}
+.kite-wing-right {transform-origin:141px 105px;}
+.kite-tail {transform-origin:120px 132px;}
+.kite-sparkle {transform-box:fill-box;transform-origin:center;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-flight {animation:kite-cruise 9s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-character {animation:kite-bank 9s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-wing-left {animation:kite-flap-left 1.6s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-wing-right {animation:kite-flap-right 1.6s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-tail {animation:kite-steer 9s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-head {animation:kite-look 5s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-eyes {animation:kite-blink 4.8s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-cloud {animation:kite-cloud-drift 12s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .cloud-front {animation-delay:-6s;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-sparkle {animation:kite-twinkle 3s ease-in-out infinite;}
+/* Header stays inside its badge. Horizontal flight belongs to the sky scene. */
+body:has([data-motion-enabled="on"]) .brand-mark .kite-flight {animation:kite-hover 3s ease-in-out infinite;}
+.brand-mark .kite-character {transform:scale(1);}
+body:has([data-motion-enabled="on"]) .brand-mark .kite-character {animation:none;}
+.hero-companion {overflow:hidden;isolation:isolate;}
+.hero-companion svg {pointer-events:none;}
 body:has([data-motion-enabled="on"]) .st-key-main_nav label:has(input:checked)::before {animation:icon-hop .38s ease-out;}
 body:has([data-motion-enabled="on"]) .st-key-main_nav label:hover::before {animation:icon-wave .5s ease-out;}
 body:has([data-motion-enabled="on"]) [class*="st-key-task_entry_"] {transition:transform .2s ease,box-shadow .2s ease;}
@@ -526,22 +511,16 @@ body:has([data-motion-enabled="on"]) button:active:not(:disabled) {transform:tra
 .hero-companion svg {overflow:visible;}
 @media(max-width:760px) {.hero-companion {flex-basis:124px;}}
 @media(max-width:380px) {.hero-companion {flex-basis:96px;}}
-@keyframes eagle-blink {0%,43%,47%,100% {transform:scaleY(1);}45% {transform:scaleY(.12);}}
-@keyframes eagle-page {0%,30%,100% {transform:scaleX(1) skewY(0deg);}50% {transform:scaleX(-.85) skewY(-12deg);}70% {transform:scaleX(1) skewY(0deg);}}
-@keyframes eagle-wave {0%,100% {transform:rotate(0deg);}22%,62% {transform:rotate(-48deg);}42% {transform:rotate(-20deg);}82% {transform:rotate(-36deg);}}
-@keyframes eagle-greet {0%,32%,100% {transform:rotate(0deg);}7%,21% {transform:rotate(-48deg);}14% {transform:rotate(-18deg);}27% {transform:rotate(-32deg);}}
-@keyframes eagle-stretch {0%,42%,76%,100% {transform:rotate(0deg);}50%,66% {transform:rotate(40deg);}58% {transform:rotate(12deg);}}
-@keyframes eagle-flap-right {0%,100% {transform:rotate(-8deg);}50% {transform:rotate(-52deg);}}
-@keyframes eagle-flap-left {0%,100% {transform:rotate(8deg);}50% {transform:rotate(52deg);}}
-@keyframes eagle-hop {0%,35%,75%,100% {transform:translateY(0) rotate(0deg);}44% {transform:translateY(-12px) rotate(-4deg);}57% {transform:translateY(-5px) rotate(3deg);}65% {transform:translateY(-10px) rotate(-2deg);}}
-@keyframes eagle-look {0%,30%,74%,100% {transform:rotate(0deg);}12% {transform:rotate(-9deg);}48% {transform:rotate(8deg);}60% {transform:rotate(-5deg);}}
-@keyframes eagle-curious {0%,100% {transform:rotate(0deg);}50% {transform:rotate(-11deg);}}
-@keyframes eagle-float {0%,100% {transform:translateY(-2px) rotate(-2deg);}50% {transform:translateY(-14px) rotate(2deg);}}
-@keyframes eagle-breathe {0%,100% {transform:translateY(0) scaleY(1);}50% {transform:translateY(-3px) scaleY(1.025);}}
-@keyframes eagle-shadow {0%,100% {transform:scaleX(1);opacity:.85;}50% {transform:scaleX(.78);opacity:.5;}}
-@keyframes eagle-hop-shadow {0%,35%,75%,100% {transform:scaleX(1);opacity:.85;}44%,65% {transform:scaleX(.78);opacity:.5;}57% {transform:scaleX(.9);opacity:.7;}}
-@keyframes eagle-twinkle {0%,100% {transform:scale(.8) rotate(-10deg);opacity:.45;}50% {transform:scale(1.3) rotate(12deg);opacity:1;}}
-@keyframes eagle-dream {0%,100% {transform:translateY(0);opacity:.35;}50% {transform:translateY(-8px);opacity:1;}}
+@keyframes kite-cruise {0%,100% {transform:translate(-28px,5px);}25% {transform:translate(0,-7px);}50% {transform:translate(28px,4px);}75% {transform:translate(0,-3px);}}
+@keyframes kite-bank {0%,50%,100% {transform:scale(.78) rotate(0deg);}20% {transform:scale(.78) rotate(6deg);}70% {transform:scale(.78) rotate(-6deg);}}
+@keyframes kite-flap-left {0%,100% {transform:rotate(4deg);}42% {transform:rotate(32deg);}65% {transform:rotate(-7deg);}}
+@keyframes kite-flap-right {0%,100% {transform:rotate(-4deg);}42% {transform:rotate(-32deg);}65% {transform:rotate(7deg);}}
+@keyframes kite-steer {0%,50%,100% {transform:rotate(0deg);}25% {transform:rotate(-9deg);}75% {transform:rotate(9deg);}}
+@keyframes kite-look {0%,100% {transform:rotate(0deg);}30% {transform:rotate(-6deg);}70% {transform:rotate(5deg);}}
+@keyframes kite-blink {0%,43%,47%,100% {transform:scaleY(1);}45% {transform:scaleY(.12);}}
+@keyframes kite-hover {0%,100% {transform:translateY(0);}50% {transform:translateY(-4px);}}
+@keyframes kite-cloud-drift {0%,100% {transform:translateX(0);}50% {transform:translateX(-12px);}}
+@keyframes kite-twinkle {0%,100% {transform:scale(.8);opacity:.45;}50% {transform:scale(1.25);opacity:1;}}
 @keyframes icon-hop {0%,100% {transform:translateY(0);}45% {transform:translateY(-4px) rotate(-4deg);}}
 @keyframes icon-wave {0%,100% {transform:rotate(0deg);}30% {transform:rotate(-7deg);}65% {transform:rotate(5deg);}}
 @keyframes panel-arrive {from {transform:translateY(5px);}to {transform:translateY(0);}}
@@ -550,7 +529,6 @@ body:has([data-motion-enabled="on"]) button:active:not(:disabled) {transform:tra
 body:has([data-motion-enabled="off"]) * {animation:none!important;transition:none!important;}
 body:has([data-motion-enabled="off"]) [class*="st-key-task_entry_"]:is(:hover,:focus-within),
 body:has([data-motion-enabled="off"]) button:active {transform:none;}
-@media(max-width:760px) {.st-key-motion_controls {margin:-.7rem 0 .25rem;}}
 @media(prefers-reduced-motion:reduce) {* {animation:none!important;transition:none!important;} [class*="st-key-task_entry_"]:is(:hover,:focus-within),button:active {transform:none!important;}}
 """
 

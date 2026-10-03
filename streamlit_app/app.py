@@ -579,7 +579,7 @@ st.markdown(
     f"""
     <div class="masthead">
       <div class="masthead-brand">
-        <span class="brand-mark" aria-hidden="true">{_ui_interactions.eagle_markup("brand")}</span>
+        <span class="brand-mark" aria-hidden="true">{_ui_interactions.kite_markup("brand")}</span>
         <div><span class="brand-title">噠噠攻略站</span><span class="brand-subtitle">Survivor.io 攻略與養成指南</span></div>
       </div>
       <div class="masthead-edition"><span class="edition-label">非官方攻略</span><span>資料日期見各篇文章</span></div>
@@ -599,7 +599,7 @@ with st.container(key="main_nav"):
         on_change=_guide_ui.clear_article,
     )
 
-_ui_interactions.render_preferences()
+_ui_interactions.render_motion()
 
 if 主頁面 == "活動":
     頁面 = "活動最佳解"

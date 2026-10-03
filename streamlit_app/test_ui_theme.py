@@ -91,7 +91,7 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert sum(attrs.get("role") == "listitem" for _, attrs in markup.tags) == 3
     assert any(attrs.get("aria-label") == "執行備忘" for _, attrs in markup.tags)
     assert [e.label for e in a.expander] == ["只核對這一步的材料", "排序依據與其他候選"]
-    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成", "老鷹・動畫"}
+    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成"}
     # Opening the page never records an in-game completion.
     assert a.session_state["player_profile"]["awakening"] == 6
 
@@ -166,15 +166,15 @@ def test_original_vector_art_is_decorative_and_has_no_remote_assets():
     assert "grid-template-columns:repeat(5,minmax(0,1fr))" in STYLE
 
 
-def test_eagle_mascot_is_shared_by_brand_and_home():
-    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _EAGLE
+def test_red_kite_mascot_is_shared_by_brand_and_home():
+    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _RED_KITE
 
-    assert _EAGLE in GUIDE_BUDDY and _EAGLE in FIELD_BUDDY
-    assert 'data-mascot="eagle"' in GUIDE_BUDDY and 'data-mascot="eagle"' in FIELD_BUDDY
+    assert _RED_KITE in GUIDE_BUDDY and _RED_KITE in FIELD_BUDDY
+    assert 'data-mascot="red-kite"' in GUIDE_BUDDY and 'data-mascot="red-kite"' in FIELD_BUDDY
     a = boot()
     a.radio[0].set_value("攻略首頁").run()
     text = "\n".join(item.value for item in a.markdown if "<style>" not in item.value)
-    assert text.count('data-mascot="eagle"') == 2  # Brand and hero; no practice panel.
+    assert text.count('data-mascot="red-kite"') == 2  # Brand and hero; no practice panel.
     assert "小鷹陪你" not in text
 
 

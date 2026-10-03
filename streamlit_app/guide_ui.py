@@ -8,7 +8,7 @@ import streamlit as st
 
 import guide_content as content
 from ui_art import TOPIC_ART, guide_icon
-from ui_interactions import eagle_markup
+from ui_interactions import kite_markup
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
@@ -158,7 +158,7 @@ def render_home(legacy: list[dict]) -> None:
                     '<h1 class="guide-hero-title">噠噠特攻攻略</h1>'
                     '<p class="guide-hero-deck">特工覺醒、裝備神鑄、收藏與科技配件</p>'
                     f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
-                    f'<div class="hero-companion" aria-hidden="true">{eagle_markup()}</div></div>',
+                    f'<div class="hero-companion" aria-hidden="true">{kite_markup()}</div></div>',
                     unsafe_allow_html=True)
         search, topic = st.columns([2.25, 1], gap="medium")
         with search:

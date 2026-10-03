@@ -27,7 +27,7 @@ application is not a Cloudflare Worker.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
 - The cute visual layer uses a cream-white canvas, pastel task cards and rounded
-  controls. `ui_art.py` contains the decorative little-eagle guide SVG; it needs
+  controls. `ui_art.py` contains the decorative red-kite guide SVG; it needs
   no downloaded images, external fonts or new dependencies. Text and status
   colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
@@ -130,7 +130,7 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 
 ## Illustrated field-guide UI
 
-- Original, decorative eagle SVG mascot and icons are in `ui_art.py`; no remote images,
+- Original, decorative red-kite SVG mascot and icons are in `ui_art.py`; no remote images,
   font downloads or third-party scripts are needed. They are not game assets.
 - `ui_theme.py` is the single stylesheet for home, planner, profile, activity and
   article routes. Cream-white, caramel, peach and pale-sky surfaces retain dark
@@ -142,9 +142,9 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 - Contrast checks cover all five reading surfaces. App tests also cover original
   artwork, real counts, topic order and warm-cache reload of the shared artwork.
   Automated checks do not replace rendered desktop and phone inspection.
-- The eagle automatically waves, stretches its wings, tilts its head, hops and
-  turns a page. Native mascot preferences also offer waving, flapping, reading
-  and sleeping poses. Animation repeats while enabled; the global toggle and
-  OS reduced-motion preference stop it. These controls never edit player data.
-- The mascot is enlarged on narrow phones. Motion stays in decorative SVG groups,
-  not reading text; no practice quiz or sample-material playground is displayed.
+- The red kite flies left and right within the home sky scene, banks, flaps both
+  wings, sways its forked tail and blinks automatically. The small header mascot
+  hovers inside its badge. There is no animation chooser or playback control;
+  old session preferences are ignored, and OS reduced-motion stops all animation.
+- Motion stays in decorative SVG groups inside the illustration, not reading text
+  or buttons; no practice quiz or sample-material playground is displayed.
