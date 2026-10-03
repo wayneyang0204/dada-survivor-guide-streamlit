@@ -16,7 +16,8 @@ AWAKE_SOURCE = "https://notalknote.xyz/survivor-awakening/"
 COLLECT_SOURCE = "https://notalknote.xyz/survivorio-collection-hall/"
 SET_SOURCE = "https://notalknote.xyz/collectible-sets/"
 CALCULATOR = "https://sio-tools.exp0.dev/"
-RESOURCES = ("收藏之心", "高級收藏之心", "傳奇收藏自選", "覺醒核心", "神器核心", "科技配件")
+PET_SOURCE = "https://www.taptap.cn/moment/578920141585124521?group_id=338134"
+RESOURCES = ("收藏之心", "高級收藏之心", "傳奇收藏自選", "覺醒核心", "神器核心", "科技配件", "寵物材料")
 MODES = ("末世迴響", "遠征／月礦首領", "主線推關", "新版區域行動")
 STARS = ("未持有", "黃1", "黃2", "黃3", "黃4", "黃5", "紅1", "紅2", "紅3", "紅4", "紅5")
 STOCK_LABELS = {"hearts": "收藏之心", "advanced_hearts": "高級收藏之心", "red_boxes": "傳奇收藏自選箱",
@@ -26,6 +27,7 @@ FIELDS = {
     "mode": ("末世迴響", MODES),
     "survivor": (None, ("維納托", "塔洛莎", "楊大師", "其他")),
     "awakening": (None, (0, 8)), "taloxa": (None, (0, 8)),
+    "awakening_goal": (None, (0, 8)),
     "awakening_cores": (None, (0, 10000)), "s_shards": (None, (0, 100000)),
     "quantum_ready": (None, (True, False)),
     "slots": (None, (0, 100)), "red_owned": (None, (0, 100)),
@@ -46,6 +48,11 @@ FIELDS = {
     "relic_cores": (None, (0, 10000)), "gear_materials_ready": (None, (True, False)),
     "drone_red": (None, (True, False)), "forcefield_red": (None, (True, False)),
     "twin_drone": (None, (True, False)),
+    "pet_kind": (None, ("普通輸出寵", "主人增益寵", "異世寵物", "未持有")),
+    "pet_skills_ready": (None, (True, False)),
+    "pet_target": (None, "text"),
+    "pet_gain": (None, ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認")),
+    "pet_materials_ready": (None, (True, False)),
 }
 
 
@@ -353,7 +360,9 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     if p["neck"] is None or p["memory"] is None:
         missing.append("收藏：目前項鍊與記憶編輯器星數")
 
-    if p["survivor"] == "維納托" and p["awakening"] in (6, 7):
+    role_paused = (p["awakening_goal"] is not None and p["awakening"] is not None
+                   and p["awakening"] >= p["awakening_goal"])
+    if not role_paused and p["survivor"] == "維納托" and p["awakening"] in (6, 7):
         target = p["awakening"]+1
         shards = 550 if target == 7 else 600
         step = affordability(Step("venato", "覺醒核心", f"維納托 R{p['awakening']} → R{target}", f"維納托覺醒{target}",
@@ -371,7 +380,7 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     elif p["survivor"] is None or p["awakening"] is None:
         missing.append("特工：目前主位與精確覺醒等級")
 
-    if p["survivor"] == "維納托" and p["awakening"] == 5:
+    if not role_paused and p["survivor"] == "維納托" and p["awakening"] == 5:
         steps.append(Step("venato6", "覺醒核心", "維納托下一階先到 R6", "維納托覺醒6",
             "覺醒6強化背水一戰層數，並新增連攜被動槽位。",
             "升到R6後重新比較R7與協同，不一次投入到R8。", AWAKE_SOURCE, 85,
@@ -410,6 +419,32 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     if p["twin_drone"] is None:
         missing.append("科技：是否已完成雙生無人機")
 
+    if p["pet_kind"] is None:
+        missing.append("寵物：主戰類型、技能配置與下一個覺醒效果")
+    elif p["pet_kind"] == "未持有":
+        missing.append("寵物：尚未持有主戰寵，先確認可取得的寵物，不預設抽取成本")
+    elif p["pet_skills_ready"] is not True:
+        steps.append(Step("pet_skills", "寵物材料", "先核對寵物出戰／助戰技能", "主戰與助戰技能服務同一個傷害目標",
+            "先檢查現有技能是否放對；普通輸出寵強化寵物傷害，主人增益／異世寵優先核對主人有效增益。",
+            "只調整已解鎖技能；需要新寵或新材料時先停，不為湊配置盲抽。", PET_SOURCE, 110,
+            "待核對材料", "只用已解鎖技能時不花新材料",
+            current=p["pet_kind"], effect="先排除技能未裝入或助戰方向不一致的問題",
+            caution="社群來源已停止更新；不把歷史寵物排名當成當前版本最優配置。",
+            update={"pet_skills_ready": True}))
+    elif p["pet_target"] and p["pet_target"].strip() and p["pet_gain"] in ("主人增傷／有效增益", "寵物自身傷害"):
+        step = Step("pet_node", "寵物材料", f"寵物：{p['pet_target'].strip()}", p["pet_target"].strip(),
+            "已核對下一階有主人有效增益，完成一個節點後再比較其他系統。" if p["pet_gain"] == "主人增傷／有效增益" else
+            "這一階只強化寵物自身輸出；先看同模式結算的寵物占比，不能當成主人等比例增傷。",
+            "只完成這個節點；重新核對下一階效果與整段需求，不連續追加。", PET_SOURCE,
+            82 if p["pet_gain"] == "主人增傷／有效增益" else 55,
+            current=p["pet_kind"], effect=p["pet_gain"],
+            caution="目標與效果來自你核對的遊戲預覽，不是本站已驗證的寵物階級推薦。異世覺醒／共鳴不套用普通寵物成本。",
+            update={"pet_target": None, "pet_gain": None, "pet_materials_ready": None})
+        assess_checks(step, [condition_check("本節點所有本體、碎片、核心及其他材料（整段）", p["pet_materials_ready"])])
+        steps.append(step)
+    else:
+        missing.append("寵物：下一個完整節點及其效果；只有面板的升級先保留材料")
+
     for step in steps:
         apply_quote(step, p)
 
@@ -421,10 +456,41 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     complete = []
     if p["awakening"] == 8:
         complete.append("主位覺醒8：不再推薦重複升級")
+    elif role_paused:
+        complete.append(f"主位階段目標 R{p['awakening_goal']} 已達：暫停主位追加，改比其他系統；協同另算")
     if p["adv2"] == 8 and len(p["stars2"]) == 8 and sum(p["stars2"]) >= 80:
         complete.append("第二套8進階格／80傳奇星：菁英與BOSS門檻已完成")
     return {"primary": asdict(steps[0]) if steps else None,
             "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete}
+
+
+SYSTEMS = {"收藏之心": "普通典藏館", "高級收藏之心": "進階典藏館", "傳奇收藏自選": "收藏品",
+           "覺醒核心": "特工", "神器核心": "裝備", "科技配件": "科技", "寵物材料": "寵物", "玩法": "玩法"}
+
+
+def roadmap(raw: dict) -> dict:
+    """Visible cross-system queue; readiness precedes documented milestone rules.
+
+    This is an execution order, not an ROI ranking of interchangeable budgets.
+    Only the best current candidate per system is promoted to the overview.
+    """
+    result = recommend(raw)
+    candidates = ([result["primary"]] if result["primary"] else []) + result["alternatives"]
+    systems, queue = set(), []
+    for step in candidates:
+        system = SYSTEMS[step["resource"]]
+        if system not in systems:
+            queue.append({**step, "system": system, "rank": len(queue) + 1})
+            systems.add(system)
+    return {**result, "queue": queue}
+
+
+def following_step(raw: dict, step: dict) -> dict | None:
+    """Preview exactly one completed milestone without changing profile or game."""
+    if not step.get("update"):
+        return None
+    updated = completion_preview(raw, step)["profile"]
+    return recommend(updated)["primary"]
 
 
 def ranking_reason(result: dict) -> str:

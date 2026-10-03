@@ -558,4 +558,24 @@ _SOFT_UI = """
 }
 """
 
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + "\n</style>")
+_ROADMAP = """
+.st-key-cross_system_roadmap {margin:1.4rem 0;padding:1.25rem;background:#fffefd;border:1px solid var(--line);border-radius:24px;}
+.roadmap-heading {font-size:1.2rem!important;margin:0 0 .4rem!important;}
+.roadmap-after {padding:.8rem 1rem;background:#edf7fc;border-radius:14px;line-height:1.7;overflow-wrap:anywhere;}
+.roadmap-row {display:flex;align-items:flex-start;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--line);}
+.roadmap-rank {flex:0 0 32px;background:#fff5e2;color:var(--accent-deep);border-radius:10px;text-align:center;padding:.3rem 0;font-weight:750;}
+.roadmap-line {display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.roadmap-line span {font-size:.875rem;color:var(--muted);border:1px solid var(--line);border-radius:8px;padding:.1rem .4rem;}
+.roadmap-row p {margin:.2rem 0!important;font-size:.95rem;line-height:1.5;overflow-wrap:anywhere;}
+.roadmap-row small {color:var(--muted);font-size:.875rem;overflow-wrap:anywhere;}
+.roadmap-missing {font-size:.9rem;color:var(--muted);margin-top:1rem!important;}
+@media(max-width:760px) {
+ .st-key-cross_system_roadmap {padding:1rem .85rem;}
+ .st-key-cross_system_roadmap [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.65rem!important;}
+ .st-key-cross_system_roadmap [data-testid="stColumn"] {min-width:0!important;}
+ .st-key-cross_system_roadmap [data-testid="stHorizontalBlock"]:has(.roadmap-row) [data-testid="stColumn"]:last-child {flex:0 0 76px!important;}
+ .roadmap-row {gap:.5rem;}.roadmap-rank {flex-basis:27px;}
+}
+"""
+
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + "\n</style>")

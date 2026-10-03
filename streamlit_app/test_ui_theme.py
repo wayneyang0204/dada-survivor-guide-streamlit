@@ -100,7 +100,7 @@ def test_editor_has_visible_categories_and_only_one_form():
     a = boot()
     a.radio[0].set_value("我的帳號").run()
     selector = by_label(a.radio, "這次更新哪一項")
-    assert selector.options == ["角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技"]
+    assert selector.options == ["角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技", "寵物"]
     for section in selector.options:
         by_label(a.radio, "這次更新哪一項").set_value(section).run()
         assert not a.exception

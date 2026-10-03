@@ -7,6 +7,16 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- The planner shows a visible cross-system execution queue, one leading milestone
+  per system, plus a pure preview of what follows after the displayed milestone.
+  A main-survivor stage goal pauses further main upgrades when reached, without
+  hiding unfinished synergy milestones. Resource filters do not hide the global queue.
+- Pet configuration now participates in sequencing. Next paid nodes/effects and
+  full recipe readiness are player-confirmed from the game, not fabricated meta
+  rankings. Unknown/panel-only effects stay outside the spending queue. Historical
+  pet sources are explicitly marked as no longer updated. Completion clears the
+  old pet goal/readiness, and never consumes character cores for a pet upgrade.
+
 - New visitors open `攻略首頁`, not an account form. Home and the guide index
   read a local, source-labelled catalog and remain usable without source APIs.
 - Cornerstone articles have conclusions, conditions, tables, cautions,

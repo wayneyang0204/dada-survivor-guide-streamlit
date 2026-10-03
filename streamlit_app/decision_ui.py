@@ -22,7 +22,7 @@ def navigate(page: str) -> None:
 def edit_resource(resource: str) -> None:
     section = {"收藏之心": "普通典藏館", "高級收藏之心": "進階典藏館",
                "傳奇收藏自選": "收藏品", "覺醒核心": "角色與模式",
-               "神器核心": "裝備與科技", "科技配件": "裝備與科技"}.get(resource, "角色與模式")
+               "神器核心": "裝備與科技", "科技配件": "裝備與科技", "寵物材料": "寵物"}.get(resource, "角色與模式")
     st.session_state["profile_section"] = section
     navigate("我的帳號")
 
@@ -48,6 +48,7 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
             st.session_state["completion_undo"] = {"before": before, "title": completed_title}
             st.session_state.setdefault("completed_steps", []).append(completed_title)
         st.session_state["player_profile"] = combined
+        st.session_state.pop("route_selected_id", None)
         st.session_state["profile_updated"] = datetime.now().isoformat(timespec="minutes")
         st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0)+1
         st.session_state["profile_notice"] = "配置已儲存，升級順序已重算。"
@@ -60,6 +61,7 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
 def undo_completion() -> None:
     if previous := st.session_state.pop("completion_undo", None):
         st.session_state["player_profile"] = previous["before"]
+        st.session_state.pop("route_selected_id", None)
         st.session_state["completed_steps"] = st.session_state.get("completed_steps", [])[:-1]
         st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0)+1
         st.session_state["profile_notice"] = "已撤回剛才的完成紀錄，回到升級前的資料。沒有操作遊戲。"
@@ -166,10 +168,11 @@ def next_check(p: dict, scope: str) -> str | None:
                      or p["survivor"] == "維納托" and p["taloxa"] is None,
         "裝備與科技": p["weapon"] is None or p["weapon"] == "雙絕槍" and (p["weapon_e"] is None or p["weapon_v"] is None)
                      or p["twin_drone"] is None or p["twin_drone"] is False and p["drone_red"] is None,
+        "寵物": p["pet_kind"] is None or p["pet_kind"] == "未持有" or not p["pet_target"],
     }
     relevant = {"收藏之心": ("普通典藏館",), "高級收藏之心": ("進階典藏館",),
         "傳奇收藏自選": ("普通典藏館", "收藏品", "裝備與科技"), "覺醒核心": ("角色與模式", "裝備與科技"),
-        "神器核心": ("裝備與科技",), "科技配件": ("裝備與科技",)}
+        "神器核心": ("裝備與科技",), "科技配件": ("裝備與科技",), "寵物材料": ("寵物",)}
     return next((section for section in relevant.get(scope, groups) if groups[section]), None)
 
 
@@ -241,6 +244,10 @@ def render_decision(p: dict, step: dict) -> None:
               <h2 class="decision-title">{esc('title')}</h2>
               <dl class="decision-facts"><div><dt>目標門檻</dt><dd>{esc('target')}</dd></div>
               <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
+            if step.get("update"):
+                after = engine.following_step(p, step)
+                target = f"{engine.SYSTEMS[after['resource']]} · {after['title']}（{after['status']}）" if after else "先補其他系統資料，再決定投入"
+                st.markdown(f'<p class="roadmap-after"><b>這一步完成後 →</b> {html.escape(target)}</p>', unsafe_allow_html=True)
             plan = execution_plan(step)
             verify = f'<p>{html.escape(plan["verify"])}</p>' if plan["verify"] else ""
             operation = operating_steps(step)
@@ -288,7 +295,7 @@ def render_reasoning(result: dict) -> None:
         alternatives = result["alternatives"]
         if alternatives:
             st.markdown("#### 其他可比較的目標")
-            st.caption("不是固定升級順序，完成一步會重新計算。")
+            st.caption("同系統仍可比較的節點；跨系統順序已列在上方。完成一步會重新計算。")
             for index, item in enumerate(alternatives[:3], 2):
                 st.markdown(f'''<div class="decision-queue"><span class="queue-index">{index:02d}</span><div>
                   <div class="queue-title">{html.escape(item['title'])} · {html.escape(item['status'])}</div>
@@ -306,12 +313,57 @@ def render_reasoning(result: dict) -> None:
             st.caption(f"本次已記錄完成：{item}")
 
 
+def pause_character() -> None:
+    p = profile()
+    st.session_state["decision_resource"] = "自動排序"
+    save({"awakening_goal": p["awakening"]})
+
+
+def select_route(sid: str) -> None:
+    st.session_state["decision_resource"] = "自動排序"
+    st.session_state["route_selected_id"] = sid
+
+
+def render_roadmap(p: dict, shown: dict | None) -> None:
+    plan = engine.roadmap(p)
+    with st.container(key="cross_system_roadmap"):
+        st.markdown('<h2 class="roadmap-heading">跨系統優先順序</h2>', unsafe_allow_html=True)
+        st.caption("先完成已備妥的節點；同樣備妥才按已收錄門檻排序。不同材料可分開存，不是總傷害效益排名。")
+        for item in plan["queue"]:
+            details, open_action = st.columns([5, 1.25], vertical_alignment="center")
+            with details:
+                badge = "可完成" if item["status"] in engine.READY_STATES else item["status"]
+                st.markdown(f'''<div class="roadmap-row"><span class="roadmap-rank">{item['rank']:02d}</span><div>
+                  <div class="roadmap-line"><b>{html.escape(item['system'])}</b><span>{html.escape(badge)}</span></div>
+                  <p>{html.escape(item['title'])}</p><small>停在：{html.escape(item['target'])}</small>
+                  </div></div>''', unsafe_allow_html=True)
+            with open_action:
+                st.button(f"看 {item['rank']}", key=f"route_open_{item['id']}", width="stretch",
+                          on_click=select_route, args=(item["id"],))
+        if not plan["queue"]:
+            st.write("尚無完整路線；先核對下面的缺項，不把未知配置排成最後一名。")
+        for item in plan["complete"]:
+            st.caption(f"已達標 · {item}")
+        # Missing coverage is outside the spending queue, never a low score.
+        needs_collection = any(x.startswith(("典藏館：", "收藏：", "進階典藏：")) for x in plan["missing"])
+        needs_pet = any(x.startswith("寵物：") for x in plan["missing"])
+        if needs_collection or needs_pet:
+            st.markdown('<p class="roadmap-missing">尚未完整比較所有收藏／寵物缺口：以下資料未核對，不等於低優先。</p>', unsafe_allow_html=True)
+            left, right = st.columns(2)
+            if needs_collection:
+                with left:
+                    st.button("補收藏／典藏配置", on_click=edit_resource, args=("傳奇收藏自選",), width="stretch")
+            if needs_pet:
+                with right:
+                    st.button("補寵物配置", on_click=edit_resource, args=("寵物材料",), width="stretch")
+
+
 def render_home() -> None:
     p = profile()
     first_visit = not st.session_state.get("player_profile")
     heading, backup = st.columns([4, 1.2], vertical_alignment="center")
     with heading:
-        page_heading("升級路線", "依配置比較升級目標、材料需求與缺額。")
+        page_heading("升級路線", "目前目標、停手門檻與跨系統優先順序。")
     with backup:
         render_backup(p, first_visit=first_visit)
     workflow(0 if first_visit else 1)
@@ -352,14 +404,25 @@ def render_home() -> None:
             st.markdown(f'<div class="route-context">{html.escape(p["mode"])}<strong>{html.escape(hero)}</strong></div>', unsafe_allow_html=True)
         with edit:
             st.button("更新我的帳號", width="stretch", on_click=navigate, args=("我的帳號",))
+    if p["awakening"] is not None:
+        paused = p["awakening_goal"] is not None and p["awakening"] >= p["awakening_goal"]
+        if paused:
+            st.caption(f"主位已達階段目標 R{p['awakening_goal']}，不再追加主位核心；協同仍獨立比較。可在角色配置修改目標。")
+        else:
+            st.button(f"角色先停在 R{p['awakening']}，比較其他系統", on_click=pause_character, type="tertiary")
     if p["estimated_balances"]:
         labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
         st.caption(f"{labels}為推算結餘，未同步遊戲。有其他收入或消耗時請校正。")
     result = engine.recommend(p, scope)
-    if step := result["primary"]:
+    candidates = ([result["primary"]] if result["primary"] else []) + result["alternatives"]
+    step = next((s for s in candidates if s["id"] == st.session_state.get("route_selected_id")), result["primary"])
+    if step:
+        if step != result["primary"]:
+            st.info("正在查看其他順位，不代表它已變成第一優先。材料核對或完成後會重新排序。")
         render_decision(p, step)
     else:
         render_next_check(p, scope)
+    render_roadmap(p, step)
     render_reasoning(result)
 
 
@@ -370,7 +433,7 @@ def render_profile() -> None:
         st.caption("部分庫存為推算值；請核對遊戲內數量後重新儲存。")
     if notice := st.session_state.pop("profile_notice", None):
         st.success(notice)
-    sections = ("角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技")
+    sections = ("角色與模式", "普通典藏館", "進階典藏館", "收藏品", "裝備與科技", "寵物")
     with st.container(key="profile_layout"):
         nav, editor = st.columns([1, 3], gap="large")
         with nav:
@@ -398,6 +461,8 @@ def render_profile_form(p: dict, section: str) -> None:
                 values["taloxa"] = number("塔洛莎覺醒等級", "taloxa", p, 8)
                 values["s_shards"] = number("可用於主位的S特工碎片", "s_shards", p, 100000)
             values["quantum_ready"] = choice("量子碎片是否足夠升主位下一階", "quantum_ready", (True, False), p)
+            values["awakening_goal"] = number("主位階段目標 R（留白＝繼續比較下一階）", "awakening_goal", p, 8)
+            st.caption("目前主位已達這個目標時，暫停追加主位核心，轉比收藏、裝備、科技與寵物；不會停掉協同路線。")
         elif section == "普通典藏館":
             st.write("填所有套裝的合計；紅品質指傳奇收藏，不是史詩收藏的紅星。")
             for label, key in (("全部已開槽位", "slots"), ("不同紅品質收藏持有數", "red_owned"), ("已放入普通槽位的紅收藏數", "red_placed")):
@@ -426,6 +491,14 @@ def render_profile_form(p: dict, section: str) -> None:
             bs = stars("SS鞋套裝星數：賽博圖騰柱、複製寶鏡、夢境拼圖、基因編輯器", "boot_stars", p)
             values["red_boxes"] = number("傳奇收藏自選箱庫存", "red_boxes", p, 10000)
             st.caption("升星需求須按可選期數及每箱碎片量核對，不能只看箱數。")
+        elif section == "寵物":
+            values["pet_kind"] = choice("目前主戰寵物類型", "pet_kind", ("普通輸出寵", "主人增益寵", "異世寵物", "未持有"), p)
+            values["pet_skills_ready"] = choice("出戰與助戰技能已按主戰方向核對並裝入", "pet_skills_ready", (True, False), p)
+            values["pet_target"] = st.text_input("遊戲預覽的下一個完整節點（含寵物名稱與等級）", value=p["pet_target"] or "", max_chars=100,
+                                               placeholder="照遊戲填寫，例如：某主戰寵的下一階覺醒") or None
+            values["pet_gain"] = choice("這個節點實際解鎖的效果", "pet_gain", ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認"), p)
+            values["pet_materials_ready"] = choice("本節點全部本體、碎片、核心及其他材料已足", "pet_materials_ready", (True, False), p)
+            st.caption("只記遊戲中查到的完整節點；不套用另一種寵物的成本。未確認效果或只有面板時，先保留寵物材料。")
         else:
             values["weapon"] = choice("主武器", "weapon", ("雙絕槍", "其他"), p)
             l, r = st.columns(2)
