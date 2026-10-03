@@ -1,38 +1,21 @@
-"""Original handbook illustrations; SVG only, with no external asset requests.
+"""Bundled realistic red-kite artwork and original decorative vector icons.
 
-The little red kite is our own mascot, not an in-game character. All artwork is
-decorative: nearby native controls and headings carry the accessible names.
+The generated cutout is realistic artwork, not an in-game asset or a wildlife
+documentary photo. It is embedded locally, without external image requests.
 """
+from base64 import b64encode
+from pathlib import Path
 
-_RED_KITE = '''<g class="kite-flight"><g class="kite-character" stroke="#744635" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-<g class="kite-tail"><path d="M105 126 96 166l24-15 24 15-9-40z" fill="#c76946"/>
-<path d="m112 135-6 18m22-18 6 18" stroke="#efac73" stroke-width="3"/></g>
-<g class="kite-wing-left"><path d="M99 101C81 72 57 54 24 48q-10-1-3 11l19 19-17-8q-5 2 3 11l22 15-18-7q-5 3 4 12l24 16q22 12 43 1z" fill="#ad573e"/>
-<path d="M24 48q-10-1-3 11l19 19-17-8q-5 2 3 11l22 15-18-7q-5 3 4 12l17 11 12-19-15-24z" fill="#68504a" stroke="none"/>
-<path d="m53 72 12 26 17 5-13-26z" fill="#f4dfc1" stroke="none"/>
-<path d="m72 78 15 20m-20-6 16 15" stroke="#e89a64" stroke-width="2.5"/></g>
-<g class="kite-wing-right"><path d="M141 101c18-29 42-47 75-53q10-1 3 11l-19 19 17-8q5 2-3 11l-22 15 18-7q5 3-4 12l-24 16q-22 12-43 1z" fill="#ad573e"/>
-<path d="M216 48q10-1 3 11l-19 19 17-8q5 2-3 11l-22 15 18-7q5 3-4 12l-17 11-12-19 15-24z" fill="#68504a" stroke="none"/>
-<path d="m187 72-12 26-17 5 13-26z" fill="#f4dfc1" stroke="none"/>
-<path d="m168 78-15 20m20-6-16 15" stroke="#e89a64" stroke-width="2.5"/></g>
-<path d="M96 97q24-16 48 0l4 27q-2 25-28 26-26-1-28-26z" fill="#d78051"/>
-<path d="M106 105q14-9 28 0l-2 27q-12 12-24 0z" fill="#f2c392" stroke="none"/>
-<path d="m113 112 2 8m10-8-2 8m-3 5v7" stroke="#b46945" stroke-width="2"/>
-<path d="m108 145 6-3 5 3m8 0 6-3 5 3" stroke="#e4ae50" stroke-width="3"/>
-<g class="kite-head"><path d="M84 76c0-21 14-35 34-36l7-7 3 9c20 3 29 17 28 35-1 20-15 33-36 33S84 96 84 76z" fill="#e9e7e0"/>
-<path d="M94 60q8-12 19-13m-8 8 5-3" stroke="#fffdf7" stroke-width="3"/>
-<path d="m143 64 4 5m-4 5 5 4" stroke="#b6b8b1" stroke-width="2"/>
-<ellipse cx="97" cy="91" rx="8" ry="5" fill="#efa89a" stroke="none"/><ellipse cx="143" cy="91" rx="8" ry="5" fill="#efa89a" stroke="none"/>
-<g class="kite-eyes"><ellipse cx="106" cy="77" rx="5" ry="7" fill="#49392e" stroke="none"/><ellipse cx="134" cy="77" rx="5" ry="7" fill="#49392e" stroke="none"/>
-<circle cx="104.5" cy="75" r="1.8" fill="#fff" stroke="none"/><circle cx="132.5" cy="75" r="1.8" fill="#fff" stroke="none"/></g>
-<path d="M114 88q8-6 16-1l9 5q-10-1-12 9l-8-5z" fill="#edbe63"/>
-<path d="m129 90 10 2q-6 1-8 6" fill="#68504a" stroke="none"/>
-</g></g></g>'''
+KITE_ASSET = Path(__file__).parent / "assets" / "red-kite-realistic-v1.webp"
+_KITE_DATA = "data:image/webp;base64," + b64encode(KITE_ASSET.read_bytes()).decode("ascii")
+_REAL_KITE = ('<g class="kite-flight"><g class="kite-direction">'
+              f'<image class="kite-photo" x="28" y="36" width="184" height="123" href="{_KITE_DATA}"/>'
+              '</g></g>')
 
 
 GUIDE_BUDDY = ('<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" '
                'data-mascot="red-kite" aria-hidden="true" focusable="false">'
-               + _RED_KITE + '</svg>')
+               + _REAL_KITE + '</svg>')
 
 
 FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" data-mascot="red-kite" aria-hidden="true" focusable="false">
@@ -40,7 +23,7 @@ FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.or
 <g class="kite-cloud cloud-front"><path d="M175 151q-1-9 10-10c2-14 21-15 27-2 13-3 19 9 14 15h-44q-7 0-7-3z" fill="#fff"/></g>
 <path class="kite-wind" d="M17 130h25m-19 8h12m162-94h23m-18 8h12" stroke="#b6d2df" stroke-width="2.4" stroke-linecap="round"/>
 <path class="kite-sparkle" d="m202 18 2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#efc875"/>
-''' + _RED_KITE + '''
+''' + _REAL_KITE + '''
 </svg>''')
 
 

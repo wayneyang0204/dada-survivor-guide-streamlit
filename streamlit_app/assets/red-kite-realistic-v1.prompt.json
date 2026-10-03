@@ -1,0 +1,9 @@
+{
+  "asset": "red-kite-realistic-v1.webp",
+  "mode": "built-in image_gen",
+  "use_case": "photorealistic-natural",
+  "date": "2026-10-03",
+  "prompt": "Use case: photorealistic-natural. Asset type: transparent cutout bird for a website, not a logo. Primary request: a true-to-life adult red kite (Milvus milvus) gliding in flight, a beautiful realistic wildlife photographic cutout. Single whole bird, natural adult anatomy and proportions, finely resolved real feathers, rust-red body and deeply forked tail, greyish head with small natural eyes, pale underwing panels and dark separated primary flight feathers. Three-quarter underside side view with the head looking and travelling toward the RIGHT; both entire wings fully extended in a graceful slightly banked glide, entire forked tail visible. Gentle warm natural daylight, clean authentic wildlife colors. Centered bird fits fully inside a wide landscape canvas, generous clear margin around every wingtip and tail. Absolutely transparent background with real alpha, no sky, no cloud, no ground, no cast shadow, no props, no cartoon, no cute enlarged eyes, no human expression, no chibi, no painted outline, no text, no watermark. This asset must look like a real red kite photographed in flight; cutout edges preserve fine feather tips.",
+  "delivery": "960px WebP, alpha preserved; no content edits",
+  "disclosure": "AI-generated realistic artwork, not a photograph of an identified real bird."
+}

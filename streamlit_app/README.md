@@ -27,8 +27,8 @@ application is not a Cloudflare Worker.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
 - The cute visual layer uses a cream-white canvas, pastel task cards and rounded
-  controls. `ui_art.py` contains the decorative red-kite guide SVG; it needs
-  no downloaded images, external fonts or new dependencies. Text and status
+  controls. `ui_art.py` embeds a local realistic red-kite WebP cutout with the
+  vector UI icons; no external images, fonts or new dependencies are needed. Text and status
   colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
   lookup), then a collapsed directory by system. Search replaces the directory
@@ -130,8 +130,10 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 
 ## Illustrated field-guide UI
 
-- Original, decorative red-kite SVG mascot and icons are in `ui_art.py`; no remote images,
-  font downloads or third-party scripts are needed. They are not game assets.
+- The realistic red-kite cutout is AI-generated artwork in `assets/`, not a
+  documentary wildlife photo. It is 960px, about 103 KiB, with alpha preserved.
+  Its prompt and provenance are saved beside it. `ui_art.py` embeds it locally
+  alongside original vector icons; no external images/fonts/scripts are needed.
 - `ui_theme.py` is the single stylesheet for home, planner, profile, activity and
   article routes. Cream-white, caramel, peach and pale-sky surfaces retain dark
   text. The nest/sky surfaces keep the legacy mint/lilac token names for compatibility.
@@ -142,9 +144,12 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 - Contrast checks cover all five reading surfaces. App tests also cover original
   artwork, real counts, topic order and warm-cache reload of the shared artwork.
   Automated checks do not replace rendered desktop and phone inspection.
-- The red kite flies left and right within the home sky scene, banks, flaps both
-  wings, sways its forked tail and blinks automatically. The small header mascot
+- The realistic red kite glides left and right within the home sky scene and
+  turns at each end. Photo anatomy is not bent by fake wing/eye animations. The small header mascot
   hovers inside its badge. There is no animation chooser or playback control;
   old session preferences are ignored, and OS reduced-motion stops all animation.
 - Motion stays in decorative SVG groups inside the illustration, not reading text
   or buttons; no practice quiz or sample-material playground is displayed.
+- Cute UI styling uses cream, blush-peach and pale-sky stationery cards, rounded
+  icon tiles, small colored shadows and a subtle dotted canvas. All native flows
+  and reading/status contrast requirements are retained.

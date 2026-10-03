@@ -466,28 +466,17 @@ _NAV_ART = "\n".join(
 _MOTION_GUIDE = """
 /* Motion is decorative and local. No scrolling takeover, sound, or remote player. */
 [data-testid="stElementContainer"]:has(.motion-preferences) {display:none;}
-.kite-flight,.kite-character,.kite-head,.kite-eyes,.kite-wing-left,.kite-wing-right,.kite-tail {transform-box:view-box;}
-.kite-character {transform-origin:120px 100px;transform:scale(.78);}
-.kite-head {transform-origin:120px 102px;}
-.kite-eyes {transform-origin:120px 77px;}
-.kite-wing-left {transform-origin:99px 105px;}
-.kite-wing-right {transform-origin:141px 105px;}
-.kite-tail {transform-origin:120px 132px;}
+.kite-flight,.kite-direction {transform-box:view-box;transform-origin:120px 98px;}
 .kite-sparkle {transform-box:fill-box;transform-origin:center;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-flight {animation:kite-cruise 9s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-character {animation:kite-bank 9s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-wing-left {animation:kite-flap-left 1.6s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-wing-right {animation:kite-flap-right 1.6s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-tail {animation:kite-steer 9s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-head {animation:kite-look 5s ease-in-out infinite;}
-body:has([data-motion-enabled="on"]) .kite-animated .kite-eyes {animation:kite-blink 4.8s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-flight {animation:kite-cruise 12s ease-in-out infinite;}
+body:has([data-motion-enabled="on"]) .kite-animated .kite-direction {animation:kite-direction 12s ease-in-out infinite;}
 body:has([data-motion-enabled="on"]) .kite-animated .kite-cloud {animation:kite-cloud-drift 12s ease-in-out infinite;}
 body:has([data-motion-enabled="on"]) .kite-animated .cloud-front {animation-delay:-6s;}
 body:has([data-motion-enabled="on"]) .kite-animated .kite-sparkle {animation:kite-twinkle 3s ease-in-out infinite;}
 /* Header stays inside its badge. Horizontal flight belongs to the sky scene. */
 body:has([data-motion-enabled="on"]) .brand-mark .kite-flight {animation:kite-hover 3s ease-in-out infinite;}
-.brand-mark .kite-character {transform:scale(1);}
-body:has([data-motion-enabled="on"]) .brand-mark .kite-character {animation:none;}
+.brand-mark .kite-direction {transform:scale(1.12);}
+body:has([data-motion-enabled="on"]) .brand-mark .kite-direction {animation:none;}
 .hero-companion {overflow:hidden;isolation:isolate;}
 .hero-companion svg {pointer-events:none;}
 body:has([data-motion-enabled="on"]) .st-key-main_nav label:has(input:checked)::before {animation:icon-hop .38s ease-out;}
@@ -511,13 +500,8 @@ body:has([data-motion-enabled="on"]) button:active:not(:disabled) {transform:tra
 .hero-companion svg {overflow:visible;}
 @media(max-width:760px) {.hero-companion {flex-basis:124px;}}
 @media(max-width:380px) {.hero-companion {flex-basis:96px;}}
-@keyframes kite-cruise {0%,100% {transform:translate(-28px,5px);}25% {transform:translate(0,-7px);}50% {transform:translate(28px,4px);}75% {transform:translate(0,-3px);}}
-@keyframes kite-bank {0%,50%,100% {transform:scale(.78) rotate(0deg);}20% {transform:scale(.78) rotate(6deg);}70% {transform:scale(.78) rotate(-6deg);}}
-@keyframes kite-flap-left {0%,100% {transform:rotate(4deg);}42% {transform:rotate(32deg);}65% {transform:rotate(-7deg);}}
-@keyframes kite-flap-right {0%,100% {transform:rotate(-4deg);}42% {transform:rotate(-32deg);}65% {transform:rotate(7deg);}}
-@keyframes kite-steer {0%,50%,100% {transform:rotate(0deg);}25% {transform:rotate(-9deg);}75% {transform:rotate(9deg);}}
-@keyframes kite-look {0%,100% {transform:rotate(0deg);}30% {transform:rotate(-6deg);}70% {transform:rotate(5deg);}}
-@keyframes kite-blink {0%,43%,47%,100% {transform:scaleY(1);}45% {transform:scaleY(.12);}}
+@keyframes kite-cruise {0%,100% {transform:translate(-15px,3px) rotate(-3deg);}25% {transform:translate(0,-6px) rotate(2deg);}50% {transform:translate(15px,2px) rotate(3deg);}75% {transform:translate(0,-3px) rotate(-2deg);}}
+@keyframes kite-direction {0%,44%,100% {transform:scaleX(1);}49%,94% {transform:scaleX(-1);}}
 @keyframes kite-hover {0%,100% {transform:translateY(0);}50% {transform:translateY(-4px);}}
 @keyframes kite-cloud-drift {0%,100% {transform:translateX(0);}50% {transform:translateX(-12px);}}
 @keyframes kite-twinkle {0%,100% {transform:scale(.8);opacity:.45;}50% {transform:scale(1.25);opacity:1;}}
@@ -532,4 +516,46 @@ body:has([data-motion-enabled="off"]) button:active {transform:none;}
 @media(prefers-reduced-motion:reduce) {* {animation:none!important;transition:none!important;} [class*="st-key-task_entry_"]:is(:hover,:focus-within),button:active {transform:none!important;}}
 """
 
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + "\n</style>")
+_SOFT_UI = """
+/* Cute stationery surfaces, with a realistic bird instead of a cartoon face. */
+:root {--canvas:#fffaf8;--mint:#fff6e4;--peach:#fff0f3;--lilac:#eef6fc;--line:#ebded8;--shadow:#8e625912;}
+.stApp {background-image:radial-gradient(#dbb8b32b .8px,transparent .8px);background-size:24px 24px;}
+.brand-mark {border-radius:50%;background:#f4f8fc;border:1px solid #dfebf3;box-shadow:0 4px 12px #93adbe19;}
+.st-key-main_nav {border-radius:24px;background:#ffffffed;box-shadow:0 4px 15px var(--shadow);}
+.st-key-main_nav label[data-testid="stRadioOption"] {border-radius:17px;}
+.st-key-main_nav label:has(input:checked) {background:#fff3df;border-color:#e7d4b6;box-shadow:0 2px 0 #e8d6bb;}
+.st-key-guide_search_panel {background:linear-gradient(125deg,#fffbf3,#ffffff 58%,#fff4f7);border-color:#ecdeda;border-radius:30px;box-shadow:0 7px 24px var(--shadow);}
+.st-key-guide_search_panel::before {height:6px;background:linear-gradient(90deg,#f4c3c9 0% 34%,#f2dca7 34% 67%,#c5dfef 67%);}
+.hero-companion {flex-basis:240px;background:linear-gradient(155deg,#edf7fc,#f8fbfe);border:5px solid #fff;border-radius:44% 48% 45% 42%;box-shadow:0 4px 16px #9ab7c41c;padding:.1rem;}
+.hero-library-note {display:inline-block;background:#fff8e9;border:1px solid #ecdcbf;border-radius:14px;padding:.35rem .65rem;}
+[class*="st-key-task_entry_"] {border-radius:24px;box-shadow:0 4px 13px var(--shadow)!important;}
+.st-key-task_entries [data-testid="stColumn"]:nth-child(1) [class*="st-key-task_entry_"] {border-color:#eadbc0;}
+.st-key-task_entries [data-testid="stColumn"]:nth-child(2) [class*="st-key-task_entry_"] {border-color:#edced7;}
+.st-key-task_entries [data-testid="stColumn"]:nth-child(3) [class*="st-key-task_entry_"] {border-color:#cee1ed;}
+.task-art {border-radius:16px;background:#fffdfc;border:1px solid #ffffff;box-shadow:0 3px 0 #d3b7a521;}
+[class*="st-key-topic_cover_"] {border-radius:24px;background:#fffefd;}
+.topic-art {border-radius:18px;box-shadow:0 3px 0 #d3b7a521;}
+.st-key-guide_directory [data-testid="stExpander"] {border-radius:16px;background:#fffbf8;border-color:#eee1da;}
+.guide-verdict,.action-brief,.scenario-answer,.event-verdict,.st-key-route_notes {border-radius:22px;box-shadow:0 3px 12px var(--shadow);}
+.st-key-profile_editor,.st-key-onboarding,.st-key-route_toolbar {border-radius:24px;}
+.guide-table th {background:#fff5e2;}.guide-table tbody tr:nth-child(even) {background:#fffbf6;}
+.workflow-strip,.st-key-profile_nav {border-radius:20px;}
+[data-testid="stButton"] button,[data-testid="stFormSubmitButton"] button,[data-testid="stPopover"] button,[data-testid="stLinkButton"] a {border-radius:15px;}
+[data-testid="stTextInputRootElement"],[data-testid="stTextAreaRootElement"] {border-radius:15px;}
+@media(max-width:760px) {
+ .st-key-main_nav {border-radius:22px;}
+ .st-key-guide_search_panel {padding:1.15rem .9rem 1rem;border-radius:27px;}
+ .hero-companion {flex-basis:136px;border-width:3px;}
+ .guide-hero-title {font-size:1.65rem!important;}
+ .hero-library-note {display:block;padding:.3rem .5rem;line-height:1.65;font-size:.875rem;}
+ [class*="st-key-task_entry_"] {border-radius:23px;padding:.85rem 1rem;}
+ .task-art {border-radius:15px;}
+}
+@media(max-width:380px) {
+ .hero-companion {flex-basis:104px;}
+ .guide-hero-title {font-size:1.45rem!important;}
+ .hero-library-note span {padding:0 .1rem;}
+}
+"""
+
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + "\n</style>")

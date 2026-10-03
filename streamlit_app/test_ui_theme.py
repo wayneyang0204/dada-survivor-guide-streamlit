@@ -149,9 +149,9 @@ def test_illustrated_home_has_real_counts_and_accessible_native_routes():
 
 def test_original_vector_art_is_decorative_and_has_no_remote_assets():
     from xml.etree import ElementTree as ET
-    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, TOPIC_ART, guide_icon
+    from ui_art import TOPIC_ART, guide_icon
 
-    artwork = [GUIDE_BUDDY, FIELD_BUDDY, *(guide_icon(item[0]) for item in TOPIC_ART.values())]
+    artwork = [guide_icon(item[0]) for item in TOPIC_ART.values()]
     for item in artwork:
         root = ET.fromstring(item)
         assert root.attrib["aria-hidden"] == "true"
@@ -167,9 +167,9 @@ def test_original_vector_art_is_decorative_and_has_no_remote_assets():
 
 
 def test_red_kite_mascot_is_shared_by_brand_and_home():
-    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _RED_KITE
+    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _REAL_KITE
 
-    assert _RED_KITE in GUIDE_BUDDY and _RED_KITE in FIELD_BUDDY
+    assert _REAL_KITE in GUIDE_BUDDY and _REAL_KITE in FIELD_BUDDY
     assert 'data-mascot="red-kite"' in GUIDE_BUDDY and 'data-mascot="red-kite"' in FIELD_BUDDY
     a = boot()
     a.radio[0].set_value("攻略首頁").run()
