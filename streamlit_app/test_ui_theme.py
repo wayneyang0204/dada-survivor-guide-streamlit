@@ -167,9 +167,9 @@ def test_original_vector_art_is_decorative_and_has_no_remote_assets():
 
 
 def test_red_kite_mascot_is_shared_by_brand_and_home():
-    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _REAL_KITE
+    from ui_art import GUIDE_BUDDY, FIELD_BUDDY, _KITE_ART
 
-    assert _REAL_KITE in GUIDE_BUDDY and _REAL_KITE in FIELD_BUDDY
+    assert _KITE_ART in GUIDE_BUDDY and _KITE_ART in FIELD_BUDDY
     assert 'data-mascot="red-kite"' in GUIDE_BUDDY and 'data-mascot="red-kite"' in FIELD_BUDDY
     a = boot()
     a.radio[0].set_value("攻略首頁").run()

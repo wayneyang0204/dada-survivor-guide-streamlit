@@ -16,6 +16,7 @@ def test_flying_red_kite_is_allowlisted_decorative_svg(variant):
     root = ET.fromstring(kite_markup(variant))
     assert root.attrib["data-kite-motion"] == "flight"
     assert root.attrib["data-mascot"] == "red-kite"
+    assert root.attrib["data-kite-style"] == "storybook"
     assert root.attrib["aria-hidden"] == "true"
     assert root.attrib["focusable"] == "false"
     assert not any(node.tag.endswith(("script", "foreignObject")) for node in root.iter())
@@ -71,10 +72,10 @@ def test_old_preferences_cannot_stop_flight_or_change_player_data():
     assert '@media(prefers-reduced-motion:reduce)' in STYLE
 
 
-def test_realistic_red_kite_glides_left_and_right_without_cartoon_articulation():
+def test_storybook_red_kite_preserves_gliding_route_without_fake_articulation():
     root = ET.fromstring(kite_markup())
     classes = {node.attrib.get("class") for node in root.iter()}
-    assert {"kite-flight", "kite-direction", "kite-photo"} <= classes
+    assert {"kite-flight", "kite-direction", "kite-artwork"} <= classes
     assert not {"kite-head", "kite-eyes", "kite-wing-left", "kite-wing-right"} & classes
     for animation in ("kite-cruise 12s", "kite-direction 12s"):
         assert f"animation:{animation} ease-in-out infinite" in STYLE
@@ -89,15 +90,19 @@ def test_markup_does_not_create_a_profile():
     assert not app.query_params
 
 
-def test_realistic_asset_preserves_alpha_and_has_small_local_payload():
+def test_storybook_asset_preserves_alpha_and_has_small_local_payload():
     import json
     from PIL import Image
     from ui_art import KITE_ASSET
 
+    assert KITE_ASSET.name == "red-kite-storybook-v2.webp"
+    assert KITE_ASSET.with_name("red-kite-realistic-v1.webp").exists()
     assert KITE_ASSET.stat().st_size < 150_000
     with Image.open(KITE_ASSET) as image:
         assert image.size == (960, 640)
         assert image.mode == "RGBA" and image.getchannel("A").getextrema()[0] == 0
     provenance = json.loads(KITE_ASSET.with_suffix(".prompt.json").read_text(encoding="utf-8"))
     assert provenance["mode"] == "built-in image_gen"
+    assert provenance["reference"] == "red-kite-realistic-v1.webp"
+    assert provenance["use_case"] == "style-transfer"
     assert "not a photograph" in provenance["disclosure"]

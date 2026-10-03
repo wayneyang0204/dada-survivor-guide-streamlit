@@ -1,29 +1,29 @@
-"""Bundled realistic red-kite artwork and original decorative vector icons.
+"""Bundled storybook red-kite artwork and original decorative vector icons.
 
-The generated cutout is realistic artwork, not an in-game asset or a wildlife
-documentary photo. It is embedded locally, without external image requests.
+The generated illustration follows the realistic bird's shape and pose, not an
+in-game asset. It is embedded locally, without external image requests.
 """
 from base64 import b64encode
 from pathlib import Path
 
-KITE_ASSET = Path(__file__).parent / "assets" / "red-kite-realistic-v1.webp"
+KITE_ASSET = Path(__file__).parent / "assets" / "red-kite-storybook-v2.webp"
 _KITE_DATA = "data:image/webp;base64," + b64encode(KITE_ASSET.read_bytes()).decode("ascii")
-_REAL_KITE = ('<g class="kite-flight"><g class="kite-direction">'
-              f'<image class="kite-photo" x="28" y="36" width="184" height="123" href="{_KITE_DATA}"/>'
+_KITE_ART = ('<g class="kite-flight"><g class="kite-direction">'
+              f'<image class="kite-artwork" x="28" y="36" width="184" height="123" href="{_KITE_DATA}"/>'
               '</g></g>')
 
 
 GUIDE_BUDDY = ('<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" '
-               'data-mascot="red-kite" aria-hidden="true" focusable="false">'
-               + _REAL_KITE + '</svg>')
+               'data-mascot="red-kite" data-kite-style="storybook" aria-hidden="true" focusable="false">'
+               + _KITE_ART + '</svg>')
 
 
-FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" data-mascot="red-kite" aria-hidden="true" focusable="false">
+FIELD_BUDDY = ('''<svg viewBox="0 0 240 190" fill="none" xmlns="http://www.w3.org/2000/svg" data-mascot="red-kite" data-kite-style="storybook" aria-hidden="true" focusable="false">
 <g class="kite-cloud cloud-back"><path d="M13 49c-1-7 6-12 13-10 4-13 22-14 26-1 11-2 18 10 12 16H20q-7 0-7-5z" fill="#fff"/></g>
 <g class="kite-cloud cloud-front"><path d="M175 151q-1-9 10-10c2-14 21-15 27-2 13-3 19 9 14 15h-44q-7 0-7-3z" fill="#fff"/></g>
 <path class="kite-wind" d="M17 130h25m-19 8h12m162-94h23m-18 8h12" stroke="#b6d2df" stroke-width="2.4" stroke-linecap="round"/>
 <path class="kite-sparkle" d="m202 18 2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#efc875"/>
-''' + _REAL_KITE + '''
+''' + _KITE_ART + '''
 </svg>''')
 
 
