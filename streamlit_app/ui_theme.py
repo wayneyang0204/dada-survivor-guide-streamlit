@@ -569,6 +569,11 @@ _ROADMAP = """
 .roadmap-row p {margin:.2rem 0!important;font-size:.95rem;line-height:1.5;overflow-wrap:anywhere;}
 .roadmap-row small {color:var(--muted);font-size:.875rem;overflow-wrap:anywhere;}
 .roadmap-missing {font-size:.9rem;color:var(--muted);margin-top:1rem!important;}
+.decision-because {font-size:.9rem;color:var(--muted);line-height:1.7;margin:.8rem 0!important;}
+.decision-because b {display:block;color:var(--ink);}
+.smart-hold {background:#fff5e2;border:1px solid #ecdcbf;border-radius:14px;padding:.8rem 1rem;font-size:.9rem;line-height:1.7;}
+.st-key-smart_next_question {padding:1rem 1.25rem;border:1px solid var(--line);background:#edf7fc;border-radius:22px;margin-bottom:1rem;}
+.st-key-smart_next_question h3 {font-size:1rem!important;}.st-key-smart_next_question p {font-size:.9rem;}
 @media(max-width:760px) {
  .st-key-cross_system_roadmap {padding:1rem .85rem;}
  .st-key-cross_system_roadmap [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.65rem!important;}

@@ -130,6 +130,7 @@ def test_collection_quote_completion_and_undo_restore_exact_prior_state():
     by_label(a.number_input, "現有傳奇收藏自選箱").set_value(3)
     by_label(a.number_input, "從目前狀態到目標，合計要用多少箱").set_value(2)
     by_label(a.selectbox, "箱子可選目標期數，且其他碎片／條件都符合").set_value(True)
+    by_label(a.selectbox, "目前模式追加暴率仍有收益（含溢出轉換）").set_value(True)
     by_label(a.button, "更新這一步的材料").click().run()
     assert not a.exception
     before = dict(a.session_state["player_profile"])

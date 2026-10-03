@@ -16,6 +16,20 @@ application is not a Cloudflare Worker.
   rankings. Unknown/panel-only effects stay outside the spending queue. Historical
   pet sources are explicitly marked as no longer updated. Completion clears the
   old pet goal/readiness, and never consumes character cores for a pet upgrade.
+- Smart sequencing checks effects before spending: early Memory Editor crit
+  nodes require a mode-scoped usefulness confirmation (including overflow),
+  and the boots set requires an enabled Ice Armor skill. Inapplicable goals are
+  shown as deferred, not silently dropped or ranked as affordable upgrades.
+- Players can identify survival or slow skill formation as their current issue.
+  Survival diagnoses precede paid damage; the existing E1 milestone is promoted
+  for slow formation. Free owned adjustments still come first. These are bounded
+  decision rules, not an ML model or proof of a global DPS optimum.
+- Only two ready, identical +10% crit-damage milestones compare player-confirmed
+  full box recipes. Different effects, unknown prices and ties retain normal
+  milestone ordering. Panel gains are explicitly outside that cost comparison.
+- The next-question panel asks one decision-changing prerequisite before more
+  stock, without duplicating the active milestone form. Evidence labels distinguish
+  player-confirmed inputs and community rules from unmeasured account damage.
 
 - New visitors open `攻略首頁`, not an account form. Home and the guide index
   read a local, source-labelled catalog and remain usable without source APIs.

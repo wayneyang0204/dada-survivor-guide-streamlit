@@ -23,8 +23,10 @@ STARS = ("未持有", "黃1", "黃2", "黃3", "黃4", "黃5", "紅1", "紅2", "�
 STOCK_LABELS = {"hearts": "收藏之心", "advanced_hearts": "高級收藏之心", "red_boxes": "傳奇收藏自選箱",
                 "awakening_cores": "覺醒核心", "s_shards": "主位S特工碎片", "relic_cores": "神器核心"}
 READY_STATES = ("現在可做", "材料已足")
+FOCUSES = ("按目前配置補缺口", "首領傷害不足", "技能成形太慢", "生存不足")
 FIELDS = {
     "mode": ("末世迴響", MODES),
+    "growth_focus": ("按目前配置補缺口", FOCUSES),
     "survivor": (None, ("維納托", "塔洛莎", "楊大師", "其他")),
     "awakening": (None, (0, 8)), "taloxa": (None, (0, 8)),
     "awakening_goal": (None, (0, 8)),
@@ -39,6 +41,8 @@ FIELDS = {
     "advanced_cost": (None, (0, 100000)), "advanced_quote": (None, "text"),
     "neck": (None, ("破壞者徽記", "其他")), "memory": (None, (0, 10)),
     "ss_boots": (None, (True, False)), "boot_stars": ([], "stars4"),
+    "ice_armor_ready": (None, (True, False)),
+    "crit_more_useful": (None, (True, False)), "crit_mode": (None, MODES),
     "red_boxes": (None, (0, 10000)),
     "dark_matter": (None, (0, 10)),
     "step_quotes": ({}, "quotes"),
@@ -63,7 +67,7 @@ def clean_profile(raw: dict) -> dict:
     for key, (default, rule) in FIELDS.items():
         value = raw.get(key, default)
         if value is None:
-            result[key] = default if key == "mode" or isinstance(default, (list, dict)) else None
+            result[key] = default if key in ("mode", "growth_focus") or isinstance(default, (list, dict)) else None
             continue
         if rule == "quotes":
             if not isinstance(value, dict) or len(value) > 32:
@@ -218,6 +222,39 @@ def apply_quote(step: Step, p: dict) -> None:
                         condition_check(condition, quote.get("materials_ready"))])
     if quote.get("cost") is not None:
         step.cost = f"{quote['cost']:,} {unit}（你核對的整段需求）"
+
+
+def refine_candidates(steps: list[Step], p: dict) -> tuple[list[Step], list[dict]]:
+    """Effect prerequisites override recipes. No invented damage/ROI scores."""
+    active, deferred = [], []
+    for step in steps:
+        if (step.id == "memory" and step.update["memory"] in (3, 5)
+                and p["crit_mode"] == p["mode"] and p["crit_more_useful"] is False):
+            deferred.append({**asdict(step), "reason": "本模式已確認追加暴率沒有收益（含溢出轉換）；先不為暴率門檻花箱子。面板與後續暴傷節點需另比，並非整件收藏無用。"})
+            continue
+        if step.id == "memory" and step.update["memory"] in (3, 5):
+            useful = p["crit_more_useful"] if p["crit_mode"] == p["mode"] else None
+            assess_checks(step, [*step.checks, condition_check("本模式追加暴率有收益（含溢出轉換）", useful)])
+        if step.id == "boots_set":
+            if p["ice_armor_ready"] is False:
+                deferred.append({**asdict(step), "reason": "SS鞋冰甲技能尚未啟用；四件黃三星無法兌現這條路線所追的冰甲增益。先核對鞋子技能，不盲拆裝備補神鑄。"})
+                continue
+            assess_checks(step, [*step.checks, condition_check("SS鞋永恆神鑄的冰甲已啟用", p["ice_armor_ready"])])
+        if step.id == "lance_e1" and p["growth_focus"] == "技能成形太慢":
+            step.priority = 105
+            step.why = "你目前卡在技能成形速度；先比較雙絕槍E1這個已收錄的基礎進化節點，而不是只追高階面板。仍需備妥完整材料。"
+        active.append(step)
+    # Only compare costs when the SAME stated crit-damage milestone is ready.
+    same_bonus = [s for s in active if s.id in ("memory", "dark_matter")
+                  and s.effect == "暴擊傷害＋10%" and s.status in READY_STATES]
+    costs = {s.id: next((c["needed"] for c in s.checks if c.get("label") == "傳奇收藏自選箱"), None) for s in same_bonus}
+    if len(same_bonus) == 2 and all(type(v) is int for v in costs.values()) and len(set(costs.values())) == 2:
+        cheaper = min(same_bonus, key=lambda s: costs[s.id])
+        other = next(s for s in same_bonus if s != cheaper)
+        cheaper.priority = max(s.priority for s in same_bonus) + 1
+        cheaper.why = (f"兩個已備妥目標都解鎖暴擊傷害＋10%；本步整段需要 {costs[cheaper.id]} 箱，"
+                       f"「{other.title}」需要 {costs[other.id]} 箱，先完成較省箱的同類門檻。不同期箱子須能選各自目標；未比較沿途面板，非總傷害效益排名。")
+    return active, deferred
 
 
 def advanced_options(p: dict) -> list[Step]:
@@ -448,11 +485,18 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     for step in steps:
         apply_quote(step, p)
 
+    steps, deferred = refine_candidates(steps, p)
+    if p["growth_focus"] == "生存不足":
+        steps.append(Step("survival_check", "玩法", "先找出死亡原因，不急著追加輸出", "同一關卡記錄死亡原因與主力技能成形時間",
+            "你指定的問題是生存不足；輸出養成未必解決死亡。先保留付費材料，確認是否需要改技能、走位或現役防護配置。",
+            "確認能穩定存活後，把目前問題改成首領傷害或技能成形，再重排。", CALCULATOR, 110,
+            "先做玩法調整", "先不花養成材料"))
+
     if resource != "自動排序":
         steps = [s for s in steps if s.resource == resource]
     # Ready actions first; within the same readiness group use explained rules.
-    state = {"現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0, "資料未齊": 0}
-    steps.sort(key=lambda s: (state.get(s.status, 0), s.priority, s.id), reverse=True)
+    state = {"先做玩法調整": 4, "現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0, "資料未齊": 0}
+    steps.sort(key=lambda s: (s.id == "hall_fill" or s.id.endswith("_rearrange"), state.get(s.status, 0), s.priority, s.id), reverse=True)
     complete = []
     if p["awakening"] == 8:
         complete.append("主位覺醒8：不再推薦重複升級")
@@ -461,7 +505,8 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
     if p["adv2"] == 8 and len(p["stars2"]) == 8 and sum(p["stars2"]) >= 80:
         complete.append("第二套8進階格／80傳奇星：菁英與BOSS門檻已完成")
     return {"primary": asdict(steps[0]) if steps else None,
-            "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete}
+            "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete,
+            "deferred": [s for s in deferred if resource == "自動排序" or s["resource"] == resource]}
 
 
 SYSTEMS = {"收藏之心": "普通典藏館", "高級收藏之心": "進階典藏館", "傳奇收藏自選": "收藏品",
@@ -493,6 +538,35 @@ def following_step(raw: dict, step: dict) -> dict | None:
     return recommend(updated)["primary"]
 
 
+def next_question(raw: dict, result: dict | None = None) -> dict | None:
+    """Ask a condition that can change the decision before asking for stock."""
+    p = clean_profile(raw)
+    result = result or recommend(p)
+    first = result["primary"]
+    if p["mode"] == "新版區域行動" or first and first["id"] in ("hall_fill", "survival_check") or first and first["id"].endswith("_rearrange"):
+        return None
+    candidates = ([first] if first else []) + result["alternatives"]
+    for step in candidates:
+        if step["id"] == "memory" and step["update"]["memory"] in (3, 5) and (p["crit_mode"] != p["mode"] or p["crit_more_useful"] is None):
+            return {"resource": "傳奇收藏自選", "section": "收藏品", "field": "crit_more_useful",
+                    "title": "本模式繼續加暴擊率，還有實際收益嗎？",
+                    "why": "答案會改變記憶編輯器黃三星／五星的順位。先看戰鬥條件與溢出轉換，不只看面板100%。"}
+        if step["id"] == "boots_set" and p["ice_armor_ready"] is None:
+            return {"resource": "傳奇收藏自選", "section": "收藏品", "field": "ice_armor_ready",
+                    "title": "SS鞋的冰甲技能已啟用嗎？", "why": "這個前置條件未確認，不能把四件黃三星當成已可兌現的冰甲增益。"}
+    if any(p[k] is None for k in ("slots", "red_owned", "red_placed")):
+        return {"resource": "收藏之心", "section": "普通典藏館", "field": "hall_counts",
+                "title": "先核對典藏已開槽、紅收藏持有數與擺入數", "why": "這三個數字能先找出是否有不花新材料的空槽加成，不必先填全套帳號。"}
+    if first and any(c["state"] == "unknown" for c in first["checks"]):
+        labels = "、".join(c["label"] for c in first["checks"] if c["state"] == "unknown")
+        return {"resource": first["resource"], "section": SYSTEMS.get(first["resource"], "角色與模式"),
+                "field": "recipe", "title": f"只補本步尚未確認的條件：{labels}", "why": "上方材料表保留所有已知缺額；這次不要求重填其他系統。"}
+    if p["pet_kind"] is None:
+        return {"resource": "寵物材料", "section": "寵物", "field": "pet_kind", "title": "確認主戰寵物的類型與下一階效果",
+                "why": "目前尚無寵物候選，不能因此認定收藏一定比寵物優先。"}
+    return None
+
+
 def ranking_reason(result: dict) -> str:
     """Explain the actual comparator, without inventing efficiency or DPS data."""
     first = result["primary"]
@@ -500,6 +574,8 @@ def ranking_reason(result: dict) -> str:
         return "尚無足夠資料可比較，先保留資源。"
     if first["id"] == "hall_fill" or first["id"].endswith("_rearrange"):
         return "先使用已經持有、而且不需要新材料的提升；付費材料留到重新排序後再安排。"
+    if first["id"] == "survival_check":
+        return "先解決你指定的生存問題；材料已足的輸出升級保留為候選，不等於現在就該花。"
     other = next((s for s in result["alternatives"] if s["resource"] == first["resource"]),
                  next(iter(result["alternatives"]), None))
     if not other:

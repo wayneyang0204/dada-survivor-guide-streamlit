@@ -12,7 +12,7 @@ def execution_plan(step: dict) -> dict[str, str]:
                          else f"{check['label']}尚未符合")
         elif check["state"] == "unknown":
             unknown.append(check["label"])
-    if step.get("id") == "zone":
+    if step.get("id") in ("zone", "survival_check"):
         action = step["target"] + "；先不花局外養成材料。"
     elif short:
         action = "先補：" + "、".join(short) + "。目前不要按升級。"
@@ -117,6 +117,11 @@ def operating_steps(step: dict) -> dict:
         steps = ["先讀本期規則，確認哪些局外養成會帶入，不先套用末世材料順位。",
                  "記錄失敗原因：生存不足、首領傷害不足或技能未成形；下一次只改一項。",
                  "先取得本局可用Buff與技能，再試首領；這條路線不推薦花覺醒核心。"]
+    elif sid == "survival_check":
+        entry = "目前卡住的同一關卡 → 戰鬥過程與結算"
+        steps = ["保持同一關卡與現役配置，記錄死亡時間、死因及主力技能何時成形；不要同時改多個系統。",
+                 "分辨瞬間受傷、持續受傷或技能尚未成形；先比較已持有的技能、走位與防護配置，不拆裝備硬湊。",
+                 "只改一項再試，能穩定存活後更新目前問題；尚未確認死因前保留輸出養成材料。"]
     elif sid == "pet_skills":
         entry = "寵物 → 主戰寵出戰技能 → 助戰寵技能"
         steps = ["先查看已解鎖技能：普通輸出寵比較寵物傷害，主人增益／異世寵核對主人有效增益。",

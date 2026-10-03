@@ -73,9 +73,10 @@ def number(label: str, key: str, p: dict, maximum: int = 10000000):
                            placeholder="尚未填寫", key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}_{p.get('_input_scope', '')}")
 
 
-def choice(label: str, key: str, values: tuple, p: dict):
+def choice(label: str, key: str, values: tuple, p: dict, label_visibility: str = "visible"):
     options = (None, *values)
     return st.selectbox(label, options, index=options.index(p.get(key)) if p.get(key) in options else 0,
+        label_visibility=label_visibility,
         format_func=lambda x: "尚未確認" if x is None else "是" if x is True else "否" if x is False else str(x),
         key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}_{p.get('_input_scope', '')}")
 
@@ -120,6 +121,12 @@ def render_step_inputs(step: dict, p: dict) -> None:
         with st.form(f"step_inputs_{sid}_{st.session_state.get('editor_revision', 0)}", border=False):
             values = {}
             if kind:
+                if sid == "boots_set":
+                    values["ice_armor_ready"] = choice("SS鞋永恆神鑄的冰甲已啟用", "ice_armor_ready", (True, False), p)
+                if sid == "memory" and step["update"]["memory"] in (3, 5):
+                    crit_profile = {**p, "crit_more_useful": p["crit_more_useful"] if p["crit_mode"] == p["mode"] else None}
+                    values["crit_more_useful"] = choice("目前模式追加暴率仍有收益（含溢出轉換）", "crit_more_useful", (True, False), crit_profile)
+                    values["crit_mode"] = p["mode"]
                 stock_key = "red_boxes" if kind == "collection" else "awakening_cores"
                 label = "現有傳奇收藏自選箱" if kind == "collection" else "現有覺醒核心"
                 values[stock_key] = number(label, stock_key, p, 10000)
@@ -235,6 +242,11 @@ def render_decision(p: dict, step: dict) -> None:
     esc = lambda key: html.escape(str(step.get(key) or ""))
     state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] in ("星數未達", "資料未齊") else "pending"
     lead = "優先執行" if step["status"] in ("現在可做", "材料已足") else "儲備目標" if step["status"] == "先存資源" else "待核對目標"
+    if step["status"] == "先做玩法調整":
+        lead = "先調整玩法"
+    global_first = engine.recommend(p)["primary"]
+    if global_first and step["id"] != global_first["id"]:
+        lead = "比較目標（非全帳號第一順位）"
     with st.container(key="route_layout"):
         main, notes = st.columns([2.15, 1], gap="large")
         with main:
@@ -244,6 +256,13 @@ def render_decision(p: dict, step: dict) -> None:
               <h2 class="decision-title">{esc('title')}</h2>
               <dl class="decision-facts"><div><dt>目標門檻</dt><dd>{esc('target')}</dd></div>
               <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
+            st.markdown(f'<p class="decision-because"><b>為什麼排這一步</b> {esc("why")}</p>', unsafe_allow_html=True)
+            if step.get("quote_kind") or step["id"] == "pet_node":
+                st.caption("依據：你核對的遊戲預覽；帳號增傷未實測。")
+            elif step["id"] == "hall_fill" or step["id"].endswith("_rearrange"):
+                st.caption("依據：已填的持有與槽位資料；這一步不需新材料。")
+            elif step["id"] not in ("zone", "survival_check"):
+                st.caption("依據：已收錄社群門檻與帳號材料；帳號增傷未實測。")
             if step.get("update"):
                 after = engine.following_step(p, step)
                 target = f"{engine.SYSTEMS[after['resource']]} · {after['title']}（{after['status']}）" if after else "先補其他系統資料，再決定投入"
@@ -344,6 +363,8 @@ def render_roadmap(p: dict, shown: dict | None) -> None:
             st.write("尚無完整路線；先核對下面的缺項，不把未知配置排成最後一名。")
         for item in plan["complete"]:
             st.caption(f"已達標 · {item}")
+        for item in plan.get("deferred", []):
+            st.markdown(f'<p class="smart-hold"><b>先不投入 · {html.escape(item["title"])}</b><br>{html.escape(item["reason"])}</p>', unsafe_allow_html=True)
         # Missing coverage is outside the spending queue, never a low score.
         needs_collection = any(x.startswith(("典藏館：", "收藏：", "進階典藏：")) for x in plan["missing"])
         needs_pet = any(x.startswith("寵物：") for x in plan["missing"])
@@ -356,6 +377,37 @@ def render_roadmap(p: dict, shown: dict | None) -> None:
             if needs_pet:
                 with right:
                     st.button("補寵物配置", on_click=edit_resource, args=("寵物材料",), width="stretch")
+
+
+def update_focus(key: str) -> None:
+    save({"growth_focus": st.session_state[key]})
+
+
+def render_next_question(p: dict, shown: dict | None = None) -> None:
+    question = engine.next_question(p)
+    if not question:
+        return
+    with st.container(key="smart_next_question"):
+        st.markdown(f'<h3>現在最值得補的一項</h3><p><b>{html.escape(question["title"])}</b></p><p>{html.escape(question["why"])}</p>', unsafe_allow_html=True)
+        has_form = shown and (shown.get("quote_kind") or shown["id"] in ("venato", "hall_open", "lance_e1", "twin_drone")
+                              or shown["id"].startswith("adv") and shown["id"].rsplit("_", 1)[-1].isdigit())
+        in_current_form = shown and (question["field"] == "crit_more_useful" and shown["id"] == "memory"
+                                     or question["field"] == "ice_armor_ready" and shown["id"] == "boots_set")
+        if in_current_form:
+            st.caption("這項已列在上方「只核對這一步的材料」，不必重填整個帳號。")
+        elif question["field"] in ("crit_more_useful", "ice_armor_ready") and shown and not has_form:
+            with st.form(f"smart_question_{question['field']}_{st.session_state.get('editor_revision', 0)}", border=False):
+                scoped = {**p, "_input_scope": "smart_question"}
+                if question["field"] == "crit_more_useful" and p["crit_mode"] != p["mode"]:
+                    scoped["crit_more_useful"] = None
+                answer = choice(question["title"], question["field"], (True, False), scoped, label_visibility="collapsed")
+                if st.form_submit_button("確認這項，重算建議"):
+                    values = {question["field"]: answer}
+                    if question["field"] == "crit_more_useful":
+                        values["crit_mode"] = p["mode"]
+                    save(values)
+        elif question["field"] != "recipe":
+            st.button("只補這組資料", key="smart_question_edit", width="stretch", on_click=edit_resource, args=(question["resource"],))
 
 
 def render_home() -> None:
@@ -413,6 +465,9 @@ def render_home() -> None:
     if p["estimated_balances"]:
         labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
         st.caption(f"{labels}為推算結餘，未同步遊戲。有其他收入或消耗時請校正。")
+    focus_key = f"decision_focus_{st.session_state.get('editor_revision', 0)}"
+    st.selectbox("目前最想解決的問題", engine.FOCUSES, index=engine.FOCUSES.index(p["growth_focus"]),
+                 key=focus_key, on_change=update_focus, args=(focus_key,))
     result = engine.recommend(p, scope)
     candidates = ([result["primary"]] if result["primary"] else []) + result["alternatives"]
     step = next((s for s in candidates if s["id"] == st.session_state.get("route_selected_id")), result["primary"])
@@ -423,6 +478,7 @@ def render_home() -> None:
     else:
         render_next_check(p, scope)
     render_roadmap(p, step)
+    render_next_question(p, step)
     render_reasoning(result)
 
 
@@ -452,6 +508,7 @@ def render_profile_form(p: dict, section: str) -> None:
         values = {}
         if section == "角色與模式":
             values["mode"] = st.selectbox("主要模式", engine.MODES, index=engine.MODES.index(p["mode"]))
+            values["growth_focus"] = choice("目前最想解決的問題", "growth_focus", engine.FOCUSES, p) or engine.FOCUSES[0]
             values["survivor"] = choice("主位特工", "survivor", ("維納托", "塔洛莎", "楊大師", "其他"), p)
             l, r = st.columns(2)
             with l:
@@ -488,6 +545,11 @@ def render_profile_form(p: dict, section: str) -> None:
             values["memory"] = star_choice("記憶編輯器星數", "memory", p)
             values["dark_matter"] = star_choice("暗物質傀儡星數", "dark_matter", p)
             values["ss_boots"] = choice("是否使用SS冰霜戰靴", "ss_boots", (True, False), p)
+            values["ice_armor_ready"] = choice("SS鞋永恆神鑄的冰甲已啟用", "ice_armor_ready", (True, False), p)
+            crit_profile = {**p, "crit_more_useful": p["crit_more_useful"] if p["crit_mode"] == p["mode"] else None}
+            values["crit_more_useful"] = choice("目前模式追加暴率仍有收益（含溢出轉換）", "crit_more_useful", (True, False), crit_profile)
+            values["crit_mode"] = p["mode"]
+            st.caption("暴率收益只套用目前模式；切換模式需重新確認。包含條件暴率、減暴與已解鎖溢出轉換，不只看面板100%。")
             bs = stars("SS鞋套裝星數：賽博圖騰柱、複製寶鏡、夢境拼圖、基因編輯器", "boot_stars", p)
             values["red_boxes"] = number("傳奇收藏自選箱庫存", "red_boxes", p, 10000)
             st.caption("升星需求須按可選期數及每箱碎片量核對，不能只看箱數。")

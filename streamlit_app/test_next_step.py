@@ -137,7 +137,7 @@ def test_free_reassignment_of_owned_stars_precedes_spending():
     (99, None, True, "待核對材料"), (None, 3, True, "待核對材料"),
 ])
 def test_collection_costs_require_compatible_box_and_full_recipe(owned, cost, ready, status):
-    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": owned}
+    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": owned, "crit_more_useful": True, "crit_mode": "末世迴響"}
     key = recommend(p)["primary"]["quote_key"]
     p["step_quotes"] = {key: {"cost": cost, "materials_ready": ready}}
     result = recommend(p)["primary"]
@@ -145,7 +145,7 @@ def test_collection_costs_require_compatible_box_and_full_recipe(owned, cost, re
 
 
 def test_quote_never_leaks_to_a_new_star_target_or_another_character():
-    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": 99}
+    p = {"neck": "破壞者徽記", "memory": 3, "red_boxes": 99, "crit_more_useful": True, "crit_mode": "末世迴響"}
     key = recommend(p)["primary"]["quote_key"]
     p["step_quotes"] = {key: {"cost": 1, "materials_ready": True}}
     assert recommend(p)["primary"]["status"] == "材料已足"
@@ -203,7 +203,7 @@ def test_readiness_keeps_known_shortages_visible(cores, shards, quantum, expecte
 
 
 def test_zero_required_resource_is_not_the_same_as_unknown_cost():
-    p = {"neck": "破壞者徽記", "memory": 3}
+    p = {"neck": "破壞者徽記", "memory": 3, "crit_more_useful": True, "crit_mode": "末世迴響"}
     key = recommend(p)["primary"]["quote_key"]
     p["step_quotes"] = {key: {"cost": 0, "materials_ready": True}}
     assert recommend(p)["primary"]["status"] == "材料已足"
