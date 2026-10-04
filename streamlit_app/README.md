@@ -51,7 +51,7 @@ application is not a Cloudflare Worker.
 - The shared white/ink theme is `ui_theme.py`. Existing reference feeds,
   collectible catalog, event calculator, and profile editor remain available.
 - The cute visual layer uses a cream-white canvas, pastel task cards and rounded
-  controls. `ui_art.py` embeds a local storybook red-kite WebP cutout with the
+  controls. `ui_art.py` embeds a local cartoon red-kite WebP cutout with the
   vector UI icons; no external images, fonts or new dependencies are needed. Text and status
   colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
@@ -154,8 +154,9 @@ pytest: `python -m pytest streamlit_app -q -p no:cacheprovider`.
 
 ## Illustrated field-guide UI
 
-- The storybook red-kite illustration is AI-generated artwork in `assets/`, based
-  on the previous realistic reference's feather colors, shape and gliding pose.
+- The cartoon red-kite mascot is AI-generated artwork in `assets/`, retaining
+  the previous reference's colors and forked tail, but using a large round eye,
+  round head and simplified feathers instead of realistic bird proportions.
   It is a 960px transparent WebP, not a documentary wildlife photo.
   Its prompt and provenance are saved beside it. `ui_art.py` embeds it locally
   alongside original vector icons; no external images/fonts/scripts are needed.
