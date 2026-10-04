@@ -71,6 +71,9 @@ def test_cloud_tower_uses_verified_target_and_cost_caveat() -> None:
     assert "開寶箱任務" in playbook["free_hint"]
     assert "10/3 23:59" in playbook["period"]
     assert "神器核心" in playbook["verdict"]
+    assert "已於 10 月 3 日" in playbook["verdict"]
+    assert "歷史活動" in playbook["tags"]
+    assert "復刻" in playbook["steps"][0]
 
 
 def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:
