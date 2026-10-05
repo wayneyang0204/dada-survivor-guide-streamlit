@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'theater-festival',
+    category: '關卡活動',
+    title: '戲院盛典：免費觀演票優先，獎勵門檻待核對',
+    updated: '2026/10/05',
+    status: '現行',
+    summary: '官方蘋果商店活動卡確認本期為台灣時間 10 月 5 日 00:00 至 10 月 10 日 00:00。完成任務可取得觀演票並兌換折扇，再用折扇取得稀有道具；官方尚未公布可核對的票量、兌換比例與獎勵門檻。',
+    actions: ['先完成免費任務並領取觀演票，不先為未知門檻投入寶石或寶箱', '到遊戲內記錄觀演票、折扇與目標獎勵的實際數字', '只有能算出確定缺口並跨過高價值門檻時，再決定是否補資源'],
+    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815200823',
+  },
+  {
     id: 'tidemyst-haven',
     category: '關卡活動',
     title: '潮汐祕境：公會反向踩地雷與補券判斷',
