@@ -17,6 +17,7 @@ def test_strip_html_and_classification() -> None:
     assert classify_article("金秋海岸釣魚攻略") == "活動攻略"
     assert classify_article("雲中塔建築吊鉤攻略") == "活動攻略"
     assert classify_article("戲院盛典觀演票折扇攻略") == "活動攻略"
+    assert classify_article("劇院盛典賓果攻略") == "活動攻略"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
@@ -77,15 +78,18 @@ def test_cloud_tower_uses_verified_target_and_cost_caveat() -> None:
     assert "復刻" in playbook["steps"][0]
 
 
-def test_theater_festival_keeps_unverified_numbers_out() -> None:
-    playbook = match_event_playbook("戲院盛典觀演票與折扇攻略")
+def test_theater_festival_separates_milestones_from_chest_cost() -> None:
+    playbook = match_event_playbook("劇院盛典觀演票與折扇攻略")
     assert playbook["name"] == "戲院盛典"
-    assert playbook["target"] == 0
+    assert playbook["target"] == 240
     assert "10/5 00:00" in playbook["period"]
     assert "10/10 00:00" in playbook["period"]
     assert "官方現行活動" in playbook["tags"]
-    assert "尚未公布" in playbook["mechanic"]
-    assert "不要" in playbook["avoid"]
+    assert "三百一十六" in playbook["free_hint"]
+    assert "一百九十三" in playbook["free_hint"]
+    assert "六百個寶箱" in playbook["free_hint"]
+    assert "三百一十五抽" in playbook["verdict"]
+    assert "不要把三百一十六張任務票說成全免費" in playbook["avoid"]
 
 
 def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:
