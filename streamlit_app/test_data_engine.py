@@ -18,6 +18,7 @@ def test_strip_html_and_classification() -> None:
     assert classify_article("雲中塔建築吊鉤攻略") == "活動攻略"
     assert classify_article("戲院盛典觀演票折扇攻略") == "活動攻略"
     assert classify_article("劇院盛典賓果攻略") == "活動攻略"
+    assert classify_article("秋日海底探險電光水母攻略") == "活動攻略"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 
@@ -84,12 +85,24 @@ def test_theater_festival_separates_milestones_from_chest_cost() -> None:
     assert playbook["target"] == 240
     assert "10/5 00:00" in playbook["period"]
     assert "10/10 00:00" in playbook["period"]
-    assert "官方現行活動" in playbook["tags"]
+    assert "歷史活動" in playbook["tags"]
     assert "三百一十六" in playbook["free_hint"]
     assert "一百九十三" in playbook["free_hint"]
     assert "六百個寶箱" in playbook["free_hint"]
-    assert "三百一十五抽" in playbook["verdict"]
-    assert "不要把三百一十六張任務票說成全免費" in playbook["avoid"]
+    assert "已於 10 月 10 日" in playbook["verdict"]
+    assert "本期已結束" in playbook["avoid"]
+
+
+def test_autumn_seabed_uses_only_officially_confirmed_rules() -> None:
+    playbook = match_event_playbook("秋日海底探險電光水母攻略")
+    assert playbook["name"] == "秋日海底探險"
+    assert playbook["target"] == 0
+    assert "10/11 00:00" in playbook["period"]
+    assert "10/16 00:00" in playbook["period"]
+    assert "官方即將開放" in playbook["tags"]
+    assert "尚未公布" in playbook["free_hint"]
+    assert "先保留寶石與鑰匙" in playbook["verdict"]
+    assert "不當成事實" in playbook["avoid"]
 
 
 def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:
