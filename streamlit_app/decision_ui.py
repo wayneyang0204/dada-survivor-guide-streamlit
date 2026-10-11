@@ -230,19 +230,22 @@ def workflow(active: int) -> None:
 def render_completion(p: dict, step: dict) -> None:
     if not step.get("update"):
         return
-    with st.popover("記錄遊戲內完成", width="stretch"):
-        st.write(f"記錄的完整目標：{step['target']}")
-        try:
-            preview = engine.completion_preview(p, step)
-            for row in preview["balances"]:
-                st.caption(f"{row['resource']}：{row['before']:,} − {row['used']:,} → 推算剩餘 {row['after']:,}")
-            if preview["unknown"]:
-                st.caption("無法可靠扣除，完成後需重新核對：" + "、".join(preview["unknown"]))
-            st.caption("僅更新本站紀錄，不操作遊戲。已知成本才計算結餘；下一目標的價格與附加材料重新核對。")
-            if st.button("我已在遊戲完成，排下一步", type="primary", key=f"complete_{engine.action_token(p, step)}"):
-                complete_step(step)
-        except ValueError as exc:
-            st.warning(str(exc))
+    # Re-mount the confirmation surface when its account/target changes.
+    # Older supported Streamlit versions do not need a keyed-popover API.
+    with st.container(key=f"completion_scope_{engine.action_token(p, step)}"):
+        with st.popover("記錄遊戲內完成", width="stretch"):
+            st.write(f"記錄的完整目標：{step['target']}")
+            try:
+                preview = engine.completion_preview(p, step)
+                for row in preview["balances"]:
+                    st.caption(f"{row['resource']}：{row['before']:,} − {row['used']:,} → 推算剩餘 {row['after']:,}")
+                if preview["unknown"]:
+                    st.caption("無法可靠扣除，完成後需重新核對：" + "、".join(preview["unknown"]))
+                st.caption("僅更新本站紀錄，不操作遊戲。已知成本才計算結餘；下一目標的價格與附加材料重新核對。")
+                if st.button("我已在遊戲完成，排下一步", type="primary", key=f"complete_{engine.action_token(p, step)}"):
+                    complete_step(step)
+            except ValueError as exc:
+                st.warning(str(exc))
 
 
 def render_decision(p: dict, step: dict) -> None:

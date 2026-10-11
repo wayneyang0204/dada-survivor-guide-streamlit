@@ -26,7 +26,9 @@ application is not a Cloudflare Worker.
   not a full pet tier list, a remaining-cost table, or a global damage optimum.
   Changing a saved pet target clears the previous target's material confirmation.
   Completing a node also clears readiness for the next one; character cores are
-  not deducted for pet upgrades. Old schema-1 backups remain readable.
+  not deducted for pet upgrades. The completion confirmation surface remounts
+  when account/target changes, so it closes rather than inviting a second click
+  on the next target. Old schema-1 backups remain readable.
 - Event budgeting renders from the local dated roster, without waiting for a
   third-party feed. Unconfirmed progress, price and stock fields start blank and
   block calculation until entered; zeros are explicit inputs, not missing data.
