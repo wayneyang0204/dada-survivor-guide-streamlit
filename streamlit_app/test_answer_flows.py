@@ -2,7 +2,7 @@ from streamlit.testing.v1 import AppTest
 import pytest
 
 import guide_content as content
-from test_decision_ui import APP, by_label
+from test_decision_ui import APP, by_label, fill_event_inputs
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def test_home_search_shows_answers_without_category_wall():
 def test_home_task_routes_and_collapsed_directory(offline_sources):
     app = AppTest.from_file(APP).run()
     directory = [e for e in app.expander if e.label.startswith("瀏覽")]
-    assert len(directory) == len(content.CATEGORIES)
+    assert len(directory) == sum(sum(g['category'] == c for g in content.GUIDES) > 2 for c in content.CATEGORIES)
     assert not any(e.proto.expanded for e in directory)
     by_label(app.button, "查升級順序 →").click().run()
     assert app.radio[0].value == "下一步"
@@ -69,6 +69,7 @@ def test_home_task_routes_and_collapsed_directory(offline_sources):
 def test_event_result_survives_rerun_but_never_uses_stale_inputs(offline_sources):
     app = AppTest.from_file(APP).run()
     app.radio[0].set_value("活動").run()
+    fill_event_inputs(app)
     by_label(app.button, "計算補鑽成本").click().run()
     assert len(app.metric) == 4
     original = app.session_state["event_plan"]["result"].copy()

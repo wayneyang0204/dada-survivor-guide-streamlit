@@ -18,6 +18,15 @@ def by_label(elements, label):
     return next(item for item in elements if item.label == label)
 
 
+def fill_event_inputs(app):
+    """Explicit synthetic values: tests must not depend on invented UI defaults."""
+    for label, value in (("目前活動進度",0),("剩餘天數",3),("每天還可拿的免費進度",16),
+                         ("目標里程碑",100),("一次票券／抽取增加進度",1.0),
+                         ("一次票券／抽取寶石成本",100),("目前寶石",30000)):
+        by_label(app.number_input,label).set_value(value)
+    app.run()
+
+
 def test_first_visit_is_a_short_setup_not_an_article_feed():
     a = boot()
     assert not a.exception
@@ -100,6 +109,7 @@ def test_remaining_pages_work_when_sources_are_offline(monkeypatch):
     a = boot()
     a.radio[0].set_value("活動").run()
     assert not a.exception
+    fill_event_inputs(a)
     by_label(a.button, "計算補鑽成本").click().run()
     assert not a.exception
     a.radio[0].set_value("資料庫").run()

@@ -99,9 +99,9 @@ def test_autumn_seabed_uses_only_officially_confirmed_rules() -> None:
     assert playbook["target"] == 0
     assert "10/11 00:00" in playbook["period"]
     assert "10/16 00:00" in playbook["period"]
-    assert "官方即將開放" in playbook["tags"]
+    assert "官方排程" in playbook["tags"]
     assert "尚未公布" in playbook["free_hint"]
-    assert "先保留寶石與鑰匙" in playbook["verdict"]
+    assert "免費量與里程碑未知" in playbook["verdict"]
     assert "不當成事實" in playbook["avoid"]
 
 

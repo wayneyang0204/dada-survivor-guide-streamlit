@@ -39,11 +39,14 @@ def resonance_gap(current: int | None, target: int | None) -> dict[str, str]:
 
 
 def related_guide(step: dict) -> str:
+    if step.get("id") == "pet_umbral":
+        return "umbral-soul"
     if step.get("id") == "zone":
         return "upgrade-roadmap"
     return {"收藏之心": "collection-hall", "高級收藏之心": "collection-hall",
             "傳奇收藏自選": "red-choice-box", "覺醒核心": "survivor-awakening",
-            "神器核心": "gear-forging", "科技配件": "twin-drone"}.get(step.get("resource"), "upgrade-roadmap")
+            "神器核心": "gear-forging", "科技配件": "twin-drone",
+            "寵物材料": "xeno-assist" if step.get("id") == "pet_skills" else "ordinary-pet-skills"}.get(step.get("resource"), "upgrade-roadmap")
 
 
 def operating_steps(step: dict) -> dict:
@@ -127,7 +130,7 @@ def operating_steps(step: dict) -> dict:
         steps = ["先查看已解鎖技能：普通輸出寵比較寵物傷害，主人增益／異世寵核對主人有效增益。",
                  "把符合主戰方向的已解鎖技能裝入可用槽位；沒有解鎖的技能先記缺項，不購買、不盲抽補齊。",
                  "用同模式結算確認主戰效果，再記錄配置已核對；這是配置檢查，不是完成覺醒。"]
-    elif sid == "pet_node":
+    elif sid in ("pet_node", "pet_umbral"):
         entry = "寵物 → 本次主戰寵的覺醒／共鳴預覽"
         steps = [f"選你核對的「{step['target']}」，核對本階解鎖效果；只有面板時先不追加。",
                  "合計本節點全部本體、碎片、核心與其他材料；普通與異世寵物不可套用同一配方。",

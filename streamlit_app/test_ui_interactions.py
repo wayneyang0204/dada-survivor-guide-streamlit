@@ -9,6 +9,7 @@ from test_decision_ui import APP
 from test_ui_theme import Markup
 from ui_interactions import kite_markup
 from ui_theme import STYLE
+from guide_content import CATEGORIES
 
 
 @pytest.mark.parametrize("variant", ("brand", "field"))
@@ -39,7 +40,7 @@ def test_home_motion_coverage_exceeds_thirty_percent_of_main_content_blocks():
         if "<style>" not in item.value:
             markup.feed(item.value)
     regions = {attrs["data-ui-region"]: attrs["data-ui-motion"] for _, attrs in markup.tags if "data-ui-region" in attrs}
-    assert set(regions) == {"home-search", "tool-upgrade", "tool-event", "tool-collection", *(f"topic-{n}" for n in range(6))}
+    assert set(regions) == {"home-search", "tool-upgrade", "tool-event", "tool-collection", *(f"topic-{n}" for n in range(len(CATEGORIES)))}
     assert sum(value == "true" for value in regions.values()) / len(regions) >= .3
     assert 'kite-cruise' in STYLE and 'kite-direction' in STYLE and 'icon-hop' in STYLE
 

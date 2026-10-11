@@ -30,7 +30,8 @@ def test_guide_catalog_has_stable_ids_and_honest_source_labels():
             assert guide["checked"] is None
             assert "待重核" in guide["status"] or "歷史" in guide["status"]
         if guide["checked"]:
-            assert guide["source_date"] and guide["sources"]
+            assert guide["sources"]
+            assert guide["source_date"] or guide["slug"] == "autumn-seabed"  # The official event card has no publication date.
         for section in guide["sections"]:
             for row in section.get("rows", []):
                 assert len(row) == len(section["columns"])
@@ -84,9 +85,9 @@ def test_every_core_article_has_a_working_direct_link_and_full_content(slug):
     assert "先看結論" in text and "常見問題" in text and "資料來源" in text
     assert "本文目錄" in text and "guide-part-1" in text
     assert a.warning
-    if slug == "resonance-planning":
+    if slug in ("resonance-planning", "mount-layout"):
         assert [item.value for item in a.number_input] == [None, None]
-    elif slug == "twin-tech-milestones":
+    elif slug in ("twin-tech-milestones", "elaine-build"):
         assert [item.value for item in a.number_input] == [None]
     else:
         assert not a.number_input

@@ -14,11 +14,15 @@ import streamlit as st
 import direction_tools as _direction_tools
 import tech_routes as _tech_routes
 import direction_content as _direction_content
+import field_content as _field_content
+import field_tools as _field_tools
 import ui_art as _ui_art
 
 _direction_tools = importlib.reload(_direction_tools)
 _tech_routes = importlib.reload(_tech_routes)
 _direction_content = importlib.reload(_direction_content)
+_field_content = importlib.reload(_field_content)
+_field_tools = importlib.reload(_field_tools)
 _ui_art = importlib.reload(_ui_art)
 
 import ui_interactions as _ui_interactions
@@ -60,11 +64,11 @@ rank_rewards = _data_engine.rank_rewards
 攻略資料 = [
     {
         "分類": "關卡活動",
-        "標題": "秋日海底探險：開放前先保留資源",
+        "標題": "秋日海底探險：先做任務，數量核對後才補資源",
         "日期": "2026/10/10",
-        "狀態": "官方預告｜10/11 00:00開放",
+        "狀態": "官方排程｜10/11～10/16",
         "摘要": "官方蘋果商店活動卡確認台灣時間 10 月 11 日 00:00 至 10 月 16 日 00:00 開放。完成任務可取得電光水母，再用它探索海底深處與寶箱；官方尚未公布可核對的免費總量、保底、里程碑或寶箱獎勵表。",
-        "行動": ["活動開始前保留寶石、鑰匙與其他可延後資源", "開放後先做低成本任務，記錄電光水母免費量、開箱任務與獎勵表", "只有能算出確定缺口並跨過需要的獎勵時，才決定是否補資源"],
+        "行動": ["遊戲出現活動入口後，先做低成本任務", "記錄電光水母免費量、開箱任務與獎勵表，未知數不填零", "只有能算出確定缺口並跨過需要的獎勵時，才決定是否補資源"],
         "來源": "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815206599",
     },
     {
@@ -108,8 +112,8 @@ rank_rewards = _data_engine.rank_rewards
         "標題": "伊狑實測：雙異獸與月礦主位門檻",
         "日期": "2026/09/26",
         "狀態": "玩家實測｜5.2.0 現行",
-        "摘要": "「別說筆記」彙整上線後玩家測試：伊狑覺醒1可帶第二隻不同種類的異獸，但協同異獸同步率固定100%；覺醒5才可讓兩種形態增益常駐，覺醒7進一步提高異獸共鳴上限。她偏向雙異獸成形後的月礦遠征主位，不是所有模式直接取代維納托。",
-        "行動": ["無課、微課或異獸未成形：維持現有主位並保留碎片", "兩隻紅5異獸已成形：以覺醒5為第一停損，再評估覺醒7", "短時頭目仍先用維納托；月礦遠征再比較伊狑，測試時固定其他配置"],
+        "摘要": "「別說筆記」彙整玩家測試：伊狑覺醒1開第二隻不同種類異寵；協同同步率記為100%。覺醒5透過切換保留20秒增益，但協同寵技能上限仍紅1；覺醒8才到紅5。先在月礦遠征固定配置比較，不直接取代成熟維納托。",
+        "行動": ["異寵未成形：維持現有主位並保留碎片", "伊狑R5先按協同紅1上限核對，不計完整雙紅5技能", "短場與長場分開測試，再算下一個覺醒的完整材料"],
         "來源": "https://notalknote.xyz/survivorio-elaine-wild-wolf-girl-guide/",
     },
     {
@@ -118,7 +122,7 @@ rank_rewards = _data_engine.rank_rewards
         "日期": "2026/09/17",
         "狀態": "玩家實測｜5.2.0 現行",
         "摘要": "「別說筆記」彙整上線後玩家實測：洛基偏向協同支援，單獨連攜時不能自行產生神火；哪吒覺醒6搭配洛基覺醒4，才可用神火與餘燼銜接持續覆蓋。本結論取代 9 月 15 日上線前推測。",
-        "行動": ["哪吒未達覺醒6且寶石不足六萬：跳過本期", "已有哪吒覺醒6：洛基優先做到覺醒4", "三百抽保底；社群估算免費票約一百至一百一十七張，常見缺口約五萬五至六萬寶石"],
+        "行動": ["先確認哪吒神火來源與連攜槽數", "已有哪吒覺醒6：比較洛基覺醒4接力條件與實戰覆蓋", "原輪盤三百抽與免費票已屬歷史成本，不能當作現在可抽"],
         "來源": "https://notalknote.xyz/survivorio-divine-fire-3-sp-loki-guide/",
     },
     {
@@ -481,7 +485,7 @@ def 取得收藏圖鑑() -> list[dict]:
     "版本": "5.2.0",
     "查核": "2026/10/10",
     "標題": "洛基、伊狑與主線 346～350 章",
-    "重點": ["新增主線 346～350 章與對應挑戰章節", "官方確認神火特工洛基與高階特工伊狑已上線", "伊狑 9 月 26 日玩家實測：覺醒1開雙異獸、覺醒5常駐雙形態；一般帳號先不重置主位", "潮汐祕境已開放；官方玩法與 10 月 1 日社群實測數值分開標示", "秋日海底探險將於 10 月 11 日 00:00 開始；官方尚未公布免費量與獎勵門檻", "戲院盛典已於 10 月 10 日 00:00 結束；原期數字只供復刻核對"],
+    "重點": ["新增主線 346～350 章與對應挑戰章節", "官方確認神火特工洛基與高階特工伊狑已上線", "伊狑 9 月 26 日玩家實測：覺醒1開雙異獸，覺醒5第二寵物仍上限紅1；雙形態效果延長需配合切換", "潮汐祕境：官方玩法與 10 月 1 日社群實測數值分開標示", "秋日海底探險官方時段為 10 月 11 日 00:00 至 10 月 16 日 00:00；免費量與獎勵門檻待遊戲核對", "戲院盛典已於 10 月 10 日 00:00 結束；原期數字只供復刻核對"],
 }
 
 
@@ -644,7 +648,12 @@ elif 頁面 == "我的帳號":
     _decision_ui.render_profile()
 elif 頁面 == "活動最佳解":
     _decision_ui.page_heading("活動試算", "計算免費期末進度、目標缺口與補鑽成本。")
-    全部文章, 文章即時 = 取得完整文章庫()
+    # The calculator must not wait for an external editorial feed to render.
+    # Live source browsing remains under the explicit latest-articles view.
+    全部文章 = [{"title": item["標題"], "date": item["日期"], "excerpt": item["摘要"],
+                "link": item["來源"], "category": "活動攻略" if item["分類"] == "關卡活動" else item["分類"],
+                "freshness": item["狀態"]} for item in 攻略資料]
+    文章即時 = False
     活動備援文章 = [
         {
             "title": "秋日海底探險活動",
@@ -652,7 +661,7 @@ elif 頁面 == "活動最佳解":
             "excerpt": "官方確認活動為 10 月 11 日 00:00 至 10 月 16 日 00:00；完成任務取得電光水母，再用它探索海底深處與寶箱。",
             "link": "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815206599",
             "category": "活動攻略",
-            "freshness": "官方即將開放｜來源備援",
+            "freshness": "官方排程10/11～10/16｜來源備援",
         },
         {
             "title": "戲院盛典活動",
@@ -700,6 +709,13 @@ elif 頁面 == "活動最佳解":
             "freshness": "待核對",
         }
     活動模型 = match_event_playbook(已選活動["title"])
+    原期排程 = _field_tools.event_window(活動模型.get("starts_at"), 活動模型.get("ends_at"))
+    歷史試算已確認 = True
+    if 原期排程["state"] == "ended":
+        st.warning(原期排程["label"])
+        歷史試算已確認 = st.checkbox("我正在核對復刻或做歷史試算，不是依原期排程投入", key="historical_event_confirmed")
+    elif 原期排程["state"] != "unknown":
+        st.caption(原期排程["label"])
 
     st.caption("先核對遊戲內活動名稱與截止時間。文章日期不代表活動仍開放。")
     活動結論 = str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
@@ -714,7 +730,7 @@ elif 頁面 == "活動最佳解":
     st.caption(
         f"已同步 {len(全部文章)} 篇來源攻略｜其中 {len(活動文章)} 篇活動攻略｜自動套用：{活動模型['name']}"
         if 文章即時
-        else f"來源目前使用備援模式｜自動套用：{活動模型['name']}"
+        else f"本站已收錄活動資料｜自動套用：{活動模型['name']}；遊戲倒數與任務表優先"
     )
     st.link_button("核對活動來源 ↗", 已選活動["link"])
 
@@ -743,28 +759,28 @@ elif 頁面 == "活動最佳解":
     目標獎勵 = next(item for item in 獎勵排序 if item["name"] == 目標獎勵名稱)
 
     模型目標 = int(活動模型["target"])
-    預設目標 = 模型目標 if 0 < 模型目標 <= 10000 else 100
+    預設目標 = 模型目標 if 0 < 模型目標 <= 10000 else None
     if 模型目標 == 0:
-        st.warning("官方尚未公布可核對的積分停損門檻。下方預填數字只是試算範例，請先用遊戲內獎勵表改成你的實際目標。")
+        st.warning("本活動門檻與產量尚未核對。請填遊戲內數字；留白不當作0，也不預填假設產量。")
     st.markdown("### 02 / 免費進度")
     p1, p2, p3, p4 = st.columns(4)
     with p1:
-        目前進度 = int(st.number_input("目前活動進度", min_value=0, value=0, step=1))
+        目前進度 = st.number_input("目前活動進度", min_value=0, value=None, step=1)
     with p2:
-        剩餘天數 = int(st.number_input("剩餘天數", min_value=0, max_value=30, value=3, step=1))
+        剩餘天數 = st.number_input("剩餘天數", min_value=0, max_value=30, value=None, step=1)
     with p3:
-        每日免費進度 = int(st.number_input("每天還可拿的免費進度", min_value=0, value=max(1, 預設目標 // 6), step=1))
+        每日免費進度 = st.number_input("每天還可拿的免費進度", min_value=0, value=None, step=1)
     with p4:
-        目標進度 = int(st.number_input("目標里程碑", min_value=1, value=預設目標, step=1))
+        目標進度 = st.number_input("目標里程碑", min_value=1, value=預設目標, step=1)
 
     st.markdown("### 03 / 寶石成本")
     c1, c2, c3 = st.columns(3)
     with c1:
-        每次付費進度 = float(st.number_input("一次票券／抽取增加進度", min_value=0.01, value=1.0, step=0.1))
+        每次付費進度 = st.number_input("一次票券／抽取增加進度", min_value=0.01, value=None, step=0.1)
     with c2:
-        每次寶石成本 = int(st.number_input("一次票券／抽取寶石成本", min_value=0, value=100, step=10))
+        每次寶石成本 = st.number_input("一次票券／抽取寶石成本", min_value=0, value=None, step=10)
     with c3:
-        現有寶石 = int(st.number_input("目前寶石", min_value=0, value=30000, step=500))
+        現有寶石 = st.number_input("目前寶石", min_value=0, value=None, step=500)
 
     with st.expander("這些數字怎麼填？"):
         st.write("免費進度包含剩餘登入、每日任務、廣告、免費票與預計開箱任務；付費進度只填需要用寶石補的部分。若遊戲顯示每次十連抽，請把進度與成本都換算成單次或都用十連，兩邊單位一致即可。")
@@ -776,10 +792,14 @@ elif 頁面 == "活動最佳解":
         gems_owned=現有寶石, spending_style=消費風格, target_reward=目標獎勵,
     )
     試算識別 = {"event": 已選活動["title"], "inputs": 試算輸入}
-    if st.button("計算補鑽成本", type="primary", width="stretch"):
+    資料已齊 = 歷史試算已確認 and all(試算輸入[key] is not None for key in ("current_progress", "days_remaining", "free_progress_per_day",
+        "target_progress", "progress_per_paid_action", "gems_per_paid_action", "gems_owned"))
+    if not 資料已齊:
+        st.caption("填完本期目標、免費進度與票價才可計算；明確沒有剩餘免費進度時可填0。")
+    if st.button("計算補鑽成本", type="primary", width="stretch", disabled=not 資料已齊):
         st.session_state["event_plan"] = {"identity": 試算識別, "result": assess_event_plan(**試算輸入)}
     已存試算 = st.session_state.get("event_plan")
-    if 已存試算 and 已存試算["identity"] == 試算識別:
+    if 資料已齊 and 已存試算 and 已存試算["identity"] == 試算識別:
         判斷 = 已存試算["result"]
         st.markdown("### 試算結果")
         getattr(st, 判斷["tone"])(f"{判斷['verdict']}｜{判斷['reason']}")

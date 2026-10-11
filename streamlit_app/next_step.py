@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 import hashlib
 import json
+from field_tools import pet_milestone, UMBRAL_SOURCE
 
 SCHEMA = 1
 CHECKED = "2026-09-07～09-08"
@@ -57,6 +58,9 @@ FIELDS = {
     "pet_target": (None, "text"),
     "pet_gain": (None, ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認")),
     "pet_materials_ready": (None, (True, False)),
+    "pet_name": (None, ("幽暗之靈", "其他")),
+    "pet_star": (None, (0, 10)),
+    "pet_preview_matches": (None, (True, False)),
 }
 
 
@@ -114,6 +118,22 @@ def clean_profile(raw: dict) -> dict:
 
 def export_profile(profile: dict) -> str:
     return json.dumps({"schema": SCHEMA, "profile": clean_profile(profile)}, ensure_ascii=False, indent=2)
+
+
+def pet_scope(raw: dict) -> tuple:
+    p = clean_profile(raw)
+    if p["pet_kind"] == "異世寵物" and p["pet_name"] == "幽暗之靈" and p["pet_star"] is not None:
+        return ("sourced", p["pet_kind"], p["pet_name"], p["pet_star"])
+    return ("manual", p["pet_kind"], p["pet_target"], p["pet_gain"])
+
+
+def invalidate_pet_verification(before: dict, after: dict) -> dict:
+    """An edited existing target cannot inherit the previous target's readiness."""
+    old, new = clean_profile(before), clean_profile(after)
+    if old["pet_kind"] is not None and pet_scope(old) != pet_scope(new):
+        new["pet_materials_ready"] = None
+        new["pet_preview_matches"] = None
+    return new
 
 
 def import_profile(content: bytes) -> dict:
@@ -468,6 +488,21 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
             current=p["pet_kind"], effect="先排除技能未裝入或助戰方向不一致的問題",
             caution="社群來源已停止更新；不把歷史寵物排名當成當前版本最優配置。",
             update={"pet_skills_ready": True}))
+    elif p["pet_kind"] == "異世寵物" and p["pet_name"] == "幽暗之靈" and p["pet_star"] is not None:
+        node = pet_milestone(p["pet_name"], p["pet_star"])
+        if node["state"] == "listed" and p["pet_preview_matches"] is not False:
+            step = Step("pet_umbral", "寵物材料", node["label"], node["label"],
+                "來源收錄的主人易傷節點；只在遊戲效果一致、整段材料齊全時列為可完成，不把易傷率當總傷害增幅。",
+                "到這一個節點後停，重新比較助戰、科技與收藏。", UMBRAL_SOURCE, 82,
+                current=STARS[p["pet_star"]], effect=node["effect"],
+                caution="本表只收錄黃4與紅5，不代表中途其他技能無用。條件排序未測量帳號總傷害收益。",
+                update={"pet_star": node["target"], "pet_preview_matches": None,
+                        "pet_target": None, "pet_gain": None, "pet_materials_ready": None})
+            assess_checks(step, [condition_check("遊戲節點與來源效果一致", p["pet_preview_matches"]),
+                                condition_check("到目標的全部材料（整段）", p["pet_materials_ready"])])
+            steps.append(step)
+        elif node["state"] != "done":
+            missing.append("寵物：幽暗之靈效果與來源不一致，暫不使用本表排序；請核對版本與遊戲預覽")
     elif p["pet_target"] and p["pet_target"].strip() and p["pet_gain"] in ("主人增傷／有效增益", "寵物自身傷害"):
         step = Step("pet_node", "寵物材料", f"寵物：{p['pet_target'].strip()}", p["pet_target"].strip(),
             "已核對下一階有主人有效增益，完成一個節點後再比較其他系統。" if p["pet_gain"] == "主人增傷／有效增益" else
@@ -504,6 +539,8 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
         complete.append(f"主位階段目標 R{p['awakening_goal']} 已達：暫停主位追加，改比其他系統；協同另算")
     if p["adv2"] == 8 and len(p["stars2"]) == 8 and sum(p["stars2"]) >= 80:
         complete.append("第二套8進階格／80傳奇星：菁英與BOSS門檻已完成")
+    if p["pet_kind"] == "異世寵物" and p["pet_name"] == "幽暗之靈" and p["pet_star"] == 10:
+        complete.append("幽暗之靈紅5：本表節點已達，不再推薦重複升級")
     return {"primary": asdict(steps[0]) if steps else None,
             "alternatives": [asdict(s) for s in steps[1:]], "missing": missing, "complete": complete,
             "deferred": [s for s in deferred if resource == "自動排序" or s["resource"] == resource]}

@@ -7,12 +7,36 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-11 editorial expansion: 36 local articles, 75 tables and 48 FAQs.
+  `field_content.py` adds dated operating guides for newer survivors, synergy,
+  ordinary/xeno pets, vehicles, regional action, specific SS skills and events.
+  Each new article states a game entry, stopping point and what to compare next.
+  Community mechanisms, official schedules and our own methods are labelled
+  separately. An undated official event card is not assigned a fake publication date.
+- Articles begin with three concrete points and the operating/stopping checklist.
+  Body text and tables remain visible; only FAQs and secondary directory entries
+  fold. Homepage has quick questions, three timely articles and two visible entries
+  per system. Expired scheduled events leave the featured shelf automatically.
+- `field_tools.py` provides bounded Elaine second-pet caps, reserve-module stat
+  arithmetic and descriptive A/B medians. They never modify a profile or call the
+  game. Published event windows are timezone-aware; an active schedule is not
+  represented as a personally observed game opening.
+- The planner has a selected Umbral Soul yellow-4/red-5 route. It requires current
+  awakening, in-game effect confirmation and the full remaining recipe. This is
+  not a full pet tier list, a remaining-cost table, or a global damage optimum.
+  Changing a saved pet target clears the previous target's material confirmation.
+  Completing a node also clears readiness for the next one; character cores are
+  not deducted for pet upgrades. Old schema-1 backups remain readable.
+- Event budgeting renders from the local dated roster, without waiting for a
+  third-party feed. Unconfirmed progress, price and stock fields start blank and
+  block calculation until entered; zeros are explicit inputs, not missing data.
+  Live editorial browsing remains under the latest-articles view.
 - The planner shows a visible cross-system execution queue, one leading milestone
   per system, plus a pure preview of what follows after the displayed milestone.
   A main-survivor stage goal pauses further main upgrades when reached, without
   hiding unfinished synergy milestones. Resource filters do not hide the global queue.
-- Pet configuration now participates in sequencing. Next paid nodes/effects and
-  full recipe readiness are player-confirmed from the game, not fabricated meta
+- Pet configuration participates in sequencing. Manual paid nodes/effects and
+  all full recipe readiness are player-confirmed from the game, not fabricated meta
   rankings. Unknown/panel-only effects stay outside the spending queue. Historical
   pet sources are explicitly marked as no longer updated. Completion clears the
   old pet goal/readiness, and never consumes character cores for a pet upgrade.
@@ -55,8 +79,8 @@ application is not a Cloudflare Worker.
   vector UI icons; no external images, fonts or new dependencies are needed. Text and status
   colors retain their contrast, and reduced-motion settings disable hover motion.
 - Home offers three task entries (upgrade planning, event budgeting, collectible
-  lookup), then a collapsed directory by system. Search replaces the directory
-  with a matching answer and table facts; it does not mix browsing and results.
+  lookup), featured reading and a browsable directory by system. Search replaces
+  these sections with up to three visible answers and table facts.
   Historical source summaries remain separately grouped in search and the index.
 - Visible navigation uses task names (升級路線、我的配置、活動試算、攻略索引).
   Internal page IDs remain stable for saved session state and article return paths.
@@ -65,7 +89,7 @@ application is not a Cloudflare Worker.
 - The same search also looks up local collectible names, aliases and IDs. Those
   hits are explicitly catalog metadata, not fabricated star effects or advice.
 - Set-member lists, linkage comparisons and crit-overflow guidance include their
-  source dates. Article tables remain expanded; explanatory prose and FAQs fold.
+  source dates. Article tables and explanatory prose remain expanded; FAQs fold.
 - `direction_content.py` adds an upgrade roadmap, selector-box decision tree and
   resonance planning guide. Editorial methods are not labelled as newly verified
   meta rankings. The resonance references remain explicitly dated and do not

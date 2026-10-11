@@ -111,13 +111,17 @@ def test_tech_effect_queries_find_the_specific_table_first(query):
 def test_warm_cloud_cache_refreshes_leaf_helpers_before_new_consumers(monkeypatch):
     import direction_tools
     import tech_routes
+    import field_tools
     # Model a prior helper version in the same long-lived Python process.
     monkeypatch.delattr(direction_tools, "operating_steps")
     monkeypatch.delattr(tech_routes, "next_tech_effect")
+    monkeypatch.delattr(field_tools, "pet_milestone")
+    monkeypatch.delattr(field_tools, "event_window")
     a = AppTest.from_file(APP)
     a.query_params["guide"] = "twin-tech-milestones"
     a.run(timeout=15)
     assert not a.exception
     assert callable(direction_tools.operating_steps)
     assert callable(tech_routes.next_tech_effect)
+    assert callable(field_tools.pet_milestone) and callable(field_tools.event_window)
     assert any("雙生無人機／雷電諧振" in item.value for item in a.markdown)

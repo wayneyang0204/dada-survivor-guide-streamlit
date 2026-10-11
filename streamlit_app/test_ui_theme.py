@@ -123,6 +123,8 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     assert any('class="event-verdict"' in m.value for m in a.markdown)
     for label in ("01 / 活動目標", "02 / 免費進度", "03 / 寶石成本"):
         assert any(label in m.value for m in a.markdown)
+    from test_decision_ui import fill_event_inputs
+    fill_event_inputs(a)
     by_label(a.button, "計算補鑽成本").click().run()
     assert not a.exception
     assert len(a.metric) == 4

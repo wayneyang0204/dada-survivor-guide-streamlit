@@ -43,6 +43,7 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
         if not completed_title and not restoring:
             # Saving an edited balance is the user's confirmation of its value.
             combined["estimated_balances"] = [key for key in combined["estimated_balances"] if key not in values]
+            combined = engine.invalidate_pet_verification(before, combined)
         st.session_state["completion_undo"] = None
         if completed_title:
             st.session_state["completion_undo"] = {"before": before, "title": completed_title}
@@ -112,7 +113,7 @@ def render_step_inputs(step: dict, p: dict) -> None:
     kind, sid = step.get("quote_kind"), step["id"]
     p = {**p, "_input_scope": step.get("quote_key") or sid}
     advanced = sid.startswith("adv") and sid.rsplit("_", 1)[-1].isdigit()
-    if not (kind or advanced or sid in ("venato", "hall_open", "lance_e1", "twin_drone")):
+    if not (kind or advanced or sid in ("venato", "hall_open", "lance_e1", "twin_drone", "pet_umbral", "pet_node")):
         return
     if step["status"] in ("星數未達", "資料未齊"):
         return
@@ -157,6 +158,11 @@ def render_step_inputs(step: dict, p: dict) -> None:
             elif sid == "lance_e1":
                 values["relic_cores"] = number("現有神器核心", "relic_cores", p, 10000)
                 values["gear_materials_ready"] = choice("E1所需S裝及其他材料是否齊全", "gear_materials_ready", (True, False), p)
+            elif sid in ("pet_node", "pet_umbral"):
+                if sid == "pet_umbral":
+                    values["pet_preview_matches"] = choice("幽暗之靈目標效果與遊戲預覽一致", "pet_preview_matches", (True, False), p)
+                values["pet_materials_ready"] = choice("到本節點的全部本體、碎片、核心及其他材料已足", "pet_materials_ready", (True, False), p)
+                st.caption("核對整段需求；沒有寵物剩餘庫存資料時不推算扣款，也不消耗特工覺醒核心。")
             else:
                 values["forcefield_red"] = choice("已有紅力場配件", "forcefield_red", (True, False), p)
             if st.form_submit_button("更新這一步的材料", type="primary", width="stretch"):
@@ -257,7 +263,7 @@ def render_decision(p: dict, step: dict) -> None:
               <dl class="decision-facts"><div><dt>目標門檻</dt><dd>{esc('target')}</dd></div>
               <div><dt>所需資源</dt><dd>{esc('cost')}</dd></div></dl></section>''', unsafe_allow_html=True)
             st.markdown(f'<p class="decision-because"><b>為什麼排這一步</b> {esc("why")}</p>', unsafe_allow_html=True)
-            if step.get("quote_kind") or step["id"] == "pet_node":
+            if step.get("quote_kind") or step["id"] in ("pet_node", "pet_umbral"):
                 st.caption("依據：你核對的遊戲預覽；帳號增傷未實測。")
             elif step["id"] == "hall_fill" or step["id"].endswith("_rearrange"):
                 st.caption("依據：已填的持有與槽位資料；這一步不需新材料。")
@@ -504,6 +510,11 @@ def render_profile() -> None:
 
 
 def render_profile_form(p: dict, section: str) -> None:
+    pet_editor = None
+    if section == "寵物":
+        pet_editor = st.radio("寵物目標怎麼填", ("來源節點：幽暗之靈", "其他寵物：遊戲預覽"),
+                              index=0 if p["pet_name"] == "幽暗之靈" else 1, horizontal=True,
+                              key=f"pet_editor_mode_{st.session_state.get('editor_revision',0)}")
     with st.form(f"edit_{section}", border=False):
         values = {}
         if section == "角色與模式":
@@ -556,11 +567,19 @@ def render_profile_form(p: dict, section: str) -> None:
         elif section == "寵物":
             values["pet_kind"] = choice("目前主戰寵物類型", "pet_kind", ("普通輸出寵", "主人增益寵", "異世寵物", "未持有"), p)
             values["pet_skills_ready"] = choice("出戰與助戰技能已按主戰方向核對並裝入", "pet_skills_ready", (True, False), p)
-            values["pet_target"] = st.text_input("遊戲預覽的下一個完整節點（含寵物名稱與等級）", value=p["pet_target"] or "", max_chars=100,
-                                               placeholder="照遊戲填寫，例如：某主戰寵的下一階覺醒") or None
-            values["pet_gain"] = choice("這個節點實際解鎖的效果", "pet_gain", ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認"), p)
+            if pet_editor == "來源節點：幽暗之靈":
+                values["pet_name"] = "幽暗之靈"
+                values["pet_star"] = star_choice("現役異寵覺醒星級", "pet_star", p)
+                values["pet_preview_matches"] = choice("幽暗之靈目標效果與遊戲預覽一致", "pet_preview_matches", (True, False), p)
+                values["pet_target"], values["pet_gain"] = None, None
+                st.caption("黃4以前查60%易傷20秒；已達黃4時，紅5是下一個收錄節點，不表示立即追滿。不一致就先不按本表投入。")
+            else:
+                values["pet_name"], values["pet_star"], values["pet_preview_matches"] = "其他", None, None
+                values["pet_target"] = st.text_input("遊戲預覽的下一個完整節點（含寵物名稱與等級）", value=p["pet_target"] or "", max_chars=100,
+                                                   placeholder="照遊戲填寫，例如：某主戰寵的下一階覺醒") or None
+                values["pet_gain"] = choice("這個節點實際解鎖的效果", "pet_gain", ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認"), p)
             values["pet_materials_ready"] = choice("本節點全部本體、碎片、核心及其他材料已足", "pet_materials_ready", (True, False), p)
-            st.caption("只記遊戲中查到的完整節點；不套用另一種寵物的成本。未確認效果或只有面板時，先保留寵物材料。")
+            st.caption("材料需包含到目標整段。更換已填寵物／星級／目標時，舊材料確認會清除；儲存後只需核對新目標。")
         else:
             values["weapon"] = choice("主武器", "weapon", ("雙絕槍", "其他"), p)
             l, r = st.columns(2)

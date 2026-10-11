@@ -583,4 +583,61 @@ _ROADMAP = """
 }
 """
 
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + "\n</style>")
+_PRO_GUIDE = """
+/* A compact editorial desk: information leads, illustration stays decorative. */
+.library-strip {display:flex;align-items:center;flex-wrap:wrap;gap:.5rem 1.5rem;padding:.8rem 1rem;margin:.15rem 0 .9rem;border:1px solid var(--line);border-radius:14px;background:#fffefd;color:var(--muted);font-size:.875rem;font-variant-numeric:tabular-nums;}
+.library-strip b {color:var(--ink);font-weight:750;margin-right:.25rem;}
+.st-key-quick_queries {padding:.15rem 0 .6rem;}
+.st-key-quick_queries [data-testid="stButton"] button {background:#fffaf2;border:1px solid #e8d8c0;min-height:44px;font-size:.875rem;}
+.st-key-quick_queries [data-testid="stButton"] button p {font-size:.875rem;line-height:1.4;}
+.st-key-featured_guides {margin-bottom:.9rem;}
+[class*="st-key-feature_"] {border:1px solid var(--line);border-top:3px solid #b6d2df;border-radius:20px;background:#fffefd;padding:1rem 1.1rem;height:100%;}
+[class*="st-key-feature_"]:nth-child(2) {border-top-color:#edc98a;}
+.feature-label {display:flex;justify-content:space-between;gap:.4rem;color:var(--accent);font-size:.875rem;font-weight:650;}
+.feature-label span {color:var(--muted);font-weight:400;font-variant-numeric:tabular-nums;}
+[class*="st-key-feature_"] button p {font-size:1.1rem!important;font-weight:750!important;line-height:1.5!important;}
+[class*="st-key-feature_"] [data-testid="stCaptionContainer"] {min-height:2.6rem;}
+.feature-points {margin:.15rem 0 0;padding-left:1.2rem;}
+[data-testid="stMarkdownContainer"] .feature-points li {font-size:.875rem;line-height:1.65;color:var(--muted);}
+.st-key-guide_directory [class*="st-key-directory_"] {padding:.4rem 0 .75rem;border-bottom:1px solid #eee6de;margin-bottom:.15rem;}
+.st-key-guide_directory [class*="st-key-directory_"] button p {font-size:1rem;line-height:1.5;font-weight:700;}
+.st-key-guide_directory [data-testid="stExpander"] {margin-top:.5rem;box-shadow:none;border-color:#eee6de;}
+.article-dateline {display:flex;flex-wrap:wrap;gap:.5rem;font-size:.875rem;margin:.4rem 0 1rem;color:var(--muted);}
+.article-dateline span {background:#fff6e7;padding:.3rem .65rem;border-radius:9px;}
+.article-keypoints {padding:1rem 1.25rem;border:1px solid #d5e3eb;border-radius:18px;background:#f3f9fc;margin:.75rem 0;}
+.article-keypoints h2 {font-size:1rem!important;margin:0 0 .5rem!important;}
+.article-keypoints ul {margin:0;padding-left:1.2rem;}
+.article-keypoints li {font-weight:600;}
+.article-operating {display:grid;grid-template-columns:1fr;gap:0;border:1px solid var(--line);border-radius:18px;background:#fffdf9;margin:1rem 0;overflow:hidden;}
+.article-operating > div {padding:.8rem 1rem;display:grid;grid-template-columns:5rem 1fr;gap:.5rem;align-items:start;}
+.article-operating > div + div {border-top:1px solid var(--line);}
+.article-operating span {font-size:.875rem;color:var(--accent);font-weight:700;line-height:1.75;}
+.article-operating p {margin:0!important;font-size:.9375rem!important;line-height:1.75!important;}
+[class*="st-key-article_part_"] {margin:1rem 0 .3rem;padding:0;}
+.article-section {scroll-margin-top:1.5rem;font-size:1.3rem!important;border-bottom:1px solid var(--line);padding-bottom:.7rem;margin-top:1.4rem!important;}
+.article-anchor {scroll-margin-top:1.5rem;}
+.article-section .section-number {font-size:.875rem;color:var(--accent);background:#fff4df;padding:.25rem .4rem;border-radius:7px;margin-right:.35rem;vertical-align:middle;}
+.article-section [data-testid="stHeaderActionElements"] {display:none;}
+.article-steps {padding-left:1.5rem;margin:.5rem 0 1rem;}
+.article-steps li {margin:.6rem 0;padding-left:.2rem;}
+.article-steps li::marker {color:var(--accent);font-weight:750;}
+.st-key-article_rail {position:sticky;top:1.25rem;border:1px solid var(--line);border-radius:18px;background:#fffdf8;padding:1rem;}
+.article-toc a {line-height:1.6;padding:.6rem .2rem;border-bottom:1px solid #eee6de;min-height:44px;}
+.guide-verdict {border-left:4px solid #c89450;box-shadow:none;}
+.guide-table th {font-weight:750;}.guide-table td {vertical-align:top;}
+@media(max-width:760px) {
+ .library-strip {gap:.5rem .8rem;padding:.65rem .75rem;}
+ .library-strip span:last-child {flex-basis:100%;}
+ .st-key-quick_queries [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.4rem!important;}
+ .st-key-quick_queries [data-testid="stColumn"] {min-width:0!important;}
+ .st-key-quick_queries button {padding:.4rem .25rem!important;}
+ [class*="st-key-feature_"] {padding:.9rem 1rem;border-radius:17px;}
+ [class*="st-key-feature_"] [data-testid="stCaptionContainer"] {min-height:0;}
+ .article-operating > div {grid-template-columns:1fr;gap:.25rem;padding:.75rem;}
+ .article-keypoints {padding:.85rem 1rem;}
+ .article-section {font-size:1.15rem!important;}
+ .article-dateline span:last-child {flex-basis:100%;}
+}
+"""
+
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + "\n</style>")

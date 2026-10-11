@@ -6,9 +6,10 @@ import re
 import unicodedata
 from direction_content import DIRECTION_GUIDES, DIRECTION_ANSWERS
 from tech_routes import TECH_GUIDE
+from field_content import FIELD_GUIDES, FIELD_ANSWERS
 
 
-CATEGORIES = ("特工養成", "裝備神鑄", "收藏典藏", "科技配件", "活動玩法", "寵物與關卡")
+CATEGORIES = ("特工養成", "裝備神鑄", "收藏典藏", "科技配件", "活動玩法", "寵物與關卡", "載具與模組")
 CHECKED = "2026-09-08"
 GUIDES = [
     {
@@ -272,6 +273,8 @@ QUICK_ANSWERS.update({
 
 GUIDES.extend(DIRECTION_GUIDES)
 GUIDES.append(TECH_GUIDE)
+GUIDES.extend(FIELD_GUIDES)
+QUICK_ANSWERS.update(FIELD_ANSWERS)
 QUICK_ANSWERS.update(DIRECTION_ANSWERS)
 QUICK_ANSWERS["twin-tech-milestones"] = ("雙生雷電1600→1650：差50能量，該檔列技能傷害＋30%。", "先確認雷電態與遊戲效果；不要為補50而拆掉無人機3000的現役門檻。")
 
@@ -306,7 +309,7 @@ def normalize(text: str) -> str:
 def all_guides(legacy: list[dict] | None = None) -> list[dict]:
     result = list(GUIDES)
     sources = {url.casefold() for g in result for _, url in g["sources"]}
-    mapping = {"收藏系統": "收藏典藏", "裝備養成": "裝備神鑄", "科技配件": "科技配件", "關卡活動": "活動玩法"}
+    mapping = {"收藏系統": "收藏典藏", "裝備養成": "裝備神鑄", "科技配件": "科技配件", "關卡活動": "活動玩法", "載具養成": "載具與模組"}
     for item in legacy or []:
         if item["來源"].casefold() in sources:
             continue
@@ -328,12 +331,20 @@ def all_guides(legacy: list[dict] | None = None) -> list[dict]:
 
 def query_terms(query: str) -> list[str]:
     normalized = normalize(query)[:160]
+    for sentence, term in (("伊羚", "伊狑"), ("伊狑值得換嗎", "伊狑"),
+            ("寵物怎麼升", "寵物"), ("寵物要怎麼升", "寵物"),
+            ("協同帶誰", "協同作戰"), ("協同要帶誰", "協同作戰"),
+            ("哪吒和洛基", "神火"), ("載具怎麼升", "載具"),
+            ("打王傷害不夠", "傷害不足"), ("六星還是五星", "所有特工")):
+        normalized = normalized.replace(normalize(sentence), normalize(term))
     searchable = re.sub(r"([rev]\s*[0-8]|[黃紅][1-5])", r" \1 ", normalized)
     searchable = re.sub(r"請問|幫我|我現在|我想|應該|之後|要先|先升|要升|升到|有哪些|哪些|多少|什麼|怎麼|如何|還有用嗎|有用嗎|還有區別|還要|要不要|[要嗎？?，,。！!]", " ", searchable)
     # Split recognized game terms inside a Chinese sentence without discarding unknown words.
-    vocabulary = ("史詩收藏", "暗物質傀儡", "安全場地", "召喚替身", "第二套", "80星", "暴擊率", "超過", "SS鞋", "連攜", "協同作戰")
-    for word in vocabulary:
-        searchable = searchable.replace(normalize(word), f" {normalize(word)} ")
+    vocabulary = ("史詩收藏", "暗物質傀儡", "安全場地", "召喚替身", "第二套", "80星", "暴擊率", "超過", "SS鞋", "連攜", "協同作戰",
+                  "幽暗之靈", "潮汐祕境", "潮汐秘境", "打叉", "載具", "模組", "同調", "神火", "伊狑", "楊大師", "塔洛莎", "維納托",
+                  "諧振", "雙生無人機", "雙生雷電")
+    pattern = "|".join(re.escape(normalize(word)) for word in sorted(vocabulary, key=len, reverse=True))
+    searchable = re.sub(pattern, lambda hit: " " + hit[0] + " ", searchable)
     terms = searchable.split()
     return terms
 
@@ -353,6 +364,31 @@ def search_guides(guides: list[dict], query: str = "", category: str = "全部")
         result.sort(key=lambda guide: sum((4 if term in normalize(guide["title"]) else 0) +
                     (2 if term in normalize(guide["summary"]) else 0) for term in terms), reverse=True)
     return result
+
+
+def library_stats(guides: list[dict]) -> dict:
+    core = [g for g in guides if not g.get("reference_only")]
+    tables = [s for g in core for s in g["sections"] if s.get("rows")]
+    return {"articles": len(core), "tables": len(tables),
+            "facts": sum(len(s["rows"]) for s in tables),
+            "questions": sum(len(g["faq"]) for g in core),
+            "sources": len({url for g in core for _, url in g["sources"]}),
+            "review_date": max((g["checked"] for g in core if g["checked"]), default=None)}
+
+
+def suggested_guides(guides: list[dict], query: str) -> list[dict]:
+    """Relax only for labelled suggestions; never report them as exact matches."""
+    terms = query_terms(query)
+    scored = []
+    for guide in guides:
+        if guide.get("reference_only"):
+            continue
+        haystack = normalize(guide["title"] + " " + guide.get("keywords", ""))
+        hits = sum(term in haystack for term in terms)
+        if hits:
+            scored.append((hits, guide))
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [guide for _, guide in scored[:3]]
 
 
 def answer_rows(guide: dict, query: str = "") -> list[list[str]]:
