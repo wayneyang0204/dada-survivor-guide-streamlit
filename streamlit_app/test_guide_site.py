@@ -89,6 +89,8 @@ def test_every_core_article_has_a_working_direct_link_and_full_content(slug):
         assert [item.value for item in a.number_input] == [None, None]
     elif slug in ("twin-tech-milestones", "elaine-build"):
         assert [item.value for item in a.number_input] == [None]
+    elif slug == "tide-haven":
+        assert [item.value for item in a.number_input] == [None] * 4
     else:
         assert not a.number_input
     assert not a.get("form")

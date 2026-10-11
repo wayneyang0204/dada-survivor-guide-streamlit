@@ -6,7 +6,7 @@ import next_step as engine
 from direction_tools import operating_steps, related_guide
 from test_decision_ui import boot, by_label
 from datetime import datetime
-from field_tools import event_window
+from field_tools import event_window, guild_ticket_budget
 
 
 @pytest.mark.parametrize("r,cap", [(0,0),(1,2),(2,4),(3,4),(4,6),(5,6),(6,8),(7,8),(8,10)])
@@ -54,6 +54,14 @@ def test_wrong_version_zero_star_or_maxed_never_recommend_duplicate():
     assert result['primary'] is None and any('紅5' in s for s in result['complete'])
 
 
+def test_named_pet_does_not_request_an_unrelated_manual_target_after_finishing():
+    from decision_ui import next_check
+    assert next_check(engine.clean_profile(umbral(pet_star=10)), '寵物材料') is None
+    assert next_check(engine.clean_profile({'pet_kind':'異世寵物','pet_name':'其他'}), '寵物材料') == '寵物'
+    assert next_check(engine.clean_profile(umbral(pet_star=0)), '寵物材料') == '寵物'
+    assert any('未持有' in s for s in engine.recommend(umbral(pet_star=0))['missing'])
+
+
 def test_character_finished_can_move_to_specific_pet_node_and_completion_is_pure():
     p = umbral(survivor='維納托', awakening=6, awakening_goal=6, taloxa=4, awakening_cores=20)
     before = deepcopy(p)
@@ -81,6 +89,52 @@ def test_reserve_stat_keeps_unknown_and_no_total_damage_claim():
     for value, sync in ((-1,60),(1,101),(float('nan'),60),(True,60)):
         with pytest.raises(ValueError):
             reserve_stat(value,sync)
+
+
+@pytest.mark.parametrize('coins,reserve,price,requested,safe,maximum,cost,shortfall', [
+    (20000, 8000, 3000, 4, True, 4, 12000, 0),
+    (20000, 8000, 3000, 5, False, 4, 15000, 3000),
+    (100, 200, 30, 0, True, 0, 0, 0),
+    (0, 0, 30, 1, False, 0, 30, 30),
+    (100, 1, 30, 3, True, 3, 90, 0),
+])
+def test_guild_budget_is_only_exact_coin_arithmetic(coins,reserve,price,requested,safe,maximum,cost,shortfall):
+    result = guild_ticket_budget(coins,reserve,price,requested)
+    assert result['safe'] == safe and result['max_tickets'] == maximum
+    assert result['cost'] == cost and result['shortfall'] == shortfall
+    assert 'gem_need' not in result and 'projected_free' not in result
+
+
+@pytest.mark.parametrize('values', [(None,0,30,1), (10,None,30,1), (10,0,None,1), (10,0,30,None)])
+def test_unknown_guild_budget_never_assumes_a_price_or_reserve(values):
+    assert guild_ticket_budget(*values)['state'] == 'unknown'
+
+
+@pytest.mark.parametrize('values', [(-1,0,30,1), (10,-1,30,1), (10,0,0,1),
+                                    (10,0,30,-1), (True,0,30,1), (10.5,0,30,1)])
+def test_guild_budget_rejects_invalid_coin_units(values):
+    with pytest.raises(ValueError):
+        guild_ticket_budget(*values)
+
+
+def test_guild_activity_replaces_diamond_formula_and_readback_does_not_touch_profile():
+    app = boot('活動')
+    profile = {'survivor':'維納托', 'awakening':6, 'awakening_cores':20}
+    app.session_state['player_profile'] = deepcopy(profile)
+    selector = by_label(app.selectbox, '來源文章中的近期／歷史活動')
+    selector.set_value(next(value for value in selector.options if '潮汐' in value)).run()
+    assert not app.exception and not any(x.label == '目前寶石' for x in app.number_input)
+    assert not any(x.label == '計算補鑽成本' for x in app.button)
+    assert [x.value for x in app.number_input] == [None] * 4
+    for label, value in [('目前公會幣',20000),('本期每張探索券公會幣價格',3000),
+                         ('保留給公會商店固定物資的公會幣',8000),('這次想買的探索券張數',5)]:
+        by_label(app.number_input,label).set_value(value)
+    app.run()
+    assert not app.exception
+    assert by_label(app.metric,'本次買券成本（公會幣）').value == '15,000'
+    assert by_label(app.metric,'扣除保留額後最多可買（張）').value == '4'
+    assert any('還差 3,000 公會幣' in x.value for x in app.warning)
+    assert app.session_state['player_profile'] == profile
 
 
 def test_ab_medians_ranges_and_bad_inputs():

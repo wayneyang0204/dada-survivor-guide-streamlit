@@ -502,7 +502,8 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
                                 condition_check("到目標的全部材料（整段）", p["pet_materials_ready"])])
             steps.append(step)
         elif node["state"] != "done":
-            missing.append("寵物：幽暗之靈效果與來源不一致，暫不使用本表排序；請核對版本與遊戲預覽")
+            missing.append("寵物：" + node["message"] if node["state"] == "unknown" else
+                           "寵物：幽暗之靈效果與來源不一致，暫不使用本表排序；請核對版本與遊戲預覽")
     elif p["pet_target"] and p["pet_target"].strip() and p["pet_gain"] in ("主人增傷／有效增益", "寵物自身傷害"):
         step = Step("pet_node", "寵物材料", f"寵物：{p['pet_target'].strip()}", p["pet_target"].strip(),
             "已核對下一階有主人有效增益，完成一個節點後再比較其他系統。" if p["pet_gain"] == "主人增傷／有效增益" else

@@ -18,7 +18,7 @@ application is not a Cloudflare Worker.
   fold. Homepage has quick questions, three timely articles and two visible entries
   per system. Expired scheduled events leave the featured shelf automatically.
 - `field_tools.py` provides bounded Elaine second-pet caps, reserve-module stat
-  arithmetic and descriptive A/B medians. They never modify a profile or call the
+  arithmetic, guild-coin ticket budgets and descriptive A/B medians. They never modify a profile or call the
   game. Published event windows are timezone-aware; an active schedule is not
   represented as a personally observed game opening.
 - The planner has a selected Umbral Soul yellow-4/red-5 route. It requires current
@@ -30,6 +30,9 @@ application is not a Cloudflare Worker.
 - Event budgeting renders from the local dated roster, without waiting for a
   third-party feed. Unconfirmed progress, price and stock fields start blank and
   block calculation until entered; zeros are explicit inputs, not missing data.
+  Archived events require an explicit history/reprint acknowledgement. Tide Haven
+  uses its own guild-coin budget, never the gemstone reserve/value formula; it does
+  not predict the random gems found per ticket or promise a guild milestone.
   Live editorial browsing remains under the latest-articles view.
 - The planner shows a visible cross-system execution queue, one leading milestone
   per system, plus a pure preview of what follows after the displayed milestone.

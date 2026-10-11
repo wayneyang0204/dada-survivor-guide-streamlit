@@ -13,7 +13,7 @@ from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
 from tech_routes import TECH_ROUTES, next_tech_effect
-from field_tools import elaine_pet_limit, reserve_stat, compare_runs, event_window
+from field_tools import elaine_pet_limit, reserve_stat, compare_runs, event_window, guild_ticket_budget
 
 
 PUBLIC_URL = "https://dada-survivor-guide.streamlit.app/"
@@ -307,7 +307,34 @@ def render_quick_decision(guide: dict) -> None:
         <p><b>停在這裡：</b>{html.escape(decision['stop'])}</p></section>''', unsafe_allow_html=True)
 
 
+def render_guild_budget(prefix: str = "guild") -> None:
+    st.markdown("### 公會買券預算")
+    st.caption("先保留公會商店固定物資的成本，再算可用幣。單券價格與購買上限照本期遊戲填；寶鑽是隨機產出，不用每券固定進度的補鑽公式。")
+    left, right = st.columns(2)
+    with left:
+        coins = st.number_input("目前公會幣", min_value=0, value=None, key=f"{prefix}_coins")
+        price = st.number_input("本期每張探索券公會幣價格", min_value=1, value=None, key=f"{prefix}_price")
+    with right:
+        reserve = st.number_input("保留給公會商店固定物資的公會幣", min_value=0, value=None, key=f"{prefix}_reserve")
+        requested = st.number_input("這次想買的探索券張數", min_value=0, value=None, key=f"{prefix}_requested")
+    result = guild_ticket_budget(coins, reserve, price, requested)
+    if result["state"] == "unknown":
+        st.info(result["message"])
+        return
+    a, b = st.columns(2)
+    a.metric("本次買券成本（公會幣）", f"{result['cost']:,}")
+    b.metric("扣除保留額後最多可買（張）", f"{result['max_tickets']:,}")
+    if result["safe"]:
+        st.success("本次張數未動用保留額；是否買券仍看公會距離下一個獎勵的缺口。")
+    else:
+        st.warning(f"扣除保留額後還差 {result['shortfall']:,} 公會幣，先減少張數。")
+    st.caption(result["message"])
+
+
 def render_field_tool(slug: str) -> None:
+    if slug == "tide-haven":
+        with st.popover("計算公會幣買券預算", width="stretch"):
+            render_guild_budget("article_guild")
     """Article-local checks never change player_profile or spend game resources."""
     if slug == "elaine-build":
         with st.popover("核對我的第二寵上限", width="stretch"):

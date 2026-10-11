@@ -711,9 +711,9 @@ elif 頁面 == "活動最佳解":
     活動模型 = match_event_playbook(已選活動["title"])
     原期排程 = _field_tools.event_window(活動模型.get("starts_at"), 活動模型.get("ends_at"))
     歷史試算已確認 = True
-    if 原期排程["state"] == "ended":
-        st.warning(原期排程["label"])
-        歷史試算已確認 = st.checkbox("我正在核對復刻或做歷史試算，不是依原期排程投入", key="historical_event_confirmed")
+    if 原期排程["state"] == "ended" or "歷史活動" in 活動模型.get("tags", []):
+        st.warning(原期排程["label"] if 原期排程["state"] == "ended" else "原期已結束，以下數字只供復刻核對或歷史試算。")
+        歷史試算已確認 = st.checkbox("我正在核對復刻或做歷史試算，不是依原期排程投入", key=f"historical_event_confirmed_{活動模型['name']}")
     elif 原期排程["state"] != "unknown":
         st.caption(原期排程["label"])
 
@@ -740,6 +740,10 @@ elif 頁面 == "活動最佳解":
             st.markdown(f"{index}. {step}")
         st.markdown(f"**免費資源依據：** {活動模型['free_hint']}")
         st.markdown(f"**停損提醒：** {活動模型['avoid']}")
+
+    if 活動模型["name"] == "潮汐祕境":
+        _guide_ui.render_guild_budget("activity_guild")
+        st.stop()
 
     st.markdown('<div class="workflow-strip" aria-label="活動試算流程"><span class="active">1 選目標</span><span>2 填進度</span><span>3 看補鑽成本</span></div>', unsafe_allow_html=True)
     st.markdown("### 01 / 活動目標")

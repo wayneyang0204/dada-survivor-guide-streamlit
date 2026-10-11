@@ -9,6 +9,21 @@ UMBRAL_SOURCE = "https://notalknote.xyz/survivor-io-umbral-soul-pet-guide-2026/"
 ELAINE_LIMITS = {0: 0, 1: 2, 2: 4, 3: 4, 4: 6, 5: 6, 6: 8, 7: 8, 8: 10}
 
 
+def guild_ticket_budget(coins: int | None, reserve: int | None,
+                        price: int | None, requested: int | None) -> dict:
+    """Exact purchase arithmetic only; never predicts random gems on the board."""
+    if any(value is None for value in (coins, reserve, price, requested)):
+        return {"state": "unknown", "message": "填本期票價、公會幣與保留額；不把寶石當公會幣。"}
+    if any(type(value) is not int or value < 0 for value in (coins, reserve, price, requested)) or price == 0:
+        raise ValueError("公會幣、保留額與張數需為非負整數，單券價格需大於0。")
+    available = max(0, coins - reserve)
+    cost = price * requested
+    return {"state": "quoted", "available": available, "max_tickets": available // price,
+            "cost": cost, "shortfall": max(0, cost - available),
+            "safe": cost <= available,
+            "message": "這只計買券成本；不預測每券寶鑽，不保證公會跨檔，也不超過遊戲本期購買上限。"}
+
+
 def event_window(start: str | None, end: str | None, now: datetime | None = None) -> dict:
     """Status of the published schedule; never claims an observed game opening."""
     if not start or not end:

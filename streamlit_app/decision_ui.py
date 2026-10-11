@@ -181,7 +181,8 @@ def next_check(p: dict, scope: str) -> str | None:
                      or p["survivor"] == "維納托" and p["taloxa"] is None,
         "裝備與科技": p["weapon"] is None or p["weapon"] == "雙絕槍" and (p["weapon_e"] is None or p["weapon_v"] is None)
                      or p["twin_drone"] is None or p["twin_drone"] is False and p["drone_red"] is None,
-        "寵物": p["pet_kind"] is None or p["pet_kind"] == "未持有" or not p["pet_target"],
+        "寵物": p["pet_kind"] is None or p["pet_kind"] == "未持有" or not p["pet_target"]
+                 and not (p["pet_kind"] == "異世寵物" and p["pet_name"] == "幽暗之靈" and p["pet_star"] is not None and p["pet_star"] > 0),
     }
     relevant = {"收藏之心": ("普通典藏館",), "高級收藏之心": ("進階典藏館",),
         "傳奇收藏自選": ("普通典藏館", "收藏品", "裝備與科技"), "覺醒核心": ("角色與模式", "裝備與科技"),
