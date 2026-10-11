@@ -332,10 +332,10 @@ def render_guild_budget(prefix: str = "guild") -> None:
 
 
 def render_field_tool(slug: str) -> None:
+    """Article-local checks never change player_profile or spend game resources."""
     if slug == "tide-haven":
         with st.popover("計算公會幣買券預算", width="stretch"):
             render_guild_budget("article_guild")
-    """Article-local checks never change player_profile or spend game resources."""
     if slug == "elaine-build":
         with st.popover("核對我的第二寵上限", width="stretch"):
             stage = st.number_input("伊狑覺醒 R", min_value=0, max_value=8, value=None, key="elaine_limit_r")

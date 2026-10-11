@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from math import isfinite
-from statistics import median
 from datetime import datetime, timezone
 
 UMBRAL_SOURCE = "https://notalknote.xyz/survivor-io-umbral-soul-pet-guide-2026/"
@@ -84,7 +83,7 @@ def reserve_stat(value: float | None, sync: float | None) -> dict:
         return {"state": "unknown", "message": "填單件模組的該項屬性與本車同步率；留白不當作0。"}
     if any(type(n) not in (int, float) or not isfinite(n) or n < 0 for n in (value, sync)) or sync > 100:
         raise ValueError("屬性需為非負數，同步率需在0～100%。")
-    amount = value * sync / 100
+    amount = value * (sync / 100)
     return {"state": "calculated", "value": amount,
             "message": f"後備傳遞該項屬性 {amount:g}%。只計這一項模組屬性，不含後備連線技能，也不是總傷害增幅。"}
 
@@ -110,10 +109,18 @@ def compare_runs(a: str, b: str) -> dict:
     first, second = parse(a), parse(b)
     if len(first) < 3 or len(second) < 3:
         return {"state": "unknown", "message": "每組至少填3場同條件成績，使用相同單位。"}
-    ma, mb = median(first), median(second)
+    def finite_median(values):
+        ordered = sorted(values)
+        count = len(ordered)
+        return ordered[count // 2] if count % 2 else ordered[count // 2 - 1] / 2 + ordered[count // 2] / 2
+
+    ma, mb = finite_median(first), finite_median(second)
     overlap = max(min(first), min(second)) <= min(max(first), max(second))
+    change = (mb / ma - 1) * 100 if ma else None
+    if change is not None and not isfinite(change):
+        change = None
     return {"state": "descriptive", "median_a": ma, "median_b": mb,
             "min_a": min(first), "min_b": min(second), "range_overlap": overlap,
-            "change": (mb / ma - 1) * 100 if ma else None,
+            "change": change,
             "message": "兩組範圍有重疊；不能只靠中位數差判定值得升級。" if overlap else
                        "樣本範圍未重疊，但有限場次仍不能證明統計顯著或全局最優。"}

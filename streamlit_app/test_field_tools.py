@@ -149,6 +149,13 @@ def test_ab_medians_ranges_and_bad_inputs():
             compare_runs(value,'1,1,1')
 
 
+def test_finite_large_inputs_do_not_render_infinite_calculations():
+    assert reserve_stat(1e308,100)['value'] == 1e308
+    result = compare_runs('1e308,1e308,1e308,1e308','1e308,1e308,1e308,1e308')
+    assert result['median_a'] == 1e308 and result['change'] == 0
+    assert compare_runs('1e-308,1e-308,1e-308','1e308,1e308,1e308')['change'] is None
+
+
 def test_umbral_small_recipe_form_and_completed_node_do_not_touch_other_stock():
     app = boot()
     app.session_state['player_profile'] = umbral(pet_preview_matches=None, awakening_cores=20)
