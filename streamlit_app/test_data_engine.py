@@ -93,16 +93,18 @@ def test_theater_festival_separates_milestones_from_chest_cost() -> None:
     assert "本期已結束" in playbook["avoid"]
 
 
-def test_autumn_seabed_uses_only_officially_confirmed_rules() -> None:
+def test_autumn_seabed_separates_official_and_third_party_data() -> None:
     playbook = match_event_playbook("秋日海底探險電光水母攻略")
     assert playbook["name"] == "秋日海底探險"
-    assert playbook["target"] == 0
+    assert playbook["target"] == 1200
     assert "10/11 00:00" in playbook["period"]
     assert "10/16 00:00" in playbook["period"]
     assert "官方現行活動" in playbook["tags"]
-    assert "尚未公布" in playbook["free_hint"]
-    assert "免費量與里程碑未知時不補資源" in playbook["verdict"]
-    assert "不當成事實" in playbook["avoid"]
+    assert "六百零八" in playbook["free_hint"]
+    assert "三百零二" in playbook["free_hint"]
+    assert "四百六十箱" in playbook["free_hint"]
+    assert "一千二百公尺核心自選" in playbook["verdict"]
+    assert "社群估算" in playbook["avoid"]
 
 
 def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:

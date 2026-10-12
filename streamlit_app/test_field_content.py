@@ -32,7 +32,7 @@ def test_new_articles_are_actionable_and_evidence_is_not_faked(guide):
         if section.get('rows'):
             assert all(len(row) == len(section['columns']) for row in section['rows'])
     for source in guide['source_details']:
-        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/'))
+        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://garrytools.com/'))
         if source['date']:
             assert date.fromisoformat(source['date']) <= date.fromisoformat(REVIEW_DATE)
         else:
