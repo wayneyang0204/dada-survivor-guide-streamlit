@@ -8,7 +8,7 @@ import streamlit as st
 
 import guide_content as content
 from ui_art import TOPIC_ART, guide_icon
-from ui_interactions import kite_markup
+from ui_interactions import flight_scene_markup, article_bookmark_markup, TOPIC_LABELS
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
@@ -204,22 +204,21 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
 
 def render_home(legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
-    detailed_count = sum(not guide.get("reference_only") for guide in guides)
+    selected = st.session_state.get("home_topic", "全部")
+    if selected not in ("全部", *content.CATEGORIES):
+        selected = st.session_state["home_topic"] = "全部"
+    detailed_count = sum(not guide.get("reference_only") and
+                         (selected == "全部" or guide["category"] == selected) for guide in guides)
     with st.container(key="guide_search_panel"):
-        st.markdown('<div class="hero-intro" data-ui-region="home-search" data-ui-motion="true"><div class="hero-copy">'
-                    '<h1 class="guide-hero-title">噠噠特攻攻略</h1>'
-                    '<p class="guide-hero-deck">特工・裝備・收藏・科技・寵物・載具</p>'
-                    f'<div class="hero-library-note">{detailed_count} 篇門檻詳解<span>／</span>{len(content.CATEGORIES)} 個養成主題</div></div>'
-                    f'<div class="hero-companion" aria-hidden="true">{kite_markup()}</div></div>',
-                    unsafe_allow_html=True)
-        search, topic = st.columns([2.25, 1], gap="medium")
-        with search:
-            query = st.text_input("搜尋攻略", placeholder="暗物質黃5、SS鞋套裝、金R3……", max_chars=160, key="home_guide_search")
-        with topic:
-            category = st.selectbox("攻略分類", ("全部", *content.CATEGORIES), key="home_topic")
+        st.markdown(flight_scene_markup(selected, detailed_count), unsafe_allow_html=True)
+        with st.container(key="flight_topics"):
+            category = st.radio("攻略分類", ("全部", *content.CATEGORIES), horizontal=True,
+                                format_func=lambda value: TOPIC_LABELS[value], key="home_topic", width="stretch")
+        query = st.text_input("搜尋攻略", placeholder="暗物質黃5、SS鞋套裝、金R3……", max_chars=160, key="home_guide_search")
     render_library_brief(guides)
     if query.strip():
-        render_results(guides, query, category, "home_search")
+        with st.container(key="guide_search_results"):
+            render_results(guides, query, category, "home_search")
         return
     if category == "全部":
         render_quick_queries()
@@ -236,7 +235,8 @@ def render_home(legacy: list[dict]) -> None:
                         st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
                         st.caption(detail)
         render_featured(guides)
-    render_directory(guides, category, "home")
+    with st.container(key="flight_topic_preview"):
+        render_directory(guides, category, "home")
 
 
 def render_directory(guides: list[dict], category: str, prefix: str) -> None:
@@ -391,6 +391,7 @@ def render_article(slug: str, legacy: list[dict]) -> None:
             with st.popover("文章連結", width="stretch"):
                 st.caption("可收藏或複製此連結；連結不含個人帳號資料。")
                 st.code(PUBLIC_URL + "?guide=" + quote(guide["slug"], safe=""), language=None, wrap_lines=True)
+    st.markdown(article_bookmark_markup(guide["category"]), unsafe_allow_html=True)
     page_heading(guide["title"], "")
     date = f"來源更新：{guide['source_date']}" if guide["source_date"] else "來源未標發布日" if guide["sources"] else "本站方法說明"
     checked = f" · 本站核對：{guide['checked']}" if guide["checked"] else " · 既有摘要，待重新核對" if guide.get("reference_only") else " · 非官方規則／排行"

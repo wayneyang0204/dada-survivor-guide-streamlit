@@ -64,10 +64,10 @@ def test_search_shows_answer_numbers_without_opening_article():
 
 def test_search_with_category_survives_reading_roundtrip():
     app = AppTest.from_file(APP).run()
-    by_label(app.selectbox, "攻略分類").select("收藏典藏")
+    by_label(app.radio, "攻略分類").set_value("收藏典藏")
     by_label(app.text_input, "搜尋攻略").set_value("召喚替身有哪些").run()
     app.button(key="home_search_collectible-sets").click().run()
     by_label(app.button, "← 搜尋結果").click().run()
     assert not app.exception
-    assert by_label(app.selectbox, "攻略分類").value == "收藏典藏"
+    assert by_label(app.radio, "攻略分類").value == "收藏典藏"
     assert by_label(app.text_input, "搜尋攻略").value == "召喚替身有哪些"

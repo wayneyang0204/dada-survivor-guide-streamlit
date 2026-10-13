@@ -3,6 +3,7 @@
 from urllib.parse import quote
 
 from ui_art import guide_icon
+from motion_theme import MOTION_STYLE
 
 STYLE = """
 <style>
@@ -640,4 +641,4 @@ _PRO_GUIDE = """
 }
 """
 
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + "\n</style>")
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + MOTION_STYLE + "\n</style>")

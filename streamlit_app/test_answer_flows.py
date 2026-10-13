@@ -41,7 +41,7 @@ def test_reading_and_returning_preserves_home_search():
 
 def test_home_search_shows_answers_without_category_wall():
     app = AppTest.from_file(APP).run()
-    assert by_label(app.selectbox, "攻略分類")
+    assert by_label(app.radio, "攻略分類")
     by_label(app.text_input, "搜尋攻略").set_value("黃收藏先升哪些？").run()
     assert app.button(key="home_search_epic-collectibles")
     assert not any(str(button.key).startswith("home_topic_") for button in app.button)

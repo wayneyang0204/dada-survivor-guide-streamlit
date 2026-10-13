@@ -113,9 +113,9 @@ def test_article_to_targeted_planner_preserves_profile():
 
 def test_category_navigation_and_return_from_article():
     a = AppTest.from_file(APP).run()
-    by_label(a.selectbox, "攻略分類").select("收藏典藏").run()
+    by_label(a.radio, "攻略分類").set_value("收藏典藏").run()
     assert not a.exception
-    assert by_label(a.selectbox, "攻略分類").value == "收藏典藏"
+    assert by_label(a.radio, "攻略分類").value == "收藏典藏"
     catalog = content.all_guides(legacy_guides())
     visible = [content.get_guide(b.key.removeprefix("home_"), catalog) for b in a.button if b.key and b.key.startswith("home_")]
     assert visible and all(g["category"] == "收藏典藏" for g in visible)
@@ -123,7 +123,7 @@ def test_category_navigation_and_return_from_article():
     by_label(a.button, "← 攻略首頁").click().run()
     assert not a.exception
     assert "guide" not in a.query_params
-    assert by_label(a.selectbox, "攻略分類").value == "收藏典藏"
+    assert by_label(a.radio, "攻略分類").value == "收藏典藏"
     a.radio[0].set_value("攻略首頁").run()
     assert not a.exception
     assert by_label(a.text_input, "搜尋攻略")

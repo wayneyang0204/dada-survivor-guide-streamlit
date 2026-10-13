@@ -138,7 +138,7 @@ def test_illustrated_home_has_real_counts_and_accessible_native_routes():
     a.radio[0].set_value("攻略首頁").run()
     assert not a.exception
     text = "\n".join(m.value for m in a.markdown if "<style>" not in m.value)
-    assert f'{len(content.GUIDES)} 篇門檻詳解' in text
+    assert f'{len(content.GUIDES)} 篇詳解' in text
     assert set(TOPIC_ART) == set(content.CATEGORIES)
     assert text.count('class="topic-heading"') == len(content.CATEGORIES)
     positions = [text.index(f'<h3>{topic}</h3>') for topic in content.CATEGORIES]

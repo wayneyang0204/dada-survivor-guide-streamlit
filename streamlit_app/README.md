@@ -7,6 +7,14 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-13 motion/navigation update: the homepage combines a panoramic sky,
+  automatic red-kite cruise, native topic choices and the filtered guide shelf.
+  Topic selection changes the scene colour, station icon, article count and shelf
+  together, without changing player data or auto-opening an article. Mobile topic
+  choices use a compact four-by-two grid. Articles keep a small matching topic
+  bookmark; returning restores the originating category/search. Decorations never
+  take pointer input, and OS reduced-motion disables animation without disabling
+  navigation. No animation picker, practice widget or new external asset is used.
 - 2026-10-11 editorial expansion: 36 local articles, 75 tables and 48 FAQs.
   `field_content.py` adds dated operating guides for newer survivors, synergy,
   ordinary/xeno pets, vehicles, regional action, specific SS skills and events.

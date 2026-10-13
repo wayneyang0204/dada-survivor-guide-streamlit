@@ -17,6 +17,7 @@ import direction_content as _direction_content
 import field_content as _field_content
 import field_tools as _field_tools
 import ui_art as _ui_art
+import motion_theme as _motion_theme
 
 _direction_tools = importlib.reload(_direction_tools)
 _tech_routes = importlib.reload(_tech_routes)
@@ -24,6 +25,7 @@ _direction_content = importlib.reload(_direction_content)
 _field_content = importlib.reload(_field_content)
 _field_tools = importlib.reload(_field_tools)
 _ui_art = importlib.reload(_ui_art)
+_motion_theme = importlib.reload(_motion_theme)
 
 import ui_interactions as _ui_interactions
 _ui_interactions = importlib.reload(_ui_interactions)
