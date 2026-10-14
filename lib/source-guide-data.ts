@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'version-5-3-0',
+    category: '最新系統',
+    title: '5.3.0 官方預告：矩陣小隊與 351～355 章',
+    updated: '2026/10/14',
+    status: '需版本核對',
+    summary: '官方社群已確認新版本加入主線 351～355 章、矩陣小隊、古堡卡牌、驚喜連鎖禮包、伊狑與維托爾萬聖節造型，並更新試煉之路、迴響之戰及區域行動。本次查核時商店頁仍顯示 5.2.0，詳細門檻與消耗尚未公開。',
+    actions: ['安卓預計 10 月 14～15 日分批發布，蘋果版待審核；以自己商店與遊戲內畫面為準', '矩陣小隊正式開放前先保留通用自選箱與碎片，不重置主力或升級閒置角色', '社群文章所列 10 月 20 日、10 月 29 日、五萬寶石與核心消耗未獲官方公告證實，不據此投入資源'],
+    sourceUrl: 'https://www.facebook.com/SurvivorHabbyTW/posts/pfbid0stATwAbgwU5acXH3mYAAn2ccBowBBnYVSqn3o7Xq2q1L1u1xc6HojQumfCdfMByFl',
+  },
+  {
     id: 'autumn-seabed-exploration',
     category: '關卡活動',
     title: '秋日海底探險：七百五十／一千二百公尺停損攻略',

@@ -34,12 +34,17 @@ export type Guide = {
 };
 
 export const OFFICIAL_UPDATE = {
-  version: '5.2.0',
-  checkedAt: '2026-10-12 09:00',
-  headline: '5.2.0 已在台灣與美國商店上架',
+  version: '5.3.0 公告',
+  checkedAt: '2026-10-14 09:00',
+  headline: '5.3.0 已由官方公告，商店仍在分批上架',
   summary:
-    '台灣與美國官方蘋果商店目前皆顯示 5.2.0：新增 346–350 章、神火特工洛基與高階特工伊狑；安卓商店也已列出同版更新內容。',
+    '官方社群已公布新版本內容：安卓預計 10 月 14～15 日分批發布，蘋果版待商店審核後陸續上架；本次查核時台灣蘋果與安卓商店頁仍顯示 5.2.0。',
   bullets: [
+    '新增主線 351–355 章與對應挑戰章節',
+    '新增特工養成玩法「矩陣小隊」；官方尚未公開解鎖門檻、完整技能與資源消耗',
+    '新增「古堡卡牌」與「驚喜連鎖禮包」，伊狑與維托爾萬聖節造型即將登場',
+    '試煉之路上限更新，迴響之戰新增賽季並調整詞綴，區域行動開啟新賽季',
+    '社群文章提到的 10 月 20 日、10 月 29 日、五萬寶石與核心消耗，均未獲本次官方公告證實',
     '新增主線 346–350 章與對應挑戰章節',
     '官方確認神火特工洛基已上線；9 月 17 日玩家實測顯示他偏向協同支援，不建議當上場主位',
     '高階特工伊狑已有 9 月 26 日玩家實測：覺醒1開雙異獸，覺醒5可常駐雙形態增益；一般帳號不要因此重置現有主位',
@@ -52,6 +57,14 @@ export const OFFICIAL_UPDATE = {
     '金秋海岸狂歡已於 9 月 29 日凌晨結束，原期資料只供復刻時重新核對',
   ],
   sources: [
+    {
+      name: '新版本更新公告｜噠噠特攻官方社群',
+      url: 'https://www.facebook.com/SurvivorHabbyTW/posts/pfbid0stATwAbgwU5acXH3mYAAn2ccBowBBnYVSqn3o7Xq2q1L1u1xc6HojQumfCdfMByFl',
+    },
+    {
+      name: '5.3.0 版本整理｜別說筆記（未證實數字另行標示）',
+      url: 'https://notalknote.xyz/survivor-io-update-5-3-0-matrix-squad-halloween/',
+    },
     {
       name: '5.2.0 版本說明｜官方蘋果商店',
       url: 'https://apps.apple.com/us/app/survivor-io/id1528941310',
@@ -112,6 +125,17 @@ export const OFFICIAL_UPDATE = {
 };
 
 export const GUIDES: Guide[] = [
+  {
+    id: 'version-5-3-0',
+    category: '角色',
+    title: '5.3.0 預告：矩陣小隊先留資源，不猜消耗',
+    description: '官方已確認矩陣小隊、351–355 章與萬聖節內容；商店仍在分批上架，未公開的日期與消耗不先當成定案。',
+    level: '高難',
+    readTime: '5 分鐘',
+    updated: '10/14',
+    tags: ['5.3.0 預告', '矩陣小隊', '商店分批上架'],
+    takeaways: ['安卓預計 10 月 14～15 日分批發布，蘋果版待審核；看到自己的商店出現新版本再更新', '矩陣小隊成本與解鎖門檻尚未公開，先保留通用自選箱與碎片，不拆主力配置', '10 月 20 日、10 月 29 日、五萬寶石與核心消耗屬社群說法，未獲官方公告證實'],
+  },
   {
     id: 'autumn-seabed-exploration',
     category: '關卡',

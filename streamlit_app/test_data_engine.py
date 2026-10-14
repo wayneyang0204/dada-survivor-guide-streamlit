@@ -19,6 +19,7 @@ def test_strip_html_and_classification() -> None:
     assert classify_article("戲院盛典觀演票折扇攻略") == "活動攻略"
     assert classify_article("劇院盛典賓果攻略") == "活動攻略"
     assert classify_article("秋日海底探險電光水母攻略") == "活動攻略"
+    assert classify_article("5.3.0版本更新：矩陣小隊與伊狑萬聖造型") == "角色特工"
     assert classify_article("載具與模組同步率攻略") == "載具養成"
     assert classify_article("新版區域行動攻略") == "關卡模式"
 

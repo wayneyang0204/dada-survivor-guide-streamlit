@@ -32,7 +32,7 @@ def test_new_articles_are_actionable_and_evidence_is_not_faked(guide):
         if section.get('rows'):
             assert all(len(row) == len(section['columns']) for row in section['rows'])
     for source in guide['source_details']:
-        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://garrytools.com/'))
+        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://garrytools.com/','https://www.facebook.com/'))
         if source['date']:
             assert date.fromisoformat(source['date']) <= date.fromisoformat(REVIEW_DATE)
         else:
@@ -48,6 +48,7 @@ def test_new_content_is_traditional_chinese_except_search_aliases():
 
 
 @pytest.mark.parametrize('query,slug', [
+    ('矩陣小隊怎麼準備','matrix-squad-preview'),
     ('伊狑值得換嗎','elaine-build'), ('伊羚','elaine-build'),
     ('協同帶誰','synergy-vs-link'), ('哪吒和洛基','divine-fire-team'),
     ('六星還是五星','survivor-stars'), ('幽暗黃4','umbral-soul'),
