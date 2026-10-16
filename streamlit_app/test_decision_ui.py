@@ -18,13 +18,18 @@ def by_label(elements, label):
     return next(item for item in elements if item.label == label)
 
 
-def fill_event_inputs(app):
+def fill_event_inputs(app, *, confirm_historical=True):
     """Explicit synthetic values: tests must not depend on invented UI defaults."""
     for label, value in (("目前活動進度",0),("剩餘天數",3),("每天還可拿的免費進度",16),
                          ("目標里程碑",100),("一次票券／抽取增加進度",1.0),
                          ("一次票券／抽取寶石成本",100),("目前寶石",30000)):
         by_label(app.number_input,label).set_value(value)
     app.run()
+    if confirm_historical:
+        label = "我正在核對復刻或做歷史試算，不是依原期排程投入"
+        matching = [item for item in app.checkbox if item.label == label]
+        if matching:
+            matching[0].set_value(True).run()
 
 
 def test_first_visit_is_a_short_setup_not_an_article_feed():

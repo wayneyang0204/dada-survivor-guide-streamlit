@@ -100,12 +100,12 @@ def test_autumn_seabed_separates_official_and_third_party_data() -> None:
     assert playbook["target"] == 1200
     assert "10/11 00:00" in playbook["period"]
     assert "10/16 00:00" in playbook["period"]
-    assert "官方現行活動" in playbook["tags"]
+    assert "歷史活動" in playbook["tags"]
     assert "六百零八" in playbook["free_hint"]
     assert "三百零二" in playbook["free_hint"]
     assert "四百六十箱" in playbook["free_hint"]
-    assert "一千二百公尺核心自選" in playbook["verdict"]
-    assert "社群估算" in playbook["avoid"]
+    assert "已於 10 月 16 日" in playbook["verdict"]
+    assert "本期已結束" in playbook["avoid"]
 
 
 def test_tidemyst_haven_separates_verified_rules_from_social_numbers() -> None:
