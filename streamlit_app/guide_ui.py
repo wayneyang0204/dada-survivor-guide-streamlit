@@ -67,7 +67,10 @@ def return_to_guides(category: str) -> None:
         open_index(category)
         return
     clear_article()
-    page = origin["page"] if origin["page"] in ("攻略首頁", "資料庫") else "資料庫"
+    page = origin["page"] if origin["page"] in ("攻略首頁", "資料庫", "下一步", "我的帳號", "活動") else "資料庫"
+    if page not in ("攻略首頁", "資料庫"):
+        st.session_state["pending_navigation"] = page
+        return
     query_key = "home_guide_search" if page == "攻略首頁" else "guide_query"
     st.session_state[query_key] = origin["query"]
     st.session_state["guide_topic"] = origin["category"]
@@ -401,7 +404,8 @@ def render_article(slug: str, legacy: list[dict]) -> None:
     with st.container(key="article_actions"):
         back, link = st.columns([4, 1])
         origin = st.session_state.get("article_origin", {})
-        back_label = "← 搜尋結果" if origin.get("query") else "← 攻略首頁" if origin.get("page") == "攻略首頁" else "← 攻略索引"
+        route_back = {"下一步":"← 升級路線", "我的帳號":"← 我的配置", "活動":"← 活動步驟"}.get(origin.get("page"))
+        back_label = route_back or ("← 搜尋結果" if origin.get("query") else "← 攻略首頁" if origin.get("page") == "攻略首頁" else "← 攻略索引")
         back.button(back_label, on_click=return_to_guides, args=(guide["category"],))
         with link:
             with st.popover("文章連結", width="stretch"):

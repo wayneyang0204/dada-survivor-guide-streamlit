@@ -143,6 +143,16 @@ def test_ss_recipe_article_calculates_without_number_inputs():
     assert '<td>13</td>' in text and '<td>140</td>' in text
 
 
+def test_planner_article_returns_to_configuration_instead_of_losing_place():
+    app=boot();app.session_state['player_profile']={'survivor':'維納托','awakening':6,'awakening_cores':20};app.run()
+    before=dict(app.session_state['player_profile'])
+    app.button(key='context_read_1').click().run()
+    assert app.query_params['guide']==['survivor-awakening']
+    by_label(app.button,'← 升級路線').click().run()
+    assert app.radio[0].value=='下一步' and app.session_state['player_profile']==before
+    assert 'guide' not in app.query_params
+
+
 def test_community_event_schedule_never_becomes_official_and_expires():
     from datetime import datetime
     from field_tools import event_window
