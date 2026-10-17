@@ -16,7 +16,7 @@ def test_expanded_catalog_has_real_articles_in_every_system():
     assert all(count >= 2 for count in counts.values())
     stats = content.library_stats(content.GUIDES)
     assert stats['articles'] == len(content.GUIDES) and stats['tables'] >= 60
-    assert stats['questions'] >= 40 and stats['review_date'] == REVIEW_DATE
+    assert stats['questions'] >= 40 and stats['review_date'] == max(g['checked'] for g in content.GUIDES if g.get('checked'))
     refs = [{'reference_only': True}]
     assert content.library_stats(content.GUIDES + refs) == stats
 

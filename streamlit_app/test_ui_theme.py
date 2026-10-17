@@ -40,6 +40,15 @@ def test_controls_and_primary_button_have_sufficient_contrast():
     assert '[data-testid="stElementContainer"] [data-testid="stCaptionContainer"] {opacity:1;}' in STYLE
 
 
+@pytest.mark.parametrize('foreground,background',[
+    ('#94633f','#fffefa'),('#8e542f','#fff0d8'),('#94633f','#fffdf7'),
+    ('#766448','#fff9ec'),('#685d4c','#f4f5eb'),
+])
+def test_zero_input_answer_and_parsed_labels_have_readable_contrast(foreground,background):
+    assert contrast(foreground,background)>=4.5
+    assert foreground in STYLE and background in STYLE
+
+
 def test_cloud_theme_matches_the_single_shared_stylesheet():
     config = tomllib.loads((Path(__file__).parent.parent / ".streamlit/config.toml").read_text(encoding="utf-8"))["theme"]
     assert config["base"] == "light"
@@ -90,7 +99,8 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert sum(attrs.get("aria-label") == "優先升級目標" for _, attrs in markup.tags) == 1
     assert sum(attrs.get("role") == "listitem" for _, attrs in markup.tags) == 3
     assert any(attrs.get("aria-label") == "執行備忘" for _, attrs in markup.tags)
-    assert [e.label for e in a.expander] == ["只核對這一步的材料", "排序依據與其他候選"]
+    assert [e.label for e in a.expander] == ["貼一行更新配置", "材料缺額與詳細排序", "只核對這一步的材料", "排序依據與其他候選"]
+    assert not next(e for e in a.expander if e.label=="材料缺額與詳細排序").proto.expanded
     assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成"}
     # Opening the page never records an in-game completion.
     assert a.session_state["player_profile"]["awakening"] == 6
@@ -121,6 +131,8 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     assert not a.exception
     assert not next(e for e in a.expander if e.label == "活動規則與獎勵重點").proto.expanded
     assert any('class="event-verdict"' in m.value for m in a.markdown)
+    assert not a.number_input
+    by_label(a.toggle,"展開寶石成本試算").set_value(True).run()
     for label in ("01 / 活動目標", "02 / 免費進度", "03 / 寶石成本"):
         assert any(label in m.value for m in a.markdown)
     from test_decision_ui import fill_event_inputs

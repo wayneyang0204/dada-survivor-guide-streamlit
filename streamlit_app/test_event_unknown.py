@@ -7,6 +7,8 @@ def test_event_blanks_never_generate_a_fake_budget():
     app.session_state['主導覽'] = '活動'
     app.run(timeout=15)
     assert not app.exception and not app.metric
+    assert not app.number_input
+    by_label(app.toggle,'展開寶石成本試算').set_value(True).run()
     assert by_label(app.button,'計算補鑽成本').disabled
     for label in ('目前活動進度','剩餘天數','每天還可拿的免費進度',
                   '一次票券／抽取增加進度','一次票券／抽取寶石成本','目前寶石'):

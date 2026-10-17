@@ -641,4 +641,5 @@ _PRO_GUIDE = """
 }
 """
 
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + MOTION_STYLE + "\n</style>")
+from quick_ui import QUICK_STYLE
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + MOTION_STYLE + QUICK_STYLE + "\n</style>")

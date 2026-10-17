@@ -23,7 +23,7 @@ def guild_ticket_budget(coins: int | None, reserve: int | None,
             "message": "這只計買券成本；不預測每券寶鑽，不保證公會跨檔，也不超過遊戲本期購買上限。"}
 
 
-def event_window(start: str | None, end: str | None, now: datetime | None = None) -> dict:
+def event_window(start: str | None, end: str | None, now: datetime | None = None, *, source: str = "official") -> dict:
     """Status of the published schedule; never claims an observed game opening."""
     if not start or not end:
         return {"state": "unknown", "label": "時間未完整核對，查看遊戲倒數"}
@@ -31,11 +31,12 @@ def event_window(start: str | None, end: str | None, now: datetime | None = None
     current = now or datetime.now(timezone.utc)
     if any(value.tzinfo is None or value.utcoffset() is None for value in (begins, ends, current)) or ends <= begins:
         raise ValueError("活動時間需含時區，且結束晚於開始。")
+    label = "社群表列" if source == "community" else "官方"
     if current < begins:
-        return {"state": "scheduled", "label": "官方預告期間，先保留資源"}
+        return {"state": "scheduled", "label": label + "預告期間，先保留資源"}
     if current >= ends:
-        return {"state": "ended", "label": "原期官方排程已結束，只供復刻核對"}
-    return {"state": "within", "label": "官方排程內，仍須核對遊戲入口與倒數"}
+        return {"state": "ended", "label": "原期" + label + "排程已結束，只供復刻核對"}
+    return {"state": "within", "label": label + "排程內，仍須核對遊戲入口與倒數"}
 
 
 def pet_milestone(name: str | None, star: int | None) -> dict:

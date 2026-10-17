@@ -222,7 +222,7 @@ def page_heading(title: str, description: str) -> None:
 
 
 def workflow(active: int) -> None:
-    labels = ("1 填配置", "2 看目標", "3 核材料")
+    labels = ("1 查方向", "2 帶入現況", "3 核材料")
     spans = "".join(f'<span class="{"active" if index == active else ""}">{label}</span>' for index, label in enumerate(labels))
     st.markdown(f'<div class="workflow-strip" aria-label="升級規劃流程">{spans}</div>', unsafe_allow_html=True)
 
@@ -439,6 +439,12 @@ def render_home() -> None:
             if st.button("撤回剛才紀錄", width="stretch"):
                 undo_completion()
     if first_visit:
+        from quick_ui import decision_desk, intake
+        decision_desk("route")
+        intake(save,"route")
+        manual = st.toggle("逐項填寫角色資料",key="manual_setup")
+        if not manual:
+            return
         with st.container(key="onboarding"):
             st.markdown(f'<span class="setup-art" aria-hidden="true">{guide_icon("profile")}</span><h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
             st.caption("必填：主要模式、主位特工、覺醒等級。其他配置可稍後補充。")
@@ -446,7 +452,7 @@ def render_home() -> None:
                 mode = st.selectbox("主要模式", engine.MODES)
                 hero_col, level_col = st.columns(2)
                 with hero_col:
-                    hero = st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "其他"), index=None, placeholder="選目前主位")
+                    hero = st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "金", "其他"), index=None, placeholder="選目前主位")
                 with level_col:
                     level = st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6")
                 if st.form_submit_button("建立我的升級路線", type="primary"):
@@ -457,6 +463,16 @@ def render_home() -> None:
             st.markdown('<p class="setup-note">不需要遊戲帳號密碼。資料只保留於本次連線；離開前可從「備份與匯入」下載紀錄。</p>', unsafe_allow_html=True)
             st.button("查看升級排序方法", on_click=read_direction_guide, args=("upgrade-roadmap",), width="stretch", type="tertiary")
         return
+    from quick_ui import contextual_brief, intake
+    contextual_brief(p)
+    render_character_pause(p)
+    with st.expander("貼一行更新配置"):
+        intake(save,"route")
+    with st.expander("材料缺額與詳細排序"):
+        render_detailed_route(p)
+
+
+def render_detailed_route(p: dict) -> None:
     with st.container(key="route_toolbar"):
         left, context, edit = st.columns([2, 1.4, 1.2], vertical_alignment="bottom")
         with left:
@@ -466,12 +482,6 @@ def render_home() -> None:
             st.markdown(f'<div class="route-context">{html.escape(p["mode"])}<strong>{html.escape(hero)}</strong></div>', unsafe_allow_html=True)
         with edit:
             st.button("更新我的帳號", width="stretch", on_click=navigate, args=("我的帳號",))
-    if p["awakening"] is not None:
-        paused = p["awakening_goal"] is not None and p["awakening"] >= p["awakening_goal"]
-        if paused:
-            st.caption(f"主位已達階段目標 R{p['awakening_goal']}，不再追加主位核心；協同仍獨立比較。可在角色配置修改目標。")
-        else:
-            st.button(f"角色先停在 R{p['awakening']}，比較其他系統", on_click=pause_character, type="tertiary")
     if p["estimated_balances"]:
         labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
         st.caption(f"{labels}為推算結餘，未同步遊戲。有其他收入或消耗時請校正。")
@@ -492,9 +502,21 @@ def render_home() -> None:
     render_reasoning(result)
 
 
+def render_character_pause(p: dict) -> None:
+    if p["awakening"] is not None:
+        paused = p["awakening_goal"] is not None and p["awakening"] >= p["awakening_goal"]
+        if paused:
+            st.caption(f"主位已達階段目標 R{p['awakening_goal']}，不再追加主位核心；協同仍獨立比較。可在角色配置修改目標。")
+        else:
+            st.button(f"角色先停在 R{p['awakening']}，比較其他系統", on_click=pause_character, type="tertiary")
+
+
 def render_profile() -> None:
     p = profile()
     page_heading("我的配置", "選一個系統更新，儲存後回到升級路線。留白＝未知；0＝沒有。")
+    from quick_ui import intake
+    with st.expander("不想逐項填？貼一行更新"):
+        intake(save,"profile")
     if p["estimated_balances"]:
         st.caption("部分庫存為推算值；請核對遊戲內數量後重新儲存。")
     if notice := st.session_state.pop("profile_notice", None):
@@ -524,7 +546,7 @@ def render_profile_form(p: dict, section: str) -> None:
         if section == "角色與模式":
             values["mode"] = st.selectbox("主要模式", engine.MODES, index=engine.MODES.index(p["mode"]))
             values["growth_focus"] = choice("目前最想解決的問題", "growth_focus", engine.FOCUSES, p) or engine.FOCUSES[0]
-            values["survivor"] = choice("主位特工", "survivor", ("維納托", "塔洛莎", "楊大師", "其他"), p)
+            values["survivor"] = choice("主位特工", "survivor", ("維納托", "塔洛莎", "楊大師", "金", "其他"), p)
             l, r = st.columns(2)
             with l:
                 values["awakening"] = number("主位覺醒等級", "awakening", p, 8)

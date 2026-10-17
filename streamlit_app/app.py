@@ -18,6 +18,7 @@ import field_content as _field_content
 import field_tools as _field_tools
 import ui_art as _ui_art
 import motion_theme as _motion_theme
+import quick_start as _quick_start
 
 _direction_tools = importlib.reload(_direction_tools)
 _tech_routes = importlib.reload(_tech_routes)
@@ -26,6 +27,7 @@ _field_content = importlib.reload(_field_content)
 _field_tools = importlib.reload(_field_tools)
 _ui_art = importlib.reload(_ui_art)
 _motion_theme = importlib.reload(_motion_theme)
+_quick_start = importlib.reload(_quick_start)
 
 import ui_interactions as _ui_interactions
 _ui_interactions = importlib.reload(_ui_interactions)
@@ -38,6 +40,8 @@ import guide_content as _guide_content
 import guide_ui as _guide_ui
 
 _next_step = importlib.reload(_next_step)
+import quick_ui as _quick_ui
+_quick_ui = importlib.reload(_quick_ui)
 _decision_ui = importlib.reload(_decision_ui)
 _ui_theme = importlib.reload(_ui_theme)
 _guide_content = importlib.reload(_guide_content)
@@ -64,6 +68,13 @@ rank_rewards = _data_engine.rank_rewards
 )
 
 攻略資料 = [
+    {
+        "分類": "關卡活動", "標題": "時光拼圖：700裝備、850核心與1000外觀停點", "日期": "2026/10/17",
+        "狀態": "10月17日本期社群表｜遊戲倒數優先",
+        "摘要": "長按自動消耗影集，右上道具箱可中途領；850影集表列神器核心自選。返還率是估計，開箱任務有鑰匙成本，盤面隨機核心不是第二顆保底。",
+        "行動": ["領已完成任務，長按自動並中途領右上道具箱", "依缺口選700裝備或850核心；1000是外觀候選", "最後一天才核對差額，不為隨機核心強補1100～1200"],
+        "來源": "https://notalknote.xyz/survivor-io-time-jigsaw-puzzle-event-guide/",
+    },
     {
         "分類": "最新系統",
         "標題": "5.3.0 官方預告：矩陣小隊與 351～355 章",
@@ -705,7 +716,9 @@ elif 頁面 == "活動最佳解":
             活動文章.insert(0, 備援)
     if 活動文章:
         預設活動索引 = next(
-            (index for index, item in enumerate(活動文章) if match_event_playbook(item["title"])["name"] != "通用活動模型"),
+            (index for index, item in enumerate(活動文章)
+             if _field_tools.event_window(match_event_playbook(item["title"]).get("starts_at"),
+                                          match_event_playbook(item["title"]).get("ends_at"))["state"] == "within"),
             0,
         )
         活動選項 = [f"{item['date']}｜{item['title']}" for item in 活動文章[:40]]
@@ -720,7 +733,7 @@ elif 頁面 == "活動最佳解":
             "freshness": "待核對",
         }
     活動模型 = match_event_playbook(已選活動["title"])
-    原期排程 = _field_tools.event_window(活動模型.get("starts_at"), 活動模型.get("ends_at"))
+    原期排程 = _field_tools.event_window(活動模型.get("starts_at"), 活動模型.get("ends_at"),source=活動模型.get("schedule_source","official"))
     歷史試算已確認 = True
     if 原期排程["state"] == "ended" or "歷史活動" in 活動模型.get("tags", []):
         st.warning(原期排程["label"] if 原期排程["state"] == "ended" else "原期已結束，以下數字只供復刻核對或歷史試算。")
@@ -729,7 +742,7 @@ elif 頁面 == "活動最佳解":
         st.caption(原期排程["label"])
 
     st.caption("先核對遊戲內活動名稱與截止時間。文章日期不代表活動仍開放。")
-    活動結論 = str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
+    活動結論 = "原期已結束。以下只供復刻核對，不依舊里程碑投入。" if 原期排程["state"] == "ended" else str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
     st.markdown(f'<div class="event-verdict"><strong>活動投入建議</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
     with st.expander("活動規則與獎勵重點"):
         顯示活動重點(
@@ -744,6 +757,11 @@ elif 頁面 == "活動最佳解":
         else f"本站已收錄活動資料｜自動套用：{活動模型['name']}；遊戲倒數與任務表優先"
     )
     st.link_button("核對活動來源 ↗", 已選活動["link"])
+    st.markdown("### 現在照這個順序做")
+    for index, step in enumerate(活動模型["steps"],1):
+        st.markdown(f"{index}. {step}")
+    if 活動模型["name"] == "時光拼圖":
+        st.button("查時光拼圖完整里程碑與兌換表 →",on_click=_guide_ui.open_guide,args=("time-jigsaw",),width="stretch")
 
     with st.expander("展開詳細玩法與判斷依據"):
         st.markdown(f"**核心機制：** {活動模型['mechanic']}")
@@ -754,6 +772,10 @@ elif 頁面 == "活動最佳解":
 
     if 活動模型["name"] == "潮汐祕境":
         _guide_ui.render_guild_budget("activity_guild")
+        st.stop()
+
+    if not st.toggle("展開寶石成本試算",key="event_advanced"):
+        st.caption("只查玩法不需要填資料。要估補鑽成本時，再展開試算。")
         st.stop()
 
     if 活動模型["name"] == "秋日海底探險":

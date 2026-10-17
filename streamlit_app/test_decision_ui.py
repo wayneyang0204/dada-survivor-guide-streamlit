@@ -20,6 +20,9 @@ def by_label(elements, label):
 
 def fill_event_inputs(app, *, confirm_historical=True):
     """Explicit synthetic values: tests must not depend on invented UI defaults."""
+    toggle=by_label(app.toggle,"展開寶石成本試算")
+    if not toggle.value:
+        toggle.set_value(True).run()
     for label, value in (("目前活動進度",0),("剩餘天數",3),("每天還可拿的免費進度",16),
                          ("目標里程碑",100),("一次票券／抽取增加進度",1.0),
                          ("一次票券／抽取寶石成本",100),("目前寶石",30000)):
@@ -32,17 +35,20 @@ def fill_event_inputs(app, *, confirm_historical=True):
             matching[0].set_value(True).run()
 
 
-def test_first_visit_is_a_short_setup_not_an_article_feed():
+def test_first_visit_answers_before_requiring_any_account_fields():
     a = boot()
     assert not a.exception
     assert a.radio[0].options == ["攻略首頁", "升級路線", "我的配置", "活動試算", "攻略索引"]
-    assert len(a.get("form")) == 1
-    assert len(a.number_input) == 1
+    assert len(a.get("form")) == 0
+    assert len(a.number_input) == 0
+    assert by_label(a.radio,"選一個問題")
+    assert by_label(a.text_input,"目前配置（一行即可）")
     assert not any("本期活動完整作戰簡報" in x.value for x in a.markdown)
 
 
 def test_onboarding_contextual_edit_save_navigation_and_completion():
     a = boot()
+    by_label(a.toggle,"逐項填寫角色資料").set_value(True).run()
     by_label(a.selectbox, "主位特工").select("維納托")
     by_label(a.number_input, "覺醒等級（不是一般星數）").set_value(6)
     by_label(a.button, "建立我的升級路線").click().run()

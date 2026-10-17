@@ -110,13 +110,13 @@ def render_library_brief(guides: list[dict]) -> None:
 
 def render_featured(guides: list[dict]) -> None:
     st.markdown('<div class="guide-results-head"><h2>近期重點</h2><span>活動與養成更新</span></div>', unsafe_allow_html=True)
-    event = content.get_guide("autumn-seabed", guides)
-    ended = event and event_window(event.get("starts_at"), event.get("ends_at"))["state"] == "ended"
+    event = content.get_guide("time-jigsaw", guides)
+    ended = event and event_window(event.get("starts_at"), event.get("ends_at"), source=event.get("schedule_source","official"))["state"] == "ended"
     with st.container(key="featured_guides"):
         columns = st.columns(3, gap="medium")
-        for column, slug, label, heading in zip(columns, ("mount-layout" if ended else "autumn-seabed", "elaine-build", "tide-haven"),
-                                       ("載具整理" if ended else "官方活動排程", "特工更新", "公會玩法"),
-                                       ("載具：主戰與後備 →" if ended else "海底探險：先領任務 →", "伊狑：先查第二寵上限 →", "潮汐祕境：打叉與補券 →")):
+        for column, slug, label, heading in zip(columns, ("matrix-squad-preview" if ended else "time-jigsaw", "ss-material-recipes", "elaine-build"),
+                                       ("版本更新" if ended else "本期社群活動表", "材料查表", "特工與寵物"),
+                                       ("矩陣小隊：已確認與待確認 →" if ended else "時光拼圖：850核心怎麼停 →", "SS神鑄：不用手算材料 →", "伊狑：先查第二寵上限 →")):
             guide = content.get_guide(slug, guides)
             if guide is None:
                 continue
@@ -221,11 +221,14 @@ def render_home(legacy: list[dict]) -> None:
             render_results(guides, query, category, "home_search")
         return
     if category == "全部":
-        render_quick_queries()
+        from quick_ui import decision_desk
+        decision_desk("home")
+        with st.expander("其他常查關鍵字"):
+            render_quick_queries()
         with st.container(key="task_entries"):
             upgrade, event, catalog = st.columns(3, gap="medium")
             for column, title, detail, artwork, tag, callback, kwargs in (
-                (upgrade, "查升級順序", "填入配置，查看目標與材料缺額", "upgrade", "配置與材料", open_tool, {}),
+                (upgrade, "查升級順序", "貼一行現況，先看下一個門檻", "upgrade", "配置與材料", open_tool, {}),
                 (event, "計算活動成本", "輸入進度，計算達標所需寶石", "event", "進度與寶石", open_tool, {"activity": True}),
                 (catalog, "收藏品圖鑑", "按名稱、品質或期數查詢", "collection", "名稱與效果", open_collectible_catalog, {}),
             ):
@@ -333,7 +336,20 @@ def render_guild_budget(prefix: str = "guild") -> None:
 
 def render_field_tool(slug: str) -> None:
     """Article-local checks never change player_profile or spend game resources."""
-    if slug == "tide-haven":
+    if slug == "ss-material-recipes":
+        from quick_start import ss_recipe
+        with st.container(key="ss_recipe_tool"):
+            st.markdown("### 直接查這一段材料")
+            line=st.radio("神鑄路線",("永恆 E","破壞 V"),horizontal=True,key="ss_recipe_line")
+            a,b=st.columns(2)
+            current=a.selectbox("目前階級",tuple(range(5)),key="ss_recipe_current")
+            target=b.selectbox("目標階級",tuple(range(current+1,6)),key=f"ss_recipe_target_{current}")
+            r=ss_recipe(current,target)
+            st.markdown(table_markup(["本段", "核心", "史詩材料裝備", "傳奇材料裝備", "陣營之石", "基礎素材"],
+                [[f'{line} {current}→{target}',str(r['cores']),str(r['epic']),str(r['legendary']),str(r['stones']),str(r['base'])]]),unsafe_allow_html=True)
+            st.caption('這是需求，不是你的剩餘庫存。材料裝備的對應種類看遊戲預覽；永恆用永恆之石，破壞用破壞之石。')
+            if r['other_path_min']:st.warning('升4階前，另一線需到3階；未達前置的材料必須另外加上。')
+    elif slug == "tide-haven":
         with st.popover("計算公會幣買券預算", width="stretch"):
             render_guild_budget("article_guild")
     if slug == "elaine-build":
@@ -400,7 +416,7 @@ def render_article(slug: str, legacy: list[dict]) -> None:
     st.markdown(f'<div class="article-dateline"><span>{html.escape(guide["category"])}</span>'
                 f'<span>{html.escape(guide["status"])}</span><span>{html.escape(date + checked)}</span></div>', unsafe_allow_html=True)
     if guide.get("starts_at"):
-        window = event_window(guide["starts_at"], guide["ends_at"])
+        window = event_window(guide["starts_at"], guide["ends_at"],source=guide.get("schedule_source","official"))
         if window["state"] == "ended":
             st.warning(window["label"])
         else:
@@ -432,7 +448,7 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                 st.button("用我的配置排升級順序", on_click=open_tool, args=(guide["resource"],), width="stretch", type="primary")
             elif guide["slug"] == "epic-collectibles":
                 st.button("查完整收藏圖鑑", on_click=open_collectible_catalog, width="stretch")
-            elif guide["slug"] in ("event-budget", "autumn-seabed"):
+            elif guide["slug"] in ("event-budget", "autumn-seabed", "time-jigsaw"):
                 st.button("開啟活動投入試算", on_click=open_tool, kwargs={"activity": True}, width="stretch", type="primary")
             elif guide["slug"] in ("upgrade-roadmap", "red-choice-box"):
                 st.button("用我的配置找下一個門檻", on_click=open_tool, args=("自動排序",), width="stretch", type="primary")

@@ -7,6 +7,30 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-18 low-input update: home and first-time planner offer six question
+  playbooks with three concrete actions, stopping rules and article links, without
+  requiring an account. A bounded local parser recognises one-line current-state
+  notes; it previews recognised fields before an explicit save. Goals, negations,
+  conflicts, secrets and invalid numeric ranges cannot be applied. Unrecognised
+  text is visible, never guessed. It does not call AI, OCR, or the game.
+- One-line updates merge only recognised fields. Retargeting a main survivor or
+  gear milestone clears obsolete recipe confirmations; pet scope invalidation
+  still applies. Ordinary/twin technology is explicit, not inferred from energy.
+  Schema-1 backups support the extra optional fields and old backups still load.
+- Saved configurations first show relevant source-based milestone notes and
+  known gaps, with material forms/detail ranking collapsed. The original manual
+  role form is opt-in; targeted profile editors and completion checks remain.
+  This brief is conditional guidance, not a claim of an affordable global optimum.
+- SS E/V recipes now have per-stage and interval totals for cores, material
+  equipment, faction stones and base materials. Another-path prerequisites are
+  separate. The dated 2025 community recipe does not stand in for live game
+  previews, Chaos or Starforge costs. New Time Jigsaw coverage separates the
+  700/850/1000 milestones, chest retrieval, key costs and random rewards. Its
+  community schedule is never labelled official, and expires automatically.
+- Activity pages now show operations before a zero-default-input calculator
+  toggle. Blank prices, stock and progress are still unknown; the original seven
+  budget inputs are available only when the player asks to calculate.
+
 - 2026-10-13 motion/navigation update: the homepage combines a panoramic sky,
   automatic red-kite cruise, native topic choices and the filtered guide shelf.
   Topic selection changes the scene colour, station icon, article count and shelf
