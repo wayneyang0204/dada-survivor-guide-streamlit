@@ -67,6 +67,12 @@ def test_partial_suggestions_do_not_relabel_unknown_term_as_exact_match():
     assert any(g['slug']=='umbral-soul' for g in content.suggested_guides(content.GUIDES, query))
 
 
+def test_matrix_squad_separates_store_release_from_feature_activation():
+    guide = content.get_guide('matrix-squad-preview', content.GUIDES)
+    assert '台灣蘋果已上架 5.3.0' in guide['summary']
+    assert '即將上線' in guide['caution']
+
+
 def test_home_quick_search_callback_does_not_mutate_profile():
     app = AppTest.from_file(APP).run()
     raw = {'survivor':'維納托','awakening':6,'awakening_cores':20}
