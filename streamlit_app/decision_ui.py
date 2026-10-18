@@ -15,6 +15,32 @@ def profile() -> dict:
     return engine.clean_profile(st.session_state.get("player_profile", {}))
 
 
+def widget_key(name: str) -> str:
+    """Keep editor widget identities stable until a successful save."""
+    keys = set(st.session_state.get("_decision_widget_keys", ()))
+    keys.add(name)
+    st.session_state["_decision_widget_keys"] = sorted(keys)
+    return name
+
+
+def remember_widget(name: str, value):
+    """Retain the last rendered value for a widget that may disappear after save."""
+    values = dict(st.session_state.get("_decision_widget_values", {}))
+    values[name] = value
+    st.session_state["_decision_widget_values"] = values
+    return value
+
+
+def reset_saved_widget_drafts() -> None:
+    """Keep removed widget values readable during Streamlit 1.50 reruns."""
+    if not st.session_state.pop("_reset_decision_widgets", False):
+        return
+    for key, value in st.session_state.get("_decision_widget_values", {}).items():
+        if key == "decision_focus":
+            continue
+        st.session_state[key] = value
+
+
 def navigate(page: str) -> None:
     st.session_state["主導覽"] = page
 
@@ -52,6 +78,7 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
         st.session_state.pop("route_selected_id", None)
         st.session_state["profile_updated"] = datetime.now().isoformat(timespec="minutes")
         st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0)+1
+        st.session_state["_reset_decision_widgets"] = True
         st.session_state["profile_notice"] = "配置已儲存，升級順序已重算。"
         st.session_state["pending_navigation"] = "下一步"
         st.rerun()
@@ -65,32 +92,37 @@ def undo_completion() -> None:
         st.session_state.pop("route_selected_id", None)
         st.session_state["completed_steps"] = st.session_state.get("completed_steps", [])[:-1]
         st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0)+1
+        st.session_state["_reset_decision_widgets"] = True
         st.session_state["profile_notice"] = "已撤回剛才的完成紀錄，回到升級前的資料。沒有操作遊戲。"
         st.rerun()
 
 
 def number(label: str, key: str, p: dict, maximum: int = 10000000):
-    return st.number_input(label, min_value=0, max_value=maximum, value=p.get(key), step=1,
-                           placeholder="尚未填寫", key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}_{p.get('_input_scope', '')}")
+    name = widget_key(f"profile_{key}_{p.get('_input_scope') or 'profile'}")
+    return remember_widget(name, st.number_input(label, min_value=0, max_value=maximum, value=p.get(key), step=1,
+                           placeholder="尚未填寫", key=name))
 
 
 def choice(label: str, key: str, values: tuple, p: dict, label_visibility: str = "visible"):
     options = (None, *values)
-    return st.selectbox(label, options, index=options.index(p.get(key)) if p.get(key) in options else 0,
+    name = widget_key(f"profile_{key}_{p.get('_input_scope') or 'profile'}")
+    return remember_widget(name, st.selectbox(label, options, index=options.index(p.get(key)) if p.get(key) in options else 0,
         label_visibility=label_visibility,
         format_func=lambda x: "尚未確認" if x is None else "是" if x is True else "否" if x is False else str(x),
-        key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}_{p.get('_input_scope', '')}")
+        key=name))
 
 
 def stars(label: str, key: str, p: dict):
-    return st.text_input(label, value="、".join(engine.STARS[n] for n in p.get(key, [])),
-        placeholder="例如：紅5、黃5、黃3；空格填 0", key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}")
+    name = widget_key(f"profile_{key}_{p.get('_input_scope') or 'profile'}")
+    return remember_widget(name, st.text_input(label, value="、".join(engine.STARS[n] for n in p.get(key, [])),
+        placeholder="例如：紅5、黃5、黃3；空格填 0", key=name))
 
 
 def star_choice(label: str, key: str, p: dict):
-    return st.selectbox(label, (None, *range(11)), index=0 if p[key] is None else p[key]+1,
+    name = widget_key(f"profile_{key}_{p.get('_input_scope') or 'profile'}")
+    return remember_widget(name, st.selectbox(label, (None, *range(11)), index=0 if p[key] is None else p[key]+1,
         format_func=lambda x: "尚未確認" if x is None else engine.STARS[x],
-        key=f"profile_{key}_{st.session_state.get('editor_revision', 0)}")
+        key=name))
 
 
 def render_backup(p: dict, first_visit: bool = False) -> None:
@@ -132,11 +164,15 @@ def render_step_inputs(step: dict, p: dict) -> None:
                 label = "現有傳奇收藏自選箱" if kind == "collection" else "現有覺醒核心"
                 values[stock_key] = number(label, stock_key, p, 10000)
                 quote = p["step_quotes"].get(step["quote_key"], {"cost": None, "materials_ready": None})
-                cost = st.number_input("從目前狀態到目標，合計要用多少箱" if kind == "collection" else "從目前覺醒到目標，合計需要多少核心",
-                    min_value=0, max_value=10000000, value=quote["cost"], step=1, placeholder="核對整段需求，不只下一小階")
-                ready = st.selectbox("箱子可選目標期數，且其他碎片／條件都符合" if kind == "collection" else "目標角色碎片、量子碎片與連攜條件都符合",
+                cost_key = widget_key(f"step_cost_{step['quote_key']}")
+                cost = remember_widget(cost_key, st.number_input("從目前狀態到目標，合計要用多少箱" if kind == "collection" else "從目前覺醒到目標，合計需要多少核心",
+                    min_value=0, max_value=10000000, value=quote["cost"], step=1, placeholder="核對整段需求，不只下一小階",
+                    key=cost_key))
+                ready_key = widget_key(f"step_ready_{step['quote_key']}")
+                ready = remember_widget(ready_key, st.selectbox("箱子可選目標期數，且其他碎片／條件都符合" if kind == "collection" else "目標角色碎片、量子碎片與連攜條件都符合",
                     (None, True, False), index=(None, True, False).index(quote["materials_ready"]),
-                    format_func=lambda x: "尚未確認" if x is None else "已核對，符合" if x else "尚未齊全")
+                    format_func=lambda x: "尚未確認" if x is None else "已核對，符合" if x else "尚未齊全",
+                    key=ready_key))
                 st.caption("需要多階升級時，請合計整段材料；不同期自選箱不可只加總箱數。這是你核對的材料，不是本站推算成本。")
                 if sid == "boots_set":
                     st.warning("本目標是四件全部達到黃三星：請合計所有缺件，並確認鞋子永恆神鑄的冰甲已啟用。只升好一件，請到「我的帳號」更新實際星數。")
@@ -390,7 +426,11 @@ def render_roadmap(p: dict, shown: dict | None) -> None:
 
 
 def update_focus(key: str) -> None:
-    save({"growth_focus": st.session_state[key]})
+    current = profile()
+    st.session_state["player_profile"] = engine.clean_profile({**current, "growth_focus": st.session_state[key]})
+    st.session_state.pop("route_selected_id", None)
+    st.session_state["profile_updated"] = datetime.now().isoformat(timespec="minutes")
+    st.session_state["editor_revision"] = st.session_state.get("editor_revision", 0) + 1
 
 
 def render_next_question(p: dict, shown: dict | None = None) -> None:
@@ -421,6 +461,7 @@ def render_next_question(p: dict, shown: dict | None = None) -> None:
 
 
 def render_home() -> None:
+    reset_saved_widget_drafts()
     p = profile()
     first_visit = not st.session_state.get("player_profile")
     heading, backup = st.columns([4, 1.2], vertical_alignment="center")
@@ -449,12 +490,12 @@ def render_home() -> None:
             st.markdown(f'<span class="setup-art" aria-hidden="true">{guide_icon("profile")}</span><h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
             st.caption("必填：主要模式、主位特工、覺醒等級。其他配置可稍後補充。")
             with st.form("quick_profile", border=False):
-                mode = st.selectbox("主要模式", engine.MODES)
+                mode = remember_widget("setup_mode", st.selectbox("主要模式", engine.MODES, key=widget_key("setup_mode")))
                 hero_col, level_col = st.columns(2)
                 with hero_col:
-                    hero = st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "金", "其他"), index=None, placeholder="選目前主位")
+                    hero = remember_widget("setup_survivor", st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "金", "其他"), index=None, placeholder="選目前主位", key=widget_key("setup_survivor")))
                 with level_col:
-                    level = st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6")
+                    level = remember_widget("setup_awakening", st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6", key=widget_key("setup_awakening")))
                 if st.form_submit_button("建立我的升級路線", type="primary"):
                     if hero is None or level is None:
                         st.error("請先填主位特工與覺醒等級；不確定的帳號資料可以之後補。")
@@ -485,9 +526,10 @@ def render_detailed_route(p: dict) -> None:
     if p["estimated_balances"]:
         labels = "、".join(engine.STOCK_LABELS[key] for key in p["estimated_balances"])
         st.caption(f"{labels}為推算結餘，未同步遊戲。有其他收入或消耗時請校正。")
-    focus_key = f"decision_focus_{st.session_state.get('editor_revision', 0)}"
-    st.selectbox("目前最想解決的問題", engine.FOCUSES, index=engine.FOCUSES.index(p["growth_focus"]),
-                 key=focus_key, on_change=update_focus, args=(focus_key,))
+    focus_key = widget_key(f"decision_focus_{st.session_state.get('editor_revision', 0)}")
+    focus = st.selectbox("目前最想解決的問題", engine.FOCUSES, index=engine.FOCUSES.index(p["growth_focus"]),
+                         key=focus_key, on_change=update_focus, args=(focus_key,))
+    remember_widget(focus_key, focus)
     result = engine.recommend(p, scope)
     candidates = ([result["primary"]] if result["primary"] else []) + result["alternatives"]
     step = next((s for s in candidates if s["id"] == st.session_state.get("route_selected_id")), result["primary"])
@@ -512,6 +554,7 @@ def render_character_pause(p: dict) -> None:
 
 
 def render_profile() -> None:
+    reset_saved_widget_drafts()
     p = profile()
     page_heading("我的配置", "選一個系統更新，儲存後回到升級路線。留白＝未知；0＝沒有。")
     from quick_ui import intake
@@ -538,13 +581,13 @@ def render_profile() -> None:
 def render_profile_form(p: dict, section: str) -> None:
     pet_editor = None
     if section == "寵物":
-        pet_editor = st.radio("寵物目標怎麼填", ("來源節點：幽暗之靈", "其他寵物：遊戲預覽"),
+        pet_editor = remember_widget("pet_editor_mode", st.radio("寵物目標怎麼填", ("來源節點：幽暗之靈", "其他寵物：遊戲預覽"),
                               index=0 if p["pet_name"] == "幽暗之靈" else 1, horizontal=True,
-                              key=f"pet_editor_mode_{st.session_state.get('editor_revision',0)}")
+                              key=widget_key("pet_editor_mode")))
     with st.form(f"edit_{section}", border=False):
         values = {}
         if section == "角色與模式":
-            values["mode"] = st.selectbox("主要模式", engine.MODES, index=engine.MODES.index(p["mode"]))
+            values["mode"] = remember_widget("profile_mode_editor", st.selectbox("主要模式", engine.MODES, index=engine.MODES.index(p["mode"]), key=widget_key("profile_mode_editor")))
             values["growth_focus"] = choice("目前最想解決的問題", "growth_focus", engine.FOCUSES, p) or engine.FOCUSES[0]
             values["survivor"] = choice("主位特工", "survivor", ("維納托", "塔洛莎", "楊大師", "金", "其他"), p)
             l, r = st.columns(2)
@@ -573,8 +616,9 @@ def render_profile_form(p: dict, section: str) -> None:
             values["advanced_hearts"] = number("現有高級收藏之心", "advanced_hearts", p, 100000)
             options = (None, *(f"adv1_{n}" for n in range(1,5)), *(f"adv2_{n}" for n in range(1,9)))
             quote = p["advanced_quote"] if p["advanced_quote"] in options else None
-            values["advanced_quote"] = st.selectbox("下面的價格是查哪一格", options, index=options.index(quote),
-                format_func=lambda x: "尚未查價" if x is None else f"第{x[3]}套第{x.split('_')[1]}格")
+            values["advanced_quote"] = remember_widget("profile_advanced_quote_editor", st.selectbox("下面的價格是查哪一格", options, index=options.index(quote),
+                format_func=lambda x: "尚未查價" if x is None else f"第{x[3]}套第{x.split('_')[1]}格",
+                key=widget_key("profile_advanced_quote_editor")))
             values["advanced_cost"] = number("進階該格所需高級收藏之心（遊戲顯示）", "advanced_cost", p, 100000)
             st.caption("第二套第8格與80傳奇星同時完成才有菁英／BOSS加成。紅五星八件才是80星。")
         elif section == "收藏品":
@@ -601,8 +645,9 @@ def render_profile_form(p: dict, section: str) -> None:
                 st.caption("黃4以前查60%易傷20秒；已達黃4時，紅5是下一個收錄節點，不表示立即追滿。不一致就先不按本表投入。")
             else:
                 values["pet_name"], values["pet_star"], values["pet_preview_matches"] = "其他", None, None
-                values["pet_target"] = st.text_input("遊戲預覽的下一個完整節點（含寵物名稱與等級）", value=p["pet_target"] or "", max_chars=100,
-                                                   placeholder="照遊戲填寫，例如：某主戰寵的下一階覺醒") or None
+                values["pet_target"] = remember_widget("profile_pet_target_editor", st.text_input("遊戲預覽的下一個完整節點（含寵物名稱與等級）", value=p["pet_target"] or "", max_chars=100,
+                                                   placeholder="照遊戲填寫，例如：某主戰寵的下一階覺醒",
+                                                   key=widget_key("profile_pet_target_editor"))) or None
                 values["pet_gain"] = choice("這個節點實際解鎖的效果", "pet_gain", ("主人增傷／有效增益", "寵物自身傷害", "只有面板／尚未確認"), p)
             values["pet_materials_ready"] = choice("本節點全部本體、碎片、核心及其他材料已足", "pet_materials_ready", (True, False), p)
             st.caption("材料需包含到目標整段。更換已填寵物／星級／目標時，舊材料確認會清除；儲存後只需核對新目標。")

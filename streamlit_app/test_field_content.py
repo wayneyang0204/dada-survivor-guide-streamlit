@@ -69,7 +69,7 @@ def test_partial_suggestions_do_not_relabel_unknown_term_as_exact_match():
 
 def test_matrix_squad_separates_store_release_from_feature_activation():
     guide = content.get_guide('matrix-squad-preview', content.GUIDES)
-    assert '台灣蘋果已上架 5.3.0' in guide['summary']
+    assert '台灣與美國蘋果皆已上架 5.3.0' in guide['summary']
     assert '即將上線' in guide['caution']
 
 

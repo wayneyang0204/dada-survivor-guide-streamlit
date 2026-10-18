@@ -5,13 +5,14 @@ are our own checklists, not a claim that a community tier list is universally be
 """
 from __future__ import annotations
 
-REVIEW_DATE = "2026-10-17"
+REVIEW_DATE = "2026-10-18"
 SOURCES = {
     "ss_costs": ("別說筆記｜神鑄各階消耗表", "https://notalknote.xyz/【噠噠特攻】神鑄消耗/", "2025-04-14"),
     "time_puzzle": ("別說筆記｜時光拼圖本期機制與里程碑", "https://notalknote.xyz/survivor-io-time-jigsaw-puzzle-event-guide/", "2026-10-17"),
     "time_official": ("HABBY｜時光拼圖官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6814114699", None),
     "official_android_1014": ("官方安卓商店｜10月14日更新狀態", "https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=zh_TW&gl=TW", "2026-10-14"),
     "official_ios_530": ("官方台灣蘋果商店｜5.3.0版本說明", "https://apps.apple.com/tw/app/survivor-io/id1528941310", "2026-10-16"),
+    "official_ios_us_530": ("官方美國蘋果商店｜5.3.0版本說明", "https://apps.apple.com/us/app/survivor-io/id1528941310", "2026-10-16"),
     "official_530": ("噠噠特攻官方社群｜新版本更新公告", "https://www.facebook.com/SurvivorHabbyTW/posts/pfbid0stATwAbgwU5acXH3mYAAn2ccBowBBnYVSqn3o7Xq2q1L1u1xc6HojQumfCdfMByFl", "2026-10-14"),
     "community_530": ("別說筆記｜5.3.0版本整理", "https://notalknote.xyz/survivor-io-update-5-3-0-matrix-squad-halloween/", "2026-10-14"),
     "elaine": ("別說筆記｜伊狑技能表", "https://notalknote.xyz/elaine/", "2026-09-24"),
@@ -133,15 +134,15 @@ FIELD_GUIDES = [
              ("免費影集怎麼算？", "只合計尚未領且確定能完成的任務，已領不要重複算；開箱耗鑰匙與隨機返還分開記。")]),
 
     entry("matrix-squad-preview", "特工養成", "5.3.0 矩陣小隊：官方確認了什麼、現在先留什麼",
-        "台灣蘋果已上架 5.3.0，安卓更新說明也已更新；矩陣小隊仍標示即將上線，解鎖門檻、技能與消耗尚未公開。",
+        "台灣與美國蘋果皆已上架 5.3.0，安卓更新說明也已更新；矩陣小隊仍標示即將上線，解鎖門檻、技能與消耗尚未公開。",
         "高階帳號現在最有效的動作是保存目前配置與通用資源。先不要為社群猜測拆主力、重置角色或預留固定五萬寶石；等遊戲內介面出現後，再依實際門檻算一次完整升級成本。",
-        ["official_530", "official_android_1014", "official_ios_530", "community_530"], [
+        ["official_530", "official_android_1014", "official_ios_530", "official_ios_us_530", "community_530"], [
             table("官方已確認的內容", ["項目", "已確認資訊"], [
                 ["主線", "新增 351～355 章與對應挑戰章節"],
                 ["矩陣小隊", "新的特工養成玩法；詳細門檻與消耗未公開"],
                 ["萬聖節內容", "古堡卡牌、驚喜連鎖禮包、伊狑與維托爾造型"],
                 ["常駐模式", "試煉之路更新上限；迴響之戰與區域行動開啟新賽季"],
-                ["發布節奏", "台灣蘋果已上架 5.3.0；安卓更新說明已換成新版內容，美國蘋果仍為 5.2.0"]]),
+                ["發布節奏", "台灣與美國蘋果皆已上架 5.3.0；安卓更新說明也已換成新版內容"]]),
             table("尚未獲官方公告證實", ["社群說法", "本站處理"], [
                 ["10 月 20 日試煉之路更新", "不列為官方排程"],
                 ["10 月 29 日矩陣小隊開放", "不列為確定日期"],
@@ -158,7 +159,7 @@ FIELD_GUIDES = [
         caution="商店上架 5.3.0 不代表矩陣小隊已開放，官方版本說明仍標示即將上線。社群文章中的 10 月 20 日、10 月 29 日、寶石預算、核心消耗及推測機制均未獲官方公告證實；商店顯示不同時，以自己的商店與遊戲內畫面為準。",
         related=["synergy-vs-link", "survivor-stars", "elaine-build", "daily-resource-ledger"],
         keywords="矩陣小隊 5.3.0 351 352 353 354 355 古堡卡牌 萬聖節 伊狑 維托爾 試煉之路 迴響之戰 區域行動",
-        status="台灣蘋果已上架｜功能分批開放",
+        status="台美蘋果已上架｜功能分批開放",
         faq=[("需要先存五萬寶石嗎？", "不用把五萬當成官方門檻。先保留不影響現有突破的通用資源，等遊戲內顯示解鎖與升級成本後再計算。")]),
 
     entry("lance-starforge", "裝備神鑄", "雙絕槍異星神煉：觸發條件、異常增傷與升級節點",
