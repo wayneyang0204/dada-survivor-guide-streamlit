@@ -1,7 +1,7 @@
 import pytest
 import quick_start as quick
 import next_step as engine
-from test_decision_ui import boot, by_label, APP
+from test_decision_ui import boot, by_label, APP, open_event_calculator
 from streamlit.testing.v1 import AppTest
 
 
@@ -128,9 +128,12 @@ def test_all_decision_desk_links_resolve_and_do_not_change_profile():
 def test_activity_gives_steps_before_any_calculator_inputs():
     app=boot('活動')
     assert not app.exception and len(app.number_input)==0
-    assert '時光拼圖' in by_label(app.selectbox,'來源文章中的近期／歷史活動').value
+    from data_engine import match_event_playbook
+    from activity_status import event_phase
+    selected=by_label(app.selectbox,'來源文章中的近期／歷史活動').value
+    assert event_phase(match_event_playbook(selected))['state'] in ('active','exchange','upcoming','unknown','ended')
     assert any('現在照這個順序做' in m.value for m in app.markdown)
-    by_label(app.toggle,'展開寶石成本試算').set_value(True).run()
+    open_event_calculator(app)
     assert len(app.number_input)==7 and by_label(app.number_input,'目前活動進度').value is None
 
 

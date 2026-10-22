@@ -579,6 +579,39 @@ def following_step(raw: dict, step: dict) -> dict | None:
     return recommend(updated)["primary"]
 
 
+def priority_brief(raw: dict) -> dict:
+    """One leading action, with a bounded preview; unknown stock stays unknown."""
+    p=clean_profile(raw)
+    route=roadmap(p)
+    first=route['primary']
+    after=following_step(p,first) if first and first.get('update') and first['status'] in READY_STATES else None
+    if not first:
+        label='先補一項配置'
+    elif first['status'] in READY_STATES:
+        label='先做這一步'
+    elif first['status']=='先存資源':
+        label='先存材料，不急著升'
+    elif first['status']=='先做玩法調整':
+        label='先調整玩法'
+    else:
+        label='先確認這一步'
+    technology_hint=None
+    if not first:
+        from tech_routes import TECH_ROUTES, next_tech_effect
+        hints=[]
+        for prefix,name,part in (('drone','無人機','雙生無人機（無人機態）'),('lightning','雷電','雙生雷電（雷電態）')):
+            energy=p[prefix+'_energy']
+            if p[prefix+'_form']=='雙生' and energy is not None:
+                result=next_tech_effect(part,energy)
+                if result.get('target'):
+                    hints.append({**result,'name':name,'current':energy,'source':TECH_ROUTES[part]['source'],'slug':'twin-tech-milestones'})
+        if hints:
+            technology_hint=min(hints,key=lambda h:h['gap'])
+    return {'primary':first,'following':after,'label':label,'technology_hint':technology_hint,
+            'queue':route['queue'][1:3],'missing':route['missing'],
+            'reason':ranking_reason(route)}
+
+
 def next_question(raw: dict, result: dict | None = None) -> dict | None:
     """Ask a condition that can change the decision before asking for stock."""
     p = clean_profile(raw)

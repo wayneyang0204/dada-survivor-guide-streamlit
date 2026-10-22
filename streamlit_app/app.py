@@ -19,6 +19,7 @@ import field_tools as _field_tools
 import ui_art as _ui_art
 import motion_theme as _motion_theme
 import quick_start as _quick_start
+import activity_status as _activity_status
 
 _direction_tools = importlib.reload(_direction_tools)
 _tech_routes = importlib.reload(_tech_routes)
@@ -28,6 +29,7 @@ _field_tools = importlib.reload(_field_tools)
 _ui_art = importlib.reload(_ui_art)
 _motion_theme = importlib.reload(_motion_theme)
 _quick_start = importlib.reload(_quick_start)
+_activity_status = importlib.reload(_activity_status)
 
 import ui_interactions as _ui_interactions
 _ui_interactions = importlib.reload(_ui_interactions)
@@ -68,6 +70,13 @@ rank_rewards = _data_engine.rank_rewards
 )
 
 攻略資料 = [
+    {
+        "分類":"關卡活動", "標題":"沙灘尋寶：官方活動卡與開放前準備", "日期":"2026/10/22",
+        "狀態":"官方預告｜10/23起，遊戲倒數優先",
+        "摘要":"官方活動卡列10月23日00:00至10月28日00:00（台灣時間）；玩具鏟尋寶、漂流瓶兌換與海星模式已確認，任務、票價與里程碑數值尚未收錄。",
+        "行動":["先保留鑰匙與寶石，不為預告提前開箱", "開放後核對本期任務與獎勵表", "按目前缺口選停點，不套用時光拼圖或舊沙灘活動數字"],
+        "來源":"https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815209488",
+    },
     {
         "分類": "關卡活動", "標題": "時光拼圖：700裝備、850核心與1000外觀停點", "日期": "2026/10/17",
         "狀態": "10月17日本期社群表｜遊戲倒數優先",
@@ -715,14 +724,12 @@ elif 頁面 == "活動最佳解":
         if not any(match_event_playbook(item["title"])["name"] == match_event_playbook(備援["title"])["name"] for item in 活動文章):
             活動文章.insert(0, 備援)
     if 活動文章:
-        預設活動索引 = next(
-            (index for index, item in enumerate(活動文章)
-             if _field_tools.event_window(match_event_playbook(item["title"]).get("starts_at"),
-                                          match_event_playbook(item["title"]).get("ends_at"))["state"] == "within"),
-            0,
-        )
+        預設活動索引 = _activity_status.preferred_event([match_event_playbook(item["title"]) for item in 活動文章]) or 0
         活動選項 = [f"{item['date']}｜{item['title']}" for item in 活動文章[:40]]
-        活動標籤 = st.selectbox("來源文章中的近期／歷史活動", 活動選項, index=min(預設活動索引, len(活動選項) - 1))
+        if requested:=st.session_state.pop('requested_activity',None):
+            choice=next((label for label,item in zip(活動選項,活動文章) if match_event_playbook(item['title']).get('guide_slug')==requested),None)
+            if choice:st.session_state['activity_selection']=choice
+        活動標籤 = st.selectbox("來源文章中的近期／歷史活動", 活動選項, index=min(預設活動索引, len(活動選項) - 1),key='activity_selection')
         已選活動 = 活動文章[活動選項.index(活動標籤)]
     else:
         已選活動 = {
@@ -733,17 +740,18 @@ elif 頁面 == "活動最佳解":
             "freshness": "待核對",
         }
     活動模型 = match_event_playbook(已選活動["title"])
+    活動階段 = _activity_status.event_phase(活動模型)
     原期排程 = _field_tools.event_window(活動模型.get("starts_at"), 活動模型.get("ends_at"),source=活動模型.get("schedule_source","official"))
     歷史試算已確認 = True
-    if 原期排程["state"] == "ended" or "歷史活動" in 活動模型.get("tags", []):
+    if 活動階段['state'] != 'exchange' and (原期排程["state"] == "ended" or "歷史活動" in 活動模型.get("tags", [])):
         st.warning(原期排程["label"] if 原期排程["state"] == "ended" else "原期已結束，以下數字只供復刻核對或歷史試算。")
         歷史試算已確認 = st.checkbox("我正在核對復刻或做歷史試算，不是依原期排程投入", key=f"historical_event_confirmed_{活動模型['name']}")
-    elif 原期排程["state"] != "unknown":
+    elif 活動階段['state'] != 'exchange' and 原期排程["state"] != "unknown":
         st.caption(原期排程["label"])
 
     st.caption("先核對遊戲內活動名稱與截止時間。文章日期不代表活動仍開放。")
-    活動結論 = "原期已結束。以下只供復刻核對，不依舊里程碑投入。" if 原期排程["state"] == "ended" else str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
-    st.markdown(f'<div class="event-verdict"><strong>活動投入建議</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
+    活動結論 = 活動階段['action'] if 活動階段['state'] in ('ended','exchange','upcoming') else str(活動模型.get("verdict") or "先做完免費任務，最後一天再決定是否投入。")
+    st.markdown(f'<div class="event-verdict"><strong>{html.escape(活動階段["label"])}</strong><p>{html.escape(活動結論)}</p></div>', unsafe_allow_html=True)
     with st.expander("活動規則與獎勵重點"):
         顯示活動重點(
             str(已選活動["title"]),
@@ -758,10 +766,13 @@ elif 頁面 == "活動最佳解":
     )
     st.link_button("核對活動來源 ↗", 已選活動["link"])
     st.markdown("### 現在照這個順序做")
-    for index, step in enumerate(活動模型["steps"],1):
+    本期行動 = _activity_status.current_playbook([活動模型]) if 活動模型.get('guide_slug') and 活動階段['state'] in ('active','exchange','upcoming') else None
+    for index, step in enumerate([text for _,text in 本期行動['steps']] if 本期行動 else 活動模型['steps'],1):
         st.markdown(f"{index}. {step}")
     if 活動模型["name"] == "時光拼圖":
         st.button("查時光拼圖完整里程碑與兌換表 →",on_click=_guide_ui.open_guide,args=("time-jigsaw",),width="stretch")
+    elif 活動模型.get('guide_slug'):
+        st.button("查本期完整重點 →",on_click=_guide_ui.open_guide,args=(活動模型['guide_slug'],),width="stretch")
 
     with st.expander("展開詳細玩法與判斷依據"):
         st.markdown(f"**核心機制：** {活動模型['mechanic']}")
@@ -774,7 +785,15 @@ elif 頁面 == "活動最佳解":
         _guide_ui.render_guild_budget("activity_guild")
         st.stop()
 
-    if not st.toggle("展開寶石成本試算",key="event_advanced"):
+    if 活動階段['state'] in ('exchange','upcoming','ended'):
+        if not st.toggle("進行歷史／假設試算",key=f"event_simulation_{活動模型['name']}"):
+            st.caption("本階段不提供現行補鑽建議；需核對復刻或做假設比較時才展開。")
+            st.stop()
+        if 活動階段['state'] in ('exchange','upcoming'):
+            歷史試算已確認 = st.checkbox("我正在核對復刻或做歷史試算，不是依原期排程投入",key=f"historical_event_confirmed_{活動模型['name']}")
+
+    活動欄位範圍 = 已選活動['date']+'|'+已選活動['title']+'|'+活動模型.get('starts_at','undated')
+    if not st.toggle("展開寶石成本試算",key=f"event_advanced_{活動欄位範圍}"):
         st.caption("只查玩法不需要填資料。要估補鑽成本時，再展開試算。")
         st.stop()
 
@@ -805,22 +824,22 @@ elif 頁面 == "活動最佳解":
     st.markdown("### 02 / 免費進度")
     p1, p2, p3, p4 = st.columns(4)
     with p1:
-        目前進度 = st.number_input("目前活動進度", min_value=0, value=None, step=1)
+        目前進度 = st.number_input("目前活動進度", min_value=0, value=None, step=1,key=f"event_current_{活動欄位範圍}")
     with p2:
-        剩餘天數 = st.number_input("剩餘天數", min_value=0, max_value=30, value=None, step=1)
+        剩餘天數 = st.number_input("剩餘天數", min_value=0, max_value=30, value=None, step=1,key=f"event_days_{活動欄位範圍}")
     with p3:
-        每日免費進度 = st.number_input("每天還可拿的免費進度", min_value=0, value=None, step=1)
+        每日免費進度 = st.number_input("每天還可拿的免費進度", min_value=0, value=None, step=1,key=f"event_free_{活動欄位範圍}")
     with p4:
-        目標進度 = st.number_input("目標里程碑", min_value=1, value=預設目標, step=1)
+        目標進度 = st.number_input("目標里程碑", min_value=1, value=預設目標, step=1,key=f"event_target_{活動欄位範圍}")
 
     st.markdown("### 03 / 寶石成本")
     c1, c2, c3 = st.columns(3)
     with c1:
-        每次付費進度 = st.number_input("一次票券／抽取增加進度", min_value=0.01, value=None, step=0.1)
+        每次付費進度 = st.number_input("一次票券／抽取增加進度", min_value=0.01, value=None, step=0.1,key=f"event_yield_{活動欄位範圍}")
     with c2:
-        每次寶石成本 = st.number_input("一次票券／抽取寶石成本", min_value=0, value=None, step=10)
+        每次寶石成本 = st.number_input("一次票券／抽取寶石成本", min_value=0, value=None, step=10,key=f"event_price_{活動欄位範圍}")
     with c3:
-        現有寶石 = st.number_input("目前寶石", min_value=0, value=None, step=500)
+        現有寶石 = st.number_input("目前寶石", min_value=0, value=None, step=500,key=f"event_gems_{活動欄位範圍}")
 
     with st.expander("這些數字怎麼填？"):
         st.write("免費進度包含剩餘登入、每日任務、廣告、免費票與預計開箱任務；付費進度只填需要用寶石補的部分。若遊戲顯示每次十連抽，請把進度與成本都換算成單次或都用十連，兩邊單位一致即可。")

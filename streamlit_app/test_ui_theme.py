@@ -99,7 +99,7 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert sum(attrs.get("aria-label") == "優先升級目標" for _, attrs in markup.tags) == 1
     assert sum(attrs.get("role") == "listitem" for _, attrs in markup.tags) == 3
     assert any(attrs.get("aria-label") == "執行備忘" for _, attrs in markup.tags)
-    assert [e.label for e in a.expander] == ["貼一行更新配置", "材料缺額與詳細排序", "只核對這一步的材料", "排序依據與其他候選"]
+    assert [e.label for e in a.expander] == ["依配置補充門檻", "貼一行更新配置", "材料缺額與詳細排序", "只核對這一步的材料", "排序依據與其他候選"]
     assert not next(e for e in a.expander if e.label=="材料缺額與詳細排序").proto.expanded
     assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成"}
     # Opening the page never records an in-game completion.
@@ -132,7 +132,8 @@ def test_event_summary_is_visible_and_offline_calculator_is_preserved(monkeypatc
     assert not next(e for e in a.expander if e.label == "活動規則與獎勵重點").proto.expanded
     assert any('class="event-verdict"' in m.value for m in a.markdown)
     assert not a.number_input
-    by_label(a.toggle,"展開寶石成本試算").set_value(True).run()
+    from test_decision_ui import open_event_calculator
+    open_event_calculator(a)
     for label in ("01 / 活動目標", "02 / 免費進度", "03 / 寶石成本"):
         assert any(label in m.value for m in a.markdown)
     from test_decision_ui import fill_event_inputs

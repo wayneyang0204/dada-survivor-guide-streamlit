@@ -31,7 +31,9 @@ def test_guide_catalog_has_stable_ids_and_honest_source_labels():
             assert "待重核" in guide["status"] or "歷史" in guide["status"]
         if guide["checked"]:
             assert guide["sources"]
-            assert guide["source_date"] or guide["slug"] == "autumn-seabed"  # The official event card has no publication date.
+            if not guide['source_date']:
+                details=guide.get('source_details',[])
+                assert details and all(s['date'] is None and s['url'].startswith('https://apps.apple.com/') for s in details)
         for section in guide["sections"]:
             for row in section.get("rows", []):
                 assert len(row) == len(section["columns"])
@@ -82,7 +84,9 @@ def test_every_core_article_has_a_working_direct_link_and_full_content(slug):
     text = "\n".join(m.value for m in a.markdown)
     guide = content.get_guide(slug, content.GUIDES)
     assert guide["title"] in text
-    assert "先看結論" in text and "常見問題" in text and "資料來源" in text
+    from activity_status import event_phase
+    archived=guide.get('starts_at') and event_phase(guide)['state'] in ('exchange','ended')
+    assert ('原期攻略重點' if archived else '先看結論') in text and "常見問題" in text and "資料來源" in text
     assert "本文目錄" in text and "guide-part-1" in text
     assert a.warning
     if slug in ("resonance-planning", "mount-layout"):

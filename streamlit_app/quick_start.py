@@ -28,6 +28,7 @@ LABELS = {"survivor":"主位", "awakening":"主位覺醒", "taloxa":"塔洛莎�
           "pet_kind":"寵物類型", "pet_name":"主戰寵物", "pet_star":"寵物覺醒", "mode":"模式",
           "drone_energy":"無人機諧振", "lightning_energy":"雷電諧振", "drone_form":"無人機形態", "lightning_form":"雷電形態",
           "neck":"項鍊", "ss_boots":"SS鞋", "twin_drone":"雙生無人機", "drone_red":"紅無人機"}
+LABELS.update(slots='已開普通典藏槽',red_owned='持有紅品質收藏',red_placed='已擺入紅品質收藏')
 
 
 def parse_snapshot(text: str) -> dict:
@@ -78,10 +79,12 @@ def parse_snapshot(text: str) -> dict:
             notes.append('第一位角色暫列主位；若不是，請在該角色前加「主位」。')
     stocks = (('覺醒核心','awakening_cores',10000),('神器核心','relic_cores',10000),
               ('(?:主位)?S(?:特工)?碎片','s_shards',100000),('(?:傳奇|紅色)收藏自選箱','red_boxes',10000),
-              ('高級收藏之心','advanced_hearts',100000),('收藏之心','hearts',10000000))
+              ('高級收藏之心','advanced_hearts',100000),('收藏之心','hearts',10000000),
+              ('(?:典藏已開|普通槽位|已開普通槽|已開槽位)','slots',100),
+              ('(?:持有紅收藏|紅收藏持有)','red_owned',100),('(?:已擺入紅收藏|已放入紅收藏)','red_placed',100))
     for term,key,maximum in stocks:
-        patterns=(rf'(?:^|[\s,，、;；])(?P<label>{term})\s*[:：=]?\s*(?P<n>{number})\s*(?:個|顆|箱)?',
-                  rf'(?:^|[\s,，、;；])(?P<n>{number})\s*(?:個|顆|箱)\s*(?P<label>{term})')
+        patterns=(rf'(?:^|[\s,，、;；])(?P<label>{term})\s*[:：=]?\s*(?P<n>{number})\s*(?:個|顆|箱|格|件)?',
+                  rf'(?:^|[\s,，、;；])(?P<n>{number})\s*(?:個|顆|箱|格|件)\s*(?P<label>{term})')
         for m in (m for pattern in patterns for m in re.finditer(pattern,value,re.I)):
             n=numeric(m['n'])
             if not n.is_integer() or not 0<=n<=maximum:
@@ -185,12 +188,12 @@ PLAYBOOKS = {
   'stop':'沒有使用的寵物不平均投。未測量主人輸出前，寵物面板提升不等於帳號總傷害提升。',
   'guides':('ordinary-pet-skills','umbral-soul','elaine-build','xeno-assist')},
  '現在活動怎麼做': {
-  'title':'時光拼圖：先拿確定里程碑，隨機核心別當保底',
-  'steps':(('日常操作','長按自動移動；右上道具箱可中途領影集，不必等一整張完成。'),
-           ('先看目標','10月17日社群表列700影集S裝、850神器核心自選、1000動態頭像；以遊戲本期獎勵表對照。'),
-           ('最後一天再補差額','開300箱任務有鑰匙成本；約30%返還是估計，拼圖隨機核心不構成第二顆保底。')),
-  'stop':'已拿需要的里程碑就停；不為猜測1000～1200會出核心而強補鑽。',
-  'guides':('time-jigsaw','event-budget','matrix-squad-preview')},
+  'title':'先分清遊玩、兌換與預告階段',
+  'steps':(('核對倒數','遊玩期內才比較補票；兌換期只整理已有代幣。'),
+           ('確認本期獎勵','任務、票價與里程碑必須是本期表，不直接套用上次復刻。'),
+           ('缺額清楚才投入','先用確定可領的資源，隨機獎與估計返還不當保底。')),
+  'stop':'尚未開放或已結束就不補鑽；詳細內容按目前階段顯示。',
+  'guides':('beach-treasure','time-jigsaw','event-budget')},
 }
 
 
@@ -227,7 +230,9 @@ def context_notes(p: dict) -> list[dict]:
           'body':'黃4易傷門檻已知；紅5不是立即必追。先保留目前配置，比較整段成本與主人輸出。' if star>=4 else '先比較黃4的60%易傷20秒；不要求你手打技能名稱或下一階效果。','slug':'umbral-soul'})
     for prefix,part in (('drone','無人機'),('lightning','雷電')):
         if p.get(prefix+'_energy') is not None:
-            if p.get(prefix+'_form')!='雙生':
+            if p.get(prefix+'_form')=='普通':
+                notes.append({'title':'普通'+part+'：不套用雙生表','body':'已記下普通形態與能量，不需要重填。本表未收錄普通形態的完整技能節點，先保留現役配置，不套用雙生1650／3000門檻。','slug':'resonance-planning'})
+            elif p.get(prefix+'_form')!='雙生':
                 notes.append({'title':part+'形態尚未確認','body':'能量已記下；加上「普通」或「雙生」即可辨識，不把普通門檻套成雙生。','slug':'twin-tech-milestones'})
             else:
                 from tech_routes import next_tech_effect

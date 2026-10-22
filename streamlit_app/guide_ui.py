@@ -93,6 +93,11 @@ def open_tool(resource: str | None = None, activity: bool = False) -> None:
     st.session_state["pending_navigation"] = "活動" if activity else "下一步"
 
 
+def open_activity(slug: str) -> None:
+    open_tool(activity=True)
+    st.session_state['requested_activity']=slug
+
+
 def article_button(guide: dict, prefix: str, label: str | None = None) -> None:
     st.button(label or guide["title"], key=f"{prefix}_{guide['slug']}", on_click=open_guide,
               args=(guide["slug"],), width="stretch", type="tertiary")
@@ -113,22 +118,27 @@ def render_library_brief(guides: list[dict]) -> None:
 
 def render_featured(guides: list[dict]) -> None:
     st.markdown('<div class="guide-results-head"><h2>近期重點</h2><span>活動與養成更新</span></div>', unsafe_allow_html=True)
-    event = content.get_guide("time-jigsaw", guides)
-    ended = event and event_window(event.get("starts_at"), event.get("ends_at"), source=event.get("schedule_source","official"))["state"] == "ended"
+    from activity_status import current_playbook, event_phase
+    from data_engine import EVENT_PLAYBOOKS
+    brief=current_playbook(EVENT_PLAYBOOKS)
+    first=brief['guides'][0] if brief['state']!='unknown' else 'matrix-squad-preview'
+    upcoming=next((m for m in EVENT_PLAYBOOKS if m.get('guide_slug') and m['guide_slug']!=first and event_phase(m)['state']=='upcoming'),None)
+    third=upcoming['guide_slug'] if upcoming else 'elaine-build'
     with st.container(key="featured_guides"):
         columns = st.columns(3, gap="medium")
-        for column, slug, label, heading in zip(columns, ("matrix-squad-preview" if ended else "time-jigsaw", "ss-material-recipes", "elaine-build"),
-                                       ("版本更新" if ended else "本期社群活動表", "材料查表", "特工與寵物"),
-                                       ("矩陣小隊：已確認與待確認 →" if ended else "時光拼圖：850核心怎麼停 →", "SS神鑄：不用手算材料 →", "伊狑：先查第二寵上限 →")):
+        for column, slug, label, heading in zip(columns, (first, "ss-material-recipes", third),
+                                       (brief['label'] if brief['state']!='unknown' else '版本更新', "材料查表", '下一檔預告' if upcoming else "特工與寵物"),
+                                       (brief['title']+' →' if brief['state']!='unknown' else '矩陣小隊：已確認與待確認 →', "SS神鑄：不用手算材料 →", upcoming['name']+'：先看已確認內容 →' if upcoming else "伊狑：先查第二寵上限 →")):
             guide = content.get_guide(slug, guides)
             if guide is None:
                 continue
             with column, st.container(key=f"feature_{slug}"):
                 st.markdown(f'<div class="feature-label">{html.escape(label)}<span>{guide["checked"]}</span></div>', unsafe_allow_html=True)
                 article_button(guide, "featured", heading)
-                st.caption(guide["summary"])
-                first, second = guide.get("takeaways", [])[:2]
-                st.markdown(f'<ul class="feature-points"><li>{html.escape(first)}</li><li>{html.escape(second)}</li></ul>', unsafe_allow_html=True)
+                is_event=slug==brief['guides'][0] and brief['state']!='unknown'
+                st.caption(brief['action'] if is_event else guide["summary"])
+                points=[heading for heading,_ in brief['steps'][:2]] if is_event else guide.get('takeaways',[])[:2]
+                st.markdown('<ul class="feature-points">'+''.join(f'<li>{html.escape(point)}</li>' for point in points)+'</ul>',unsafe_allow_html=True)
 
 
 def render_quick_queries() -> None:
@@ -419,12 +429,11 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         st.caption("適用：" + guide["audience"])
     st.markdown(f'<div class="article-dateline"><span>{html.escape(guide["category"])}</span>'
                 f'<span>{html.escape(guide["status"])}</span><span>{html.escape(date + checked)}</span></div>', unsafe_allow_html=True)
+    phase=None
     if guide.get("starts_at"):
-        window = event_window(guide["starts_at"], guide["ends_at"],source=guide.get("schedule_source","official"))
-        if window["state"] == "ended":
-            st.warning(window["label"])
-        else:
-            st.caption(window["label"])
+        from activity_status import event_phase
+        phase=event_phase(guide)
+        (st.warning if phase['state']=='ended' else st.info)(phase['label']+' · '+phase['action'])
     toc = "".join(f'<a href="#guide-part-{i}" target="_self">{i:02d} {html.escape(section["title"])}</a>' for i, section in enumerate(guide["sections"], 1))
     toc += '<a href="#guide-cautions" target="_self">適用限制</a>'
     if guide["faq"]:
@@ -436,7 +445,8 @@ def render_article(slug: str, legacy: list[dict]) -> None:
         with body:
             if guide.get("takeaways"):
                 items = "".join(f'<li>{html.escape(point)}</li>' for point in guide["takeaways"])
-                st.markdown(f'<section class="article-keypoints" aria-label="攻略重點"><h2>先看結論</h2><ul>{items}</ul></section>', unsafe_allow_html=True)
+                heading='原期攻略重點' if phase and phase['state'] in ('exchange','ended') else '先看結論'
+                st.markdown(f'<section class="article-keypoints" aria-label="攻略重點"><h2>{heading}</h2><ul>{items}</ul></section>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<section class="guide-verdict"><h2>先看結論</h2><p>{html.escape(guide["verdict"])}</p></section>', unsafe_allow_html=True)
             if guide.get("game_entry"):
@@ -452,7 +462,9 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                 st.button("用我的配置排升級順序", on_click=open_tool, args=(guide["resource"],), width="stretch", type="primary")
             elif guide["slug"] == "epic-collectibles":
                 st.button("查完整收藏圖鑑", on_click=open_collectible_catalog, width="stretch")
-            elif guide["slug"] in ("event-budget", "autumn-seabed", "time-jigsaw"):
+            elif guide["slug"] in ("time-jigsaw", "beach-treasure"):
+                st.button("查看本期階段與活動步驟",on_click=open_activity,args=(guide['slug'],),width="stretch",type="primary")
+            elif guide["slug"] in ("event-budget", "autumn-seabed"):
                 st.button("開啟活動投入試算", on_click=open_tool, kwargs={"activity": True}, width="stretch", type="primary")
             elif guide["slug"] in ("upgrade-roadmap", "red-choice-box"):
                 st.button("用我的配置找下一個門檻", on_click=open_tool, args=("自動排序",), width="stretch", type="primary")

@@ -18,11 +18,19 @@ def by_label(elements, label):
     return next(item for item in elements if item.label == label)
 
 
-def fill_event_inputs(app, *, confirm_historical=True):
-    """Explicit synthetic values: tests must not depend on invented UI defaults."""
+def open_event_calculator(app):
+    """Outside the play window, budgeting is explicitly a hypothetical exercise."""
+    simulation=next((t for t in app.toggle if t.label=='進行歷史／假設試算'),None)
+    if simulation and not simulation.value:
+        simulation.set_value(True).run()
     toggle=by_label(app.toggle,"展開寶石成本試算")
     if not toggle.value:
         toggle.set_value(True).run()
+
+
+def fill_event_inputs(app, *, confirm_historical=True):
+    """Explicit synthetic values: tests must not depend on invented UI defaults."""
+    open_event_calculator(app)
     for label, value in (("目前活動進度",0),("剩餘天數",3),("每天還可拿的免費進度",16),
                          ("目標里程碑",100),("一次票券／抽取增加進度",1.0),
                          ("一次票券／抽取寶石成本",100),("目前寶石",30000)):

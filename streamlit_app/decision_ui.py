@@ -509,8 +509,10 @@ def render_home() -> None:
     render_character_pause(p)
     with st.expander("貼一行更新配置"):
         intake(save,"route")
-    with st.expander("材料缺額與詳細排序"):
-        render_detailed_route(p)
+    request=st.session_state.get('route_details_revision',0)
+    with st.container(key=f'route_details_scope_{request}'):
+        with st.expander("材料缺額與詳細排序",expanded=request>0):
+            render_detailed_route(p)
 
 
 def render_detailed_route(p: dict) -> None:

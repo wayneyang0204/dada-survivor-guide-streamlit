@@ -7,6 +7,26 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-22 priority/phase update: the saved planner promotes one engine-ranked
+  action, shows its unmet conditions, and previews the following action only for
+  an already-ready node. Other candidates and source notes remain available in
+  deliberate expansions. The summary button opens the matching material detail
+  without changing account data or recording game completion.
+  If no engine action remains, a supplied twin-tech form/energy can expose the
+  nearest listed energy breakpoint as an unverified hint, never an affordable
+  upgrade or DPS ranking. Ordinary tech does not inherit twin-tech effects.
+- One-line intake now accepts ordinary-hall counts (opened, owned, placed) and
+  validates the merged configuration before offering Apply. It can find free
+  placements without asking for stock or a full manual profile.
+- `activity_status.py` distinguishes scheduled play, exchange-only, expired and
+  unverified windows. Current answers, featured cards, articles and the activity
+  screen share these phases. Outside the play window, budgeting requires explicit
+  hypothetical/history mode and acknowledgement. Event links preserve the chosen
+  activity on later reruns; progress and ticket prices never transfer between
+  different event periods. Time Jigsaw exchange uses the dated community table;
+  the next Beach Treasure card confirms its schedule and mechanics, not a cost or
+  milestone table. Official card windows are not presented as observed openings.
+
 - 2026-10-18 low-input update: home and first-time planner offer six question
   playbooks with three concrete actions, stopping rules and article links, without
   requiring an account. A bounded local parser recognises one-line current-state

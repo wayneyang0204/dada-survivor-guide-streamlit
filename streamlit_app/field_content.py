@@ -7,6 +7,7 @@ from __future__ import annotations
 
 REVIEW_DATE = "2026-10-18"
 SOURCES = {
+    "beach_official": ("HABBY｜沙灘尋寶官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815209488", None),
     "ss_costs": ("別說筆記｜神鑄各階消耗表", "https://notalknote.xyz/【噠噠特攻】神鑄消耗/", "2025-04-14"),
     "time_puzzle": ("別說筆記｜時光拼圖本期機制與里程碑", "https://notalknote.xyz/survivor-io-time-jigsaw-puzzle-event-guide/", "2026-10-17"),
     "time_official": ("HABBY｜時光拼圖官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6814114699", None),
@@ -73,6 +74,35 @@ def entry(slug, category, title, summary, verdict, source_keys, sections, *,
 
 
 FIELD_GUIDES = [
+    entry("beach-treasure", "活動玩法", "沙灘尋寶：10月23日官方活動卡、玩法與開放前準備",
+        "官方卡列10/23至10/28；玩具鏟、漂流瓶與海星模式已確認，任務和里程碑數字待核對。",
+        "10月22日先保留鑰匙與寶石。官方活動卡確認以玩具鏟尋寶、漂流瓶換獎勵，海星可開啟尋寶模式；卡片沒有公開完整任務、票價與累計獎勵表，不把舊沙灘活動門檻或固定鑽數搬進本期。",
+        ["beach_official"], [
+            table("已確認與未確認分開看", ["項目", "本次查核"], [
+                ["官方活動卡時段", "10/23 00:00至10/28 00:00，台灣時間；不等於已實際看到遊戲開放"],
+                ["基本玩法", "玩具鏟尋寶；漂流瓶兌換；海星觸發尋寶模式"],
+                ["尚未收錄", "免費鏟總量、開箱任務、返還率、累計獎勵與商店價格"],
+                ["本站試算", "不預填固定里程碑；需要本期數字才計算"]]),
+            procedure("今天與開放後怎麼做", "10/22：先整理現有鑰匙與寶石；不要為預告先開箱。",
+                "開放後：先領確定可領的免費項目，對照本期任務與累計獎勵。",
+                "選目標：把獎勵對應到正在升的裝備、收藏或寵物；不因通用排行榜把整個商店列成必換。",
+                "最後一天：用實際剩餘票券、可領任務與價格算差額；隨機所得不當保證量。"),
+            table("看到這些情況就先停", ["情況", "現在動作"], [
+                ["遊戲還沒有入口", "等倒數與正式介面，不花資源搶跑"],
+                ["任務表與舊攻略不同", "只用本期表，重新計算開箱與補鑽成本"],
+                ["商店物品已滿星", "不重複買；轉比下一個有效門檻"],
+                ["缺少售價或獎勵表", "先不補鑽，也不推測保底與掉率"]]),
+        ], entrypoint="遊戲活動 → 沙灘尋寶；官方活動卡與本期任務／累計獎勵／商店",
+        stop="未看到本期入口、任務與價格就先不投入；拿到需要的確定獎勵後，再比較下一檔。",
+        after="將實際獎勵加入目前養成缺口；本站升級路線重新排序，不沿用舊庫存。",
+        takeaways=["官方卡：10/23起，遊戲倒數優先", "玩具鏟／漂流瓶／海星玩法已確認", "本期數值未齊，不預填里程碑或固定鑽數"],
+        caution="官方活動卡的公開展示排程不保證個別帳號已開放，也沒有完整成本與機率。本文準備與停手順序為本站整理；不猜免費量、返還率、核心保底或兌換延長日。",
+        related=["event-budget", "daily-resource-ledger", "red-choice-box", "time-jigsaw"],
+        keywords="沙灘尋寶 海邊假日 玩具鏟 漂流瓶 海星 10月23 10月28 活動 開箱 任務",
+        status="官方活動卡｜本期數值待核對",
+        faq=[("現在先開寶箱嗎？", "不要。開放後先核對本期開箱任務與停點，再決定用多少鑰匙。"),
+             ("要準備多少鑽石？", "本期價格與目標門檻未收錄，沒有可查證的固定預算；先保留資源。")]),
+
     entry("ss-material-recipes", "裝備神鑄", "SS神鑄材料表：E／V各階消耗與區間合計",
         "神器核心、材料裝備、陣營之石和基礎素材一次查；不必自己合計。",
         "先確定要開哪一個技能，再選目前與目標階級查整段配方。E與V分開計算；核心只是一部分，不能把19顆核心當成整件裝備全滿的成本。",
@@ -724,7 +754,10 @@ FIELD_GUIDES = [
 next(g for g in FIELD_GUIDES if g["slug"] == "autumn-seabed").update(
     starts_at="2026-10-11T00:00:00+08:00", ends_at="2026-10-16T00:00:00+08:00")
 next(g for g in FIELD_GUIDES if g["slug"] == "time-jigsaw").update(
-    checked="2026-10-18", starts_at="2026-10-17T00:00:00+08:00", ends_at="2026-10-22T00:00:00+08:00", schedule_source="community")
+    starts_at="2026-10-17T00:00:00+08:00", ends_at="2026-10-22T00:00:00+08:00",
+    exchange_ends_at="2026-10-23T00:00:00+08:00", schedule_source="community")
+next(g for g in FIELD_GUIDES if g["slug"] == "beach-treasure").update(
+    checked="2026-10-22", starts_at="2026-10-23T00:00:00+08:00", ends_at="2026-10-28T00:00:00+08:00")
 next(g for g in FIELD_GUIDES if g["slug"] == "ss-material-recipes")["checked"] = "2026-10-18"
 
 FIELD_ANSWERS = {g["slug"]: (g["takeaways"][0], g["summary"]) for g in FIELD_GUIDES}
