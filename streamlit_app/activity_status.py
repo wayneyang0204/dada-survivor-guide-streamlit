@@ -14,14 +14,15 @@ def event_phase(model: dict, now: datetime | None = None) -> dict:
     if any(t.tzinfo is None or t.utcoffset() is None for t in (start,end,exchange)) or not start < end <= exchange:
         raise ValueError("活動與兌換截止需含時區，且順序正確。")
     basis = '官方活動卡' if model.get('schedule_source','official')=='official' else '社群表列'
+    exchange_basis = '官方活動卡' if model.get('exchange_schedule_source', model.get('schedule_source','official'))=='official' else '社群表列'
     def stamp(t):return t.astimezone(ZoneInfo('Asia/Taipei')).strftime('%m/%d %H:%M')
-    common={'basis':basis,'starts':stamp(start),'ends':stamp(end),'exchange_ends':stamp(exchange)}
+    common={'basis':basis,'exchange_basis':exchange_basis,'starts':stamp(start),'ends':stamp(end),'exchange_ends':stamp(exchange)}
     if current < start:
         return {**common,'state':'upcoming','label':'尚未開始','action':f'{basis}預告 {stamp(start)} 起；先保留鑰匙與寶石，開放後再核對遊戲。','can_spend':False}
     if current < end:
         return {**common,'state':'active','label':'活動時段內','action':f'{basis}至 {stamp(end)}；仍以遊戲入口與倒數為準。','can_spend':True}
     if current < exchange:
-        return {**common,'state':'exchange','label':'僅剩兌換','action':f'{basis}兌換至 {stamp(exchange)}；只整理已持有代幣，不再補鑽追里程碑。','can_spend':False}
+        return {**common,'state':'exchange','label':'僅剩兌換','action':f'{exchange_basis}兌換至 {stamp(exchange)}；只整理已持有代幣，不再補鑽追里程碑。','can_spend':False}
     return {**common,'state':'ended','label':'原期已結束','action':'只供歷史或復刻核對，不再依原期里程碑投入。','can_spend':False}
 
 

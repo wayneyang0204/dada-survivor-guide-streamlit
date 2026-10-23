@@ -65,12 +65,21 @@ def test_exchange_answer_does_not_repeat_spending_instructions():
     assert '不補鑽' in str(brief['steps']) and not brief['can_spend']
 
 
-def test_upcoming_official_card_never_invents_costs_or_milestone():
+def test_beach_schedule_changes_from_official_preview_to_verified_active_guide():
     assert event_phase(BEACH,at('2026-10-22T12:00:00+08:00'))['starts']=='10/23 00:00'
-    assert BEACH['target']==0
+    assert BEACH['target']==820
     brief=current_playbook([BEACH],at('2026-10-22T12:00:00+08:00'))
     assert brief['state']=='upcoming' and '官方活動卡' in brief['action']
     assert not brief['can_spend'] and '固定' in str(brief['steps'])
+    active=current_playbook([BEACH],at('2026-10-23T12:00:00+08:00'))
+    assert active['state']=='active' and active['can_spend']
+    assert '820' in str(BEACH['highlights']) and '1000' in str(BEACH['highlights'])
+
+
+def test_beach_exchange_extension_is_labelled_as_community_schedule():
+    phase=event_phase(BEACH,at('2026-10-28T12:00:00+08:00'))
+    assert phase['state']=='exchange' and phase['exchange_basis']=='社群表列'
+    assert '社群表列兌換至 10/29 00:00' in phase['action'] and not phase['can_spend']
 
 
 def test_archived_events_leave_current_answers_instead_of_reusing_old_targets():
@@ -178,5 +187,5 @@ def test_different_events_do_not_inherit_progress_or_ticket_prices():
     open_event_calculator(app)
     assert by_label(app.number_input,'目前活動進度').value is None
     assert by_label(app.number_input,'一次票券／抽取寶石成本').value is None
-    assert by_label(app.number_input,'目標里程碑').value is None
+    assert by_label(app.number_input,'目標里程碑').value==820
     assert not app.exception
