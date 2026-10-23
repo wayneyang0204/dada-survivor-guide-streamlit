@@ -101,7 +101,8 @@ def contextual_brief(p):
                 <p><b>還差 {hint['gap']:,} 能量</b> · {html.escape(hint['effect'])}</p><p>{html.escape(hint['action'])}</p>
                 <p><b>停手條件：</b>{html.escape(hint['stop'])}</p></section>''',unsafe_allow_html=True)
             st.caption('只按能量距離找候選，不代表最省材料或最高傷害；未核對的收藏與寵物仍須比較。')
-            st.button('查這個諧振效果與調整方式',key='priority_tech_article',on_click=open_article,args=(hint['slug'],),width='stretch')
+            from guide_ui import open_tech_guide
+            st.button('查這個諧振效果與調整方式',key='priority_tech_article',on_click=open_tech_guide,args=(hint['part'],),width='stretch')
         else:
             st.write('還沒有可確認的單一步驟。先從下方已知配置找門檻，不必補齊整份帳號。')
         notes=quick.context_notes(p)
@@ -113,6 +114,9 @@ def contextual_brief(p):
 
 
 def open_details():
+    # The top card is the global priority, not the last filtered comparison.
+    st.session_state['decision_resource']='自動排序'
+    st.session_state.pop('route_selected_id',None)
     st.session_state['route_details_revision']=st.session_state.get('route_details_revision',0)+1
 
 

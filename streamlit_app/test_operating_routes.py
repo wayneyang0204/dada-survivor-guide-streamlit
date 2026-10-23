@@ -89,7 +89,13 @@ def test_article_calculator_uses_correct_shape_and_keeps_account_untouched():
     assert not a.get("form")
     by_label(a.selectbox, "目前使用的雙生形態").select("雙生無人機（無人機態）").run()
     assert not by_label(a.checkbox, "我已對照遊戲，下一檔效果與來源表一致").value
+    # A lightning reading is not evidence of the drone's energy.
+    assert by_label(a.number_input, "這件目前的諧振能量").value is None
+    assert not any('aria-label="諧振操作目標"' in item.value for item in a.markdown)
+    by_label(a.number_input, "這件目前的諧振能量").set_value(3000).run()
     assert "先對照遊戲" in "\n".join(item.value for item in a.markdown)
+    assert any("還差 1,500 能量" in item.value for item in a.info)
+    assert a.session_state["player_profile"] == profile
 
 
 def test_planner_shows_game_entry_without_marking_upgrade_done():

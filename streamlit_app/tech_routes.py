@@ -31,6 +31,15 @@ TECH_ROUTES = {
 }
 
 
+def recorded_tech_energy(profile: dict, part: str | None) -> int | None:
+    """Only explicit twin forms can seed the twin tool; zero is a valid reading."""
+    prefix = {'雙生無人機（無人機態）': 'drone', '雙生雷電（雷電態）': 'lightning'}.get(part)
+    if prefix is None or profile.get(prefix + '_form') != '雙生':
+        return None
+    energy = profile.get(prefix + '_energy')
+    return energy if type(energy) is int and 0 <= energy <= 1000000 else None
+
+
 def next_tech_effect(part: str | None, energy: int | None, confirmed: bool = False) -> dict:
     """Next selected effect, not the next arbitrary stat or proven best DPS."""
     route = TECH_ROUTES.get(part)

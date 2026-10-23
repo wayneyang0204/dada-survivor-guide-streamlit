@@ -301,8 +301,10 @@ def normalize(text: str) -> str:
     for old, new in (("自定", "自訂"), ("爆擊", "暴擊"), ("魁儡", "傀儡"), ("维纳托", "維納托"),
                      ("黃色收藏", "史詩收藏"), ("黃收藏", "史詩收藏"), ("水力推動腳蹼", "水動推力腳蹼"),
                      ("維托爾", "維納托"), ("塔洛西婭", "塔洛莎"), ("時間軸魔術方", "時間線魔術方塊"),
-                     ("金三星", "黃3"), ("黃三星", "黃3"), ("紅三星", "紅3")):
+                     ("金三星", "黃3"), ("異星神練", "異星神煉")):
         value = value.replace(old, new)
+    value = re.sub(r"([黃紅])\s*([一二三四五])\s*星", lambda m: m[1] + str("一二三四五".index(m[2]) + 1), value)
+    value = re.sub(r"\b([rev])\s+([0-8])\b", r"\1\2", value)
     return re.sub(r"\s+", " ", value).strip()
 
 
@@ -337,12 +339,14 @@ def query_terms(query: str) -> list[str]:
             ("哪吒和洛基", "神火"), ("載具怎麼升", "載具"),
             ("打王傷害不夠", "傷害不足"), ("六星還是五星", "所有特工")):
         normalized = normalized.replace(normalize(sentence), normalize(term))
+    # Remove only known question wording; unknown effects still constrain the search.
+    normalized = re.sub(r"(無人機|雷電)\s*(?:已經|目前|現在)?\s*(\d+)(?:了)?", r"\1 \2 ", normalized)
     searchable = re.sub(r"([rev]\s*[0-8]|[黃紅][1-5])", r" \1 ", normalized)
-    searchable = re.sub(r"請問|幫我|我現在|我想|應該|之後|要先|先升|要升|升到|有哪些|哪些|多少|什麼|怎麼|如何|還有用嗎|有用嗎|還有區別|還要|要不要|[要嗎？?，,。！!]", " ", searchable)
+    searchable = re.sub(r"請問|幫我|我現在|我想|應該|之後|要先|先升|要升|升到|達到|程度|選擇|有哪些|哪些|多少|什麼|怎麼|如何|還有用嗎|有用嗎|還有區別|還要|要不要|[要嗎？?，,。！!]", " ", searchable)
     # Split recognized game terms inside a Chinese sentence without discarding unknown words.
     vocabulary = ("史詩收藏", "暗物質傀儡", "安全場地", "召喚替身", "第二套", "80星", "暴擊率", "超過", "SS鞋", "連攜", "協同作戰",
                   "幽暗之靈", "潮汐祕境", "潮汐秘境", "打叉", "載具", "模組", "同調", "神火", "伊狑", "楊大師", "塔洛莎", "維納托",
-                  "諧振", "雙生無人機", "雙生雷電")
+                  "諧振", "雙生無人機", "雙生雷電", "無人機", "雷電", "雙絕槍", "異星神煉")
     pattern = "|".join(re.escape(normalize(word)) for word in sorted(vocabulary, key=len, reverse=True))
     searchable = re.sub(pattern, lambda hit: " " + hit[0] + " ", searchable)
     terms = searchable.split()

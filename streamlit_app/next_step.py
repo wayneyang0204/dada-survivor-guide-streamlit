@@ -604,7 +604,7 @@ def priority_brief(raw: dict) -> dict:
             if p[prefix+'_form']=='雙生' and energy is not None:
                 result=next_tech_effect(part,energy)
                 if result.get('target'):
-                    hints.append({**result,'name':name,'current':energy,'source':TECH_ROUTES[part]['source'],'slug':'twin-tech-milestones'})
+                    hints.append({**result,'name':name,'part':part,'current':energy,'source':TECH_ROUTES[part]['source'],'slug':'twin-tech-milestones'})
         if hints:
             technology_hint=min(hints,key=lambda h:h['gap'])
     return {'primary':first,'following':after,'label':label,'technology_hint':technology_hint,

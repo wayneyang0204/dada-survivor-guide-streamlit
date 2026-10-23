@@ -12,7 +12,7 @@ from ui_interactions import flight_scene_markup, article_bookmark_markup, TOPIC_
 from data_engine import load_collectible_catalog
 from decision_ui import page_heading
 from direction_tools import resonance_gap
-from tech_routes import TECH_ROUTES, next_tech_effect
+from tech_routes import TECH_ROUTES, next_tech_effect, recorded_tech_energy
 from field_tools import elaine_pet_limit, reserve_stat, compare_runs, event_window, guild_ticket_budget
 
 
@@ -96,6 +96,18 @@ def open_tool(resource: str | None = None, activity: bool = False) -> None:
 def open_activity(slug: str) -> None:
     open_tool(activity=True)
     st.session_state['requested_activity']=slug
+
+
+def open_tech_guide(part: str) -> None:
+    open_guide('twin-tech-milestones')
+    st.session_state['requested_tech_part'] = part
+
+
+def change_search(prefix: str, clear: bool = False) -> None:
+    if clear:
+        st.session_state['home_guide_search' if prefix == 'home_search' else 'guide_query'] = ''
+    else:
+        st.session_state['home_topic' if prefix == 'home_search' else 'guide_topic'] = '全部'
 
 
 def article_button(guide: dict, prefix: str, label: str | None = None) -> None:
@@ -195,18 +207,35 @@ def render_results(guides: list[dict], query: str, category: str, prefix: str) -
         f'<span>{len(core)} 篇詳解 · {len(references)} 篇來源摘要</span></div>',
         unsafe_allow_html=True,
     )
+    outside = []
+    outside_catalog = 0
+    if query.strip():
+        if category != '全部':
+            outside = [g for g in content.search_guides(guides, query) if g['category'] != category]
+            if category != '收藏典藏':
+                outside_catalog = len(content.search_collectibles(load_collectible_catalog(), query))
+            st.caption('目前只搜尋：' + category)
+        with st.container(key=f'{prefix}_search_actions'):
+            if outside or outside_catalog:
+                counts = '、'.join(([f'{len(outside)} 篇攻略'] if outside else []) + ([f'{outside_catalog} 件收藏'] if outside_catalog else []))
+                st.button(f'搜尋所有分類（另有 {counts}）', key=f'broaden_{prefix}',
+                          on_click=change_search, args=(prefix,), width='stretch')
+            st.button('清除搜尋', key=f'clear_{prefix}', on_click=change_search, args=(prefix, True), type='tertiary')
     for guide in (core[:3] if query.strip() else core):
         guide_row(guide, prefix, query)
     if query.strip() and len(core) > 3:
         with st.expander(f"其他相關詳解（{len(core) - 3}）"):
             for guide in core[3:]:
-                guide_row(guide, prefix)
+                guide_row(guide, prefix, query)
     catalog_count = render_catalog_matches(query, category)
     if references:
         with st.expander(f"來源摘要與歷史資料（{len(references)}）", expanded=not core and not catalog_count):
             for guide in references:
                 guide_row(guide, prefix)
     if not results and not catalog_count:
+        if outside or outside_catalog:
+            st.info('目前分類沒有符合結果；其他分類有相符資料，可直接擴大搜尋。')
+            return
         st.info("沒有符合的結果。請改用物品名稱、別名或較短的關鍵字。")
         suggestions = content.suggested_guides(guides, query)
         if suggestions:
@@ -404,6 +433,40 @@ def render_field_tool(slug: str) -> None:
                 st.warning(str(exc))
 
 
+def render_tech_tool() -> None:
+    profile = st.session_state.get('player_profile', {})
+    requested = st.session_state.pop('requested_tech_part', None)
+    saved_parts = [part for part in TECH_ROUTES if recorded_tech_energy(profile, part) is not None]
+    if requested in saved_parts:
+        st.session_state['tech_route_part'] = requested
+    elif 'tech_route_part' not in st.session_state and len(saved_parts) == 1:
+        st.session_state['tech_route_part'] = saved_parts[0]
+    with st.popover('找我的下一個諧振效果', width='stretch'):
+        st.caption('只選已持有且正在使用的紅品質以上雙生形態；不套用普通配件，也不改動帳號紀錄。')
+        part = st.selectbox('目前使用的雙生形態', tuple(TECH_ROUTES), index=None, placeholder='選實際形態', key='tech_route_part')
+        saved_energy = recorded_tech_energy(profile, part)
+        # A different part or changed account reading starts a fresh scenario.
+        energy_key = f'tech_route_energy_{part}_{saved_energy}'
+        if energy_key not in st.session_state or (requested == part and saved_energy is not None):
+            st.session_state[energy_key] = saved_energy
+        energy = st.number_input('這件目前的諧振能量', min_value=0, max_value=1000000, value=None, key=energy_key)
+        unverified = next_tech_effect(part, energy)
+        confirmed_key = f'tech_route_verified_{part}_{energy}_{unverified.get("target")}'
+        if requested == part:
+            st.session_state[confirmed_key] = False
+        confirmed = st.checkbox('我已對照遊戲，下一檔效果與來源表一致', key=confirmed_key, disabled=not bool(unverified.get('target')))
+    if saved_energy is not None:
+        st.caption(f'本次配置：{part} {saved_energy:,} 能量。' + ('已帶入試算。' if energy == saved_energy else '目前顯示調整後的試算值。') + ' 試算不會改寫配置。')
+    result = next_tech_effect(part, energy, confirmed)
+    if result.get('target'):
+        st.info(result['message'])
+        st.markdown(f'''<section class="scenario-answer" aria-label="諧振操作目標">
+            <h3>{html.escape(result['effect'])}</h3><p>{html.escape(result['action'])}</p>
+            <p>{html.escape(result['stop'])}</p></section>''', unsafe_allow_html=True)
+    else:
+        st.caption(result['message'])
+
+
 def render_article(slug: str, legacy: list[dict]) -> None:
     guides = content.all_guides(legacy)
     guide = content.get_guide(slug, guides)
@@ -477,22 +540,7 @@ def render_article(slug: str, legacy: list[dict]) -> None:
                     st.info(result["message"])
                 st.button("查雙生無人機／雷電的實際效果", on_click=open_guide, args=("twin-tech-milestones",), width="stretch")
             elif guide["slug"] == "twin-tech-milestones":
-                with st.popover("找我的下一個諧振效果", width="stretch"):
-                    st.caption("只選已持有且正在使用的紅品質以上雙生形態；不套用普通配件，也不改動帳號紀錄。")
-                    part = st.selectbox("目前使用的雙生形態", tuple(TECH_ROUTES), index=None, placeholder="選實際形態", key="tech_route_part")
-                    energy = st.number_input("這件目前的諧振能量", min_value=0, max_value=1000000, value=None, key="tech_route_energy")
-                    unverified = next_tech_effect(part, energy)
-                    confirmed = st.checkbox("我已對照遊戲，下一檔效果與來源表一致",
-                                            key=f"tech_route_verified_{part}_{unverified.get('target')}",
-                                            disabled=not bool(unverified.get("target")))
-                result = next_tech_effect(part, energy, confirmed)
-                if result.get("target"):
-                    st.info(result["message"])
-                    st.markdown(f'''<section class="scenario-answer" aria-label="諧振操作目標">
-                        <h3>{html.escape(result['effect'])}</h3><p>{html.escape(result['action'])}</p>
-                        <p>{html.escape(result['stop'])}</p></section>''', unsafe_allow_html=True)
-                else:
-                    st.caption(result["message"])
+                render_tech_tool()
             if guide.get("editorial_note"):
                 st.caption(guide["editorial_note"])
             for index, section in enumerate(guide["sections"], 1):

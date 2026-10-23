@@ -7,6 +7,16 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-23 flow repairs: search accepts Chinese star numerals, spaced R/E/V
+  notation and common question wording while retaining unknown terms. A category
+  mismatch offers an explicit all-category search, including catalog-only hits;
+  clearing a query keeps the current category. Expanded results retain matching
+  table facts. Article roundtrips keep the broadened search context.
+- The main priority button resets prior resource/comparison filters before opening
+  detail. Twin-tech hints carry the exact part and recorded energy into the tool;
+  only explicitly recorded twin forms seed values. Each part/reading has its own
+  scenario and effect confirmation, and simulations never change account records.
+
 - 2026-10-22 priority/phase update: the saved planner promotes one engine-ranked
   action, shows its unmet conditions, and previews the following action only for
   an already-ready node. Other candidates and source notes remain available in
