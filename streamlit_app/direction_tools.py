@@ -64,9 +64,9 @@ def operating_steps(step: dict) -> dict:
             ("升到R4後，在主位可用連攜槽裝入塔洛莎「戰術協議」，才算完成這條路線。" if sid == "taloxa4" else
              "升級後檢查可用連攜槽並保留現役配置；回本站記錄這一階，不連續升下一階。"),
         ]
-    elif sid in ("hall_fill", "hall_open", "red_unlock"):
+    elif sid in ("hall_fill", "hall_fill_check", "hall_open", "red_unlock"):
         entry = "收藏館標籤 → 下方「自訂收藏館」"
-        if sid == "hall_fill":
+        if sid in ("hall_fill", "hall_fill_check"):
             steps = ["打開已解鎖的空格，選尚未擺入且已持有的傳奇收藏。",
                      "按確認擺入；不要先按購買新格，也不用先把這件升高星。",
                      "檢查放入件數和亮起詞條；可放收藏用完／空槽填滿就停。"]

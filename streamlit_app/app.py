@@ -42,6 +42,8 @@ import guide_content as _guide_content
 import guide_ui as _guide_ui
 
 _next_step = importlib.reload(_next_step)
+import priority_intake as _priority_intake
+_priority_intake = importlib.reload(_priority_intake)
 import quick_ui as _quick_ui
 _quick_ui = importlib.reload(_quick_ui)
 _decision_ui = importlib.reload(_decision_ui)

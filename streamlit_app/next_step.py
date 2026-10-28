@@ -36,6 +36,7 @@ FIELDS = {
     "quantum_ready": (None, (True, False)),
     "slots": (None, (0, 100)), "red_owned": (None, (0, 100)),
     "red_placed": (None, (0, 100)), "hearts": (None, (0, 10000000)),
+    "hall_can_fill": (None, (True, False)),
     "next_slot_cost": (None, (0, 10000000)),
     "adv1": (None, (0, 4)), "adv2": (None, (0, 8)),
     "stars1": ([], "stars4"), "stars2": ([], "stars8"),
@@ -346,6 +347,16 @@ def advanced_options(p: dict) -> list[Step]:
     return options
 
 
+def hall_fill_state(p: dict) -> bool | None:
+    """Known counts outrank a coarse observation, including partial zeroes."""
+    slots, owned, placed = (p.get(k) for k in ('slots', 'red_owned', 'red_placed'))
+    if slots == 0 or owned == 0 or placed is not None and (slots == placed or owned == placed):
+        return False
+    if all(v is not None for v in (slots, owned, placed)):
+        return min(slots, owned) > placed
+    return p.get('hall_can_fill')
+
+
 def recommend(raw: dict, resource: str = "自動排序") -> dict:
     p = clean_profile(raw)
     steps: list[Step] = []
@@ -358,6 +369,12 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
 
     if any(p[k] is None for k in ("slots", "red_owned", "red_placed")):
         missing.append("典藏館：已開格數、持有與已擺入的紅收藏數")
+        if hall_fill_state(p) is True:
+            steps.append(Step('hall_fill_check', '收藏之心', '把手上紅收藏放進已開空槽', '填滿目前能直接放入的空槽',
+                '你已確認有空槽，也有可放入的紅收藏；先拿不需要新材料的加成。',
+                '空槽填滿或可放的收藏用完就停，不購買新格。', HALL_SOURCE, 120, '現在可做', '0 收藏之心',
+                caution='只依你確認的空槽狀態，不推算持有數、放入數或加成百分比。',
+                update={'hall_can_fill': False, 'red_placed': None}))
     else:
         empty = p["slots"] - p["red_placed"]
         spare = p["red_owned"] - p["red_placed"]
@@ -535,7 +552,7 @@ def recommend(raw: dict, resource: str = "自動排序") -> dict:
         steps = [s for s in steps if s.resource == resource]
     # Ready actions first; within the same readiness group use explained rules.
     state = {"先做玩法調整": 4, "現在可做": 3, "材料已足": 3, "先存資源": 2, "待核對材料": 1, "星數未達": 0, "資料未齊": 0}
-    steps.sort(key=lambda s: (s.id == "hall_fill" or s.id.endswith("_rearrange"), state.get(s.status, 0), s.priority, s.id), reverse=True)
+    steps.sort(key=lambda s: (s.id in ("hall_fill", "hall_fill_check") or s.id.endswith("_rearrange"), state.get(s.status, 0), s.priority, s.id), reverse=True)
     complete = []
     if p["awakening"] == 8:
         complete.append("主位覺醒8：不再推薦重複升級")
@@ -617,7 +634,7 @@ def next_question(raw: dict, result: dict | None = None) -> dict | None:
     p = clean_profile(raw)
     result = result or recommend(p)
     first = result["primary"]
-    if p["mode"] == "新版區域行動" or first and first["id"] in ("hall_fill", "survival_check") or first and first["id"].endswith("_rearrange"):
+    if p["mode"] == "新版區域行動" or first and first["id"] in ("hall_fill", "hall_fill_check", "survival_check") or first and first["id"].endswith("_rearrange"):
         return None
     candidates = ([first] if first else []) + result["alternatives"]
     for step in candidates:
@@ -628,7 +645,7 @@ def next_question(raw: dict, result: dict | None = None) -> dict | None:
         if step["id"] == "boots_set" and p["ice_armor_ready"] is None:
             return {"resource": "傳奇收藏自選", "section": "收藏品", "field": "ice_armor_ready",
                     "title": "SS鞋的冰甲技能已啟用嗎？", "why": "這個前置條件未確認，不能把四件黃三星當成已可兌現的冰甲增益。"}
-    if any(p[k] is None for k in ("slots", "red_owned", "red_placed")):
+    if hall_fill_state(p) is None:
         return {"resource": "收藏之心", "section": "普通典藏館", "field": "hall_counts",
                 "title": "先核對典藏已開槽、紅收藏持有數與擺入數", "why": "這三個數字能先找出是否有不花新材料的空槽加成，不必先填全套帳號。"}
     if first and any(c["state"] == "unknown" for c in first["checks"]):
@@ -646,7 +663,7 @@ def ranking_reason(result: dict) -> str:
     first = result["primary"]
     if not first:
         return "尚無足夠資料可比較，先保留資源。"
-    if first["id"] == "hall_fill" or first["id"].endswith("_rearrange"):
+    if first["id"] in ("hall_fill", "hall_fill_check") or first["id"].endswith("_rearrange"):
         return "先使用已經持有、而且不需要新材料的提升；付費材料留到重新排序後再安排。"
     if first["id"] == "survival_check":
         return "先解決你指定的生存問題；材料已足的輸出升級保留為候選，不等於現在就該花。"
@@ -718,5 +735,7 @@ def completion_preview(raw: dict, step: dict) -> dict:
             estimates.discard(key)
             cleared.append(STOCK_LABELS[key])
     values["estimated_balances"] = sorted(estimates)
+    if sid != 'hall_fill_check' and any(k in values and values[k] != p[k] for k in ('slots', 'red_owned', 'red_placed')):
+        values['hall_can_fill'] = None
     updated = clean_profile({**p, **values})
     return {"profile": updated, "balances": changes, "unknown": cleared}

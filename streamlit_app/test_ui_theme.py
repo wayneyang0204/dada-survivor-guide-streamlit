@@ -102,7 +102,7 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert '只核對這一步的材料' not in [e.label for e in a.expander]
     assert len(a.get('form')) == 1  # One editable goal; the comparison doesn't duplicate its inputs.
     assert not next(e for e in a.expander if e.label=="材料缺額與詳細排序").proto.expanded
-    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成", "核對這一步的材料"}
+    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成", "核對這一步的材料", "換個項目"}
     # Opening the page never records an in-game completion.
     assert a.session_state["player_profile"]["awakening"] == 6
 

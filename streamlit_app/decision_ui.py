@@ -71,6 +71,8 @@ def save(values: dict, completed_title: str | None = None, restoring: bool = Fal
             # Saving an edited balance is the user's confirmation of its value.
             combined["estimated_balances"] = [key for key in combined["estimated_balances"] if key not in values]
             combined = engine.invalidate_pet_verification(before, combined)
+            if any(combined[k] != before[k] for k in ('slots', 'red_owned', 'red_placed')):
+                combined['hall_can_fill'] = None
         st.session_state["completion_undo"] = None
         if completed_title:
             st.session_state["completion_undo"] = {"before": before, "title": completed_title}
@@ -306,7 +308,7 @@ def render_decision(p: dict, step: dict, controls: bool = True) -> None:
             st.markdown(f'<p class="decision-because"><b>為什麼排這一步</b> {esc("why")}</p>', unsafe_allow_html=True)
             if step.get("quote_kind") or step["id"] in ("pet_node", "pet_umbral"):
                 st.caption("依據：你核對的遊戲預覽；帳號增傷未實測。")
-            elif step["id"] == "hall_fill" or step["id"].endswith("_rearrange"):
+            elif step["id"] in ("hall_fill", "hall_fill_check") or step["id"].endswith("_rearrange"):
                 st.caption("依據：已填的持有與槽位資料；這一步不需新材料。")
             elif step["id"] not in ("zone", "survival_check"):
                 st.caption("依據：已收錄社群門檻與帳號材料；帳號增傷未實測。")
@@ -484,7 +486,7 @@ def render_home() -> None:
                 undo_completion()
     if first_visit:
         from quick_ui import decision_desk, intake
-        st.caption('先選主位與覺醒等級。收藏、寵物和庫存可以之後再補。')
+        st.caption('選主位與覺醒，或先比較其他系統。不用先查庫存。')
         pick, paste = st.tabs(['點選角色', '貼一行配置'])
         with pick, st.container(key="onboarding"):
             with st.form("quick_profile", border=False):
@@ -501,15 +503,26 @@ def render_home() -> None:
                         st.error("請先填主位特工與覺醒等級；不確定的帳號資料可以之後補。")
                     else:
                         save({"mode": mode, "survivor": hero, "awakening": level})
+                if st.form_submit_button('角色稍後填，先看其他升級'):
+                    save({'mode': mode})
         with paste:
             intake(save,"route")
         st.caption('資料只保留於本次連線；可用「備份與匯入」留存紀錄。')
         with st.expander('先查問題，不建立配置'):
             decision_desk("route")
         return
-    from quick_ui import contextual_brief, intake
-    contextual_brief(p)
-    render_character_pause(p)
+    from quick_ui import contextual_brief, contextual_details, intake, priority_questions
+    plan = engine.priority_brief(p)
+    if plan['primary'] or plan['technology_hint']:
+        contextual_brief(p, show_details=False)
+        render_character_pause(p)
+        priority_questions(p)
+        contextual_details(p, plan)
+    else:
+        render_character_pause(p)
+        priority_questions(p)
+        with st.expander('已知配置與參考門檻'):
+            contextual_brief(p)
     with st.expander("貼一行更新配置"):
         intake(save,"route")
     request=st.session_state.get('route_details_revision',0)
@@ -561,7 +574,10 @@ def render_character_pause(p: dict) -> None:
     if p["awakening"] is not None:
         paused = p["awakening_goal"] is not None and p["awakening"] >= p["awakening_goal"]
         if paused:
-            st.caption(f"主位已達階段目標 R{p['awakening_goal']}，不再追加主位核心；協同仍獨立比較。可在角色配置修改目標。")
+            st.caption(f"主位先停在 R{p['awakening_goal']}，接著比較其他系統；協同仍會列入。")
+            if st.button('重新比較主位下一階', key='resume_character', type='tertiary'):
+                st.session_state['decision_resource'] = '自動排序'
+                save({'awakening_goal': None})
         else:
             st.button(f"角色先停在 R{p['awakening']}，比較其他系統", on_click=pause_character, type="tertiary")
 

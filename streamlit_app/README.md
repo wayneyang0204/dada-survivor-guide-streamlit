@@ -7,6 +7,22 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-28 adaptive intake: players can start without a character, or add one
+  observation at a time directly below their current recommendation. Weapon E,
+  drone form, Taloxa R, relevant collection stars, pet type/skills and Umbral
+  awakening are explicit selections. Each answer reranks immediately; inventory
+  is optional until a material-gap calculation is needed. Dependent questions
+  stay together, known fields are not reasked, and skipped answers remain unknown.
+  The latest answer can be undone until another profile update occurs. Pausing a
+  main survivor now leads directly into these questions and has an inline resume.
+- An optional `hall_can_fill` observation finds a free placement without asking
+  for three counts. Exact/partial counts that disprove space or spare collections
+  take precedence. Completion records only that no immediately fillable slot
+  remains, clears the unknown placement count, and spends nothing. Changes to
+  hall counts invalidate this observation. Old schema-1 backups remain valid.
+  This intake exposes existing documented rules; it does not infer unknown
+  stock, add unsupported pet breakpoints, or claim a global damage optimum.
+
 - 2026-10-28 task-first flow: the home screen starts with three direct entries
   (next upgrade, selector boxes, current activity). Search/categories remain in
   place; question answers have no automatic selection, and updates/the full
