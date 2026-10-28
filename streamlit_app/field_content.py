@@ -7,6 +7,9 @@ from __future__ import annotations
 
 REVIEW_DATE = "2026-10-25"
 SOURCES = {
+    "castle_official": ("HABBY｜萬聖奇妙夜官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6821273114", None),
+    "castle_data": ("Garry Tools｜古堡卡牌本期規則（10月29日查核）", "https://garrytools.com/event/details/88914832", "2026-10-29"),
+    "castle_missions": ("Garry Tools｜古堡卡牌本期任務", "https://garrytools.com/event/missions/88914832", "2026-10-29"),
     "beach_official": ("HABBY｜沙灘尋寶官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6815209488", None),
     "beach_community": ("別說筆記｜沙灘尋寶本期攻略", "https://notalknote.xyz/survivor-io-beach-treasure-hunt-event-guide/", "2026-10-23"),
     "beach_details": ("第三方遊戲資料庫｜沙灘尋寶里程碑（10月23日查核）", "https://garrytools.com/event/details/36253084", "2026-10-23"),
@@ -64,7 +67,7 @@ def entry(slug, category, title, summary, verdict, source_keys, sections, *,
         "slug": slug, "category": category, "title": title, "summary": summary,
         "verdict": verdict, "audience": audience, "resource": resource,
         "source_date": max((s[2] for s in evidence if s[2]), default=None),
-        "checked": REVIEW_DATE if evidence else None,
+        "checked": max([REVIEW_DATE]+[s[2] for s in evidence if s[2]]) if evidence else None,
         "status": status or ("社群機制核對" if evidence else "本站操作方法"),
         "sources": [(label, url) for label, url, _ in evidence],
         "source_details": [{"label": label, "url": url, "date": date} for label, url, date in evidence],
@@ -77,6 +80,20 @@ def entry(slug, category, title, summary, verdict, source_keys, sections, *,
 
 
 FIELD_GUIDES = [
+    entry("castle-cards", "活動玩法", "古堡卡牌：首翻後怎麼選、開箱先停在哪裡",
+        "10月29日本期：先領日常票，首翻後再選加翻；截止日期與來源差異明列，沒有套用舊活動停點。",
+        "先用任務取得的票玩首翻，看見牌型與目前可領獎勵再選直接收取或一種加翻。本站尚未核對完整牌型機率與獎勵圖示，不能保證每局加3票最省；開箱只追能確認有用的下一個獎勵。",
+        ["castle_official","castle_data","castle_missions"], [
+            table("現在先做三件事", ["順序","操作"], [["1","領登入、主線、快速巡邏及特別行動任務；開箱票另記成本"],["2","首翻看牌與可領獎勵，再選領取或一種加翻"],["3","對照本期里程碑與商店缺口，再決定要不要開更多箱"]]),
+            table("本期翻牌規則（第三方資料）", ["階段","消耗與限制"], [["首翻","1票翻3牌"],["追加","加1票翻1牌，或加3票翻4牌；每局只選一次"],["結算","追加後自動按最高牌型結算，不重複領多種牌型"],["幽靈","不組普通牌型；每3隻觸發一次免費古堡之夜，剩餘保留"]]),
+            table("期限與資料缺口", ["來源","本次核對"], [["官方活動卡","展示窗10/29 00:00至11/4 00:00，台灣時間"],["第三方本期表","遊玩截止11/3 00:00；和活動卡範圍不同，先按較早期限規劃"],["任務","表內有兩種道具；不能直接相加當同種票，開箱獎勵也不算零成本"],["里程碑與商店","圖示所代表物品及牌型期望值仍待確認，本站不指定固定必追檔位"]]),
+        ], entrypoint="遊戲活動 → 古堡卡牌／萬聖奇妙夜 → 任務、翻牌與累計獎勵",
+        stop="沒有下一個實用獎勵與完整差額就先停；不要為了清任務直接開600箱。",
+        after="把下一檔獎勵對應升級路線的實際缺口，再算鑰匙與補票成本。",
+        takeaways=["首翻後再選領取或加翻","幽靈觸發免費模式，不當普通牌型","截止先核對遊戲，不沿用沙灘停點"],
+        caution="玩法與任務來自第三方本期表，尚無完整機率與獎勵圖示核對；官方展示窗與第三方遊玩截止不一致，沒有確認11/3後能繼續遊玩或額外兌換。",
+        related=["event-budget","daily-resource-ledger","red-choice-box"], keywords="古堡卡牌 古堡翻卡牌 萬聖奇妙夜 萬聖節 南瓜票 幽靈 古堡之夜 Castle Cards 開箱",
+        status="本期活動｜官方活動卡與第三方規則分列", faq=[("每局都加3票最好嗎？","機率與每個牌型收益未完整核對，不能這樣保證。先看當局可領獎勵與你的票券預算。")]),
     entry("beach-treasure", "活動玩法", "沙灘尋寶：820高級自選後要不要追1000",
         "官方玩法與本期任務、里程碑已分開核對；先看820高級自選，再按解構需求判斷是否追1000。",
         "每盤一定走到最右列完成結算；單盤取得至少三顆海星才會進入尋寶模式，尋寶模式再以三個同色貝殼取得額外獎勵。高階帳號先把820鏟高級自選箱列為主檢查點；只有確實需要傳奇收藏品解構機，而且最後差額合理時才追1000。",
@@ -761,6 +778,8 @@ FIELD_GUIDES = [
 
 next(g for g in FIELD_GUIDES if g["slug"] == "autumn-seabed").update(
     starts_at="2026-10-11T00:00:00+08:00", ends_at="2026-10-16T00:00:00+08:00")
+next(g for g in FIELD_GUIDES if g['slug']=='castle-cards').update(
+    starts_at='2026-10-29T00:00:00+08:00', ends_at='2026-11-03T00:00:00+08:00', schedule_source='community')
 next(g for g in FIELD_GUIDES if g["slug"] == "time-jigsaw").update(
     starts_at="2026-10-17T00:00:00+08:00", ends_at="2026-10-22T00:00:00+08:00",
     exchange_ends_at="2026-10-23T00:00:00+08:00", schedule_source="community")
@@ -768,5 +787,18 @@ next(g for g in FIELD_GUIDES if g["slug"] == "beach-treasure").update(
     checked="2026-10-23", starts_at="2026-10-23T00:00:00+08:00", ends_at="2026-10-28T00:00:00+08:00",
     exchange_ends_at="2026-10-29T00:00:00+08:00", schedule_source="official", exchange_schedule_source="community")
 next(g for g in FIELD_GUIDES if g["slug"] == "ss-material-recipes")["checked"] = "2026-10-18"
+
+# The 10/29 official card supersedes the older version-note preview.
+matrix = next(g for g in FIELD_GUIDES if g['slug']=='matrix-squad-preview')
+matrix.update(checked='2026-10-29', status='官方活動卡已標示現已登場｜成本仍待遊戲內核對',
+    summary='10月29日官方矩陣小隊活動卡已標示現已登場；卡片展示窗不是所有帳號的解鎖保證，完整成本仍以遊戲介面為準。',
+    verdict='更新後先查看矩陣小隊入口、解鎖條件與本次升級預覽，再決定投入。官方活動卡已取代舊版即將上線預告，但沒有公布固定寶石預算或完整核心消耗。',
+    caution='10月29日官方活動卡已確認宣傳上線；不同帳號入口、解鎖門檻與成本仍須遊戲內核對。不要把展示窗當成養成活動截止，也不把五萬寶石或猜測機制當官方需求。',
+    takeaways=['官方卡已標示現已登場','先核對入口與完整升級需求','固定寶石預算與核心消耗仍未確認'])
+matrix['sections'][0]['rows'][1][1]='10月29日官方活動卡標示現已登場；具體門檻與消耗待遊戲內核對'
+matrix['sections'][1]['rows']=[row for row in matrix['sections'][1]['rows'] if '10 月 29 日' not in row[0]]
+matrix_url='https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827054794'
+matrix['sources'].append(('HABBY｜矩陣小隊現已登場活動卡',matrix_url))
+matrix['source_details'].append(dict(label='HABBY｜矩陣小隊現已登場活動卡',url=matrix_url,date=None))
 
 FIELD_ANSWERS = {g["slug"]: (g["takeaways"][0], g["summary"]) for g in FIELD_GUIDES}

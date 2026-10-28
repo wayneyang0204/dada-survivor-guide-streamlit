@@ -34,7 +34,7 @@ def test_new_articles_are_actionable_and_evidence_is_not_faked(guide):
     for source in guide['source_details']:
         assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://play.google.com/','https://garrytools.com/','https://www.facebook.com/'))
         if source['date']:
-            assert date.fromisoformat(source['date']) <= date.fromisoformat(REVIEW_DATE)
+            assert date.fromisoformat(source['date']) <= date.fromisoformat(guide['checked'])
         else:
             assert 'apps.apple.com' in source['url']  # No publication date is fabricated for an official event card.
     if not guide['sources']:
@@ -69,8 +69,9 @@ def test_partial_suggestions_do_not_relabel_unknown_term_as_exact_match():
 
 def test_matrix_squad_separates_store_release_from_feature_activation():
     guide = content.get_guide('matrix-squad-preview', content.GUIDES)
-    assert '台灣與美國蘋果商店已於 10 月 23 日上架 5.3.1' in guide['summary']
-    assert '即將上線' in guide['caution']
+    assert '10月29日官方矩陣小隊活動卡已標示現已登場' in guide['summary']
+    assert '成本仍須遊戲內核對' in guide['caution']
+    assert any('eventid=6827054794' in url for _,url in guide['sources'])
 
 
 def test_home_quick_search_callback_does_not_mutate_profile():

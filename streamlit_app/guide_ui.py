@@ -90,6 +90,11 @@ def open_tool(resource: str | None = None, activity: bool = False) -> None:
     clear_article()
     if resource:
         st.session_state["decision_resource"] = resource
+    if activity:
+        from activity_status import current_playbook
+        from data_engine import EVENT_PLAYBOOKS
+        brief=current_playbook(EVENT_PLAYBOOKS)
+        if brief['state']!='unknown': st.session_state['requested_activity']=brief['guides'][0]
     st.session_state["pending_navigation"] = "活動" if activity else "下一步"
 
 
@@ -259,6 +264,8 @@ def render_home(legacy: list[dict]) -> None:
                 left, right = st.columns(2, gap='small')
                 left.button('自選箱怎麼選 →', key='start_box', on_click=open_guide, args=('red-choice-box',), width='stretch')
                 right.button('本期活動 →', key='start_event', on_click=open_tool, kwargs={'activity':True}, width='stretch')
+        from live_events import render_updates
+        render_updates()
         query = st.text_input("搜尋攻略", placeholder="搜尋角色、裝備、收藏品…", max_chars=160, key="home_guide_search")
         with st.container(key="flight_topics"):
             category = st.radio("攻略分類", ("全部", *content.CATEGORIES), horizontal=True,

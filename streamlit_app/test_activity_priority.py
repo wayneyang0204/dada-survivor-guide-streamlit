@@ -83,7 +83,7 @@ def test_beach_exchange_extension_is_labelled_as_community_schedule():
 
 
 def test_archived_events_leave_current_answers_instead_of_reusing_old_targets():
-    brief=current_playbook(EVENT_PLAYBOOKS,at('2026-11-01T00:00:00+08:00'))
+    brief=current_playbook(EVENT_PLAYBOOKS,at('2026-11-05T00:00:00+08:00'))
     assert brief['state']=='unknown' and '待核對' in brief['title']
     assert '850' not in str(brief) and '時光拼圖' not in brief['title']
 

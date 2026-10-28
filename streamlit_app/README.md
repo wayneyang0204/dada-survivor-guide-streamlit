@@ -7,6 +7,17 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-29: Castle Cards is registered with official display dates and the
+  earlier third-party play cutoff labelled separately; no icon-only milestone
+  is assigned a guessed reward or target. Home/current-event entry selects the
+  current registered period even after a previous historical selection.
+  `live_events.py` discovers public Apple special-event cards independently of
+  editorial articles. A 15-minute cache and active-page fragment refresh bound
+  requests; users can force a fresh check. Unknown active event IDs are shown
+  explicitly and the calculator requires deliberate access to older records.
+  Offline/changed markup is labelled unavailable, never falsely up to date.
+  This runs on page visits/connected pages, not as an unattended background job.
+
 - 2026-10-28 adaptive intake: players can start without a character, or add one
   observation at a time directly below their current recommendation. Weapon E,
   drone form, Taloxa R, relevant collection stars, pet type/skills and Umbral
