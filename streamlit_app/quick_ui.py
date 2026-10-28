@@ -15,7 +15,9 @@ def decision_desk(prefix="desk"):
     with st.container(key=f"{prefix}_decision_desk"):
         st.markdown('<div class="desk-eyebrow">直接查答案 · 不必填帳號</div><h2 class="desk-heading">你現在卡在哪裡？</h2>', unsafe_allow_html=True)
         question=st.radio("選一個問題",tuple(quick.PLAYBOOKS),label_visibility="collapsed",
-                          key=f"{prefix}_question",horizontal=True)
+                          key=f"{prefix}_question",horizontal=True,index=None)
+        if question is None:
+            return
         item=quick.PLAYBOOKS[question]
         if question=='現在活動怎麼做':
             from activity_status import current_playbook
@@ -37,11 +39,12 @@ def decision_desk(prefix="desk"):
 def intake(save, prefix="quick"):
     with st.container(key=f"{prefix}_snapshot"):
         st.markdown('<h3 class="snapshot-heading">用一行帶入配置</h3>',unsafe_allow_html=True)
-        st.caption('只填你知道的，其他不用補。依下列固定格式辨識，不會登入遊戲或自動讀取帳號。')
+        st.caption('例如：維納托R6、塔洛莎R4、20個覺醒核心。只填目前現況即可。')
         text=st.text_input("目前配置（一行即可）",placeholder="維納托R6、塔洛莎R4、20個覺醒核心、雙生雷電1600",
                            max_chars=1000,key=f'{prefix}_snapshot_text')
-        st.caption('可辨識：特工R級、核心／碎片庫存、雙絕槍E1V2、收藏黃3／紅1、幽暗黃4、普通／雙生諧振。不要貼帳密。')
-        st.caption('找免費提升也可貼：典藏已開8格、持有紅收藏6件、已擺入紅收藏4件。紅收藏指原生傳奇品質，不是史詩紅星。')
+        with st.expander('其他填寫範例'):
+            st.caption('裝備：雙絕槍E1V2。收藏：暗物質傀儡黃3。寵物：幽暗黃4。科技：雙生雷電1600。')
+            st.caption('免費空槽：典藏已開8格、持有紅收藏6件、已擺入紅收藏4件。紅收藏指原生傳奇品質，不是史詩紅星。不要貼帳密。')
         if st.button("辨識這行配置",key=f'{prefix}_parse',disabled=not text.strip(),width="stretch"):
             st.session_state[f'{prefix}_parsed']=dict(text=text,result=quick.parse_snapshot(text))
         parsed=st.session_state.get(f'{prefix}_parsed')
@@ -70,31 +73,55 @@ def intake(save, prefix="quick"):
 
 def contextual_brief(p):
     import next_step as engine
-    from direction_tools import operating_steps
+    from direction_tools import operating_steps, execution_plan
     plan=engine.priority_brief(p)
     with st.container(key="quick_context_brief"):
-        st.markdown('<div class="desk-eyebrow">依已填配置整理 · 不要求先報全部庫存</div><h2 class="desk-heading">目前可以先做什麼</h2>',unsafe_allow_html=True)
+        who = f"{p['survivor']} R{p['awakening']} · {p['mode']}" if p.get('survivor') and p.get('awakening') is not None else '依目前已填資料'
+        st.markdown(f'<div class="desk-eyebrow">{html.escape(who)}</div>',unsafe_allow_html=True)
         first=plan['primary']
         if first:
             operation=operating_steps(first)
-            unknown=[c['label'] for c in first.get('checks',[]) if c['state']=='unknown']
-            action=('先存到下列需求；目前仍有已知缺額，這一步先不投入。' if first['status']=='先存資源' else
-                    '先確認'+ '、'.join(unknown)+'；已填的數量不用重填。' if unknown else operation['steps'][0])
+            execution=execution_plan(first)
+            action=execution['action']
             checks=''.join(f'<li>{html.escape(c["label"])}：{html.escape(c["detail"])}</li>' for c in first.get('checks',[]) if c['state']!='ready')
             st.markdown(f'''<section class="priority-main" aria-label="本次第一步"><span class="priority-label">{html.escape(plan['label'])}</span>
                 <h3>{html.escape(first['title'])}</h3><p>{html.escape(action)}</p>
-                <p><b>本次停點：</b>{html.escape(first['target'])}</p>
+                <p class="priority-entry"><b>遊戲入口</b>　{html.escape(operation['entry'])}</p>
+                <p><b>升到哪裡：</b>{html.escape(first['target'])}</p>
                 <ul class="priority-checks">{checks}</ul></section>''',unsafe_allow_html=True)
             if first.get('gap') and not checks:st.caption(first['gap'])
-            st.caption(plan['reason'])
+            from decision_ui import render_step_inputs, render_completion, edit_resource, selected_recommendation
+            _,comparison=selected_recommendation(p)
+            primary_controls = comparison is not None and comparison['id']==first['id']
+            left,right=st.columns(2,gap='small')
+            with left:
+                editable = first.get('quote_kind') or first['id'].startswith('adv') or first['id'] in ('venato','hall_open','lance_e1','twin_drone','pet_umbral','pet_node')
+                if not primary_controls:
+                    st.button('核對第一優先材料',on_click=open_details,width='stretch')
+                elif editable and first['status'] not in ('星數未達','資料未齊'):
+                    with st.popover('核對這一步的材料',width='stretch'):
+                        render_step_inputs(first,p,compact=True)
+                else:
+                    st.button('更新這一項配置',on_click=edit_resource,args=(first['resource'],),width='stretch')
+            with right:
+                if primary_controls:
+                    render_completion(p,first)
+                else:
+                    with st.popover('遊戲內怎麼做',width='stretch'):
+                        for i,item in enumerate(operation['steps'],1):
+                            st.write(f'{i}. {item}')
+                        st.caption(first['stop'])
+            with st.expander('怎麼操作／為什麼排這一步'):
+                for i,item in enumerate(operation['steps'],1):
+                    st.write(f'{i}. {item}')
+                st.caption(plan['reason'])
+                st.caption('按已填配置與已收錄門檻排序，未填的系統仍待比較。')
             if after:=plan['following']:
                 st.markdown(f'<p class="priority-after"><b>這步做完再看</b>　{html.escape(after["title"])} · {html.escape(after["status"])}</p>',unsafe_allow_html=True)
-            st.button('看這一步操作與材料',key='priority_open_details',on_click=open_details,width='stretch')
             if plan['queue']:
                 with st.expander('後續候選 · 先不一起升'):
                     for item in plan['queue']:
                         st.write(f'{item["system"]} · {item["title"]}（{item["status"]}）')
-            st.caption('不同資源分開存。尚未填的系統不等於低優先，這不是帳號總傷害效益排名。')
         elif hint:=plan['technology_hint']:
             st.markdown(f'''<section class="priority-main" aria-label="科技門檻候選"><span class="priority-label">先查最近的已收錄科技門檻</span>
                 <h3>{html.escape(hint['name'])}：{hint['current']:,} → {hint['target']:,}</h3>

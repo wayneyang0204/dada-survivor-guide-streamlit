@@ -60,7 +60,7 @@ def test_primary_button_discards_previous_resource_filter_and_comparison():
     app.run()
     primary = next(m.value for m in app.markdown if 'aria-label="本次第一步"' in m.value)
     assert '維納托' in primary
-    by_label(app.button, '看這一步操作與材料').click().run()
+    by_label(app.button, '回到第一優先').click().run()
     detail = next(m.value for m in app.markdown if 'aria-label="優先升級目標"' in m.value)
     assert '維納托 R6 → R7' in detail
     assert by_label(app.selectbox, '這次要安排的資源').value == '自動排序'

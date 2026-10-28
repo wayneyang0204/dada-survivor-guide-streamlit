@@ -47,18 +47,19 @@ def test_first_visit_answers_before_requiring_any_account_fields():
     a = boot()
     assert not a.exception
     assert a.radio[0].options == ["攻略首頁", "升級路線", "我的配置", "活動試算", "攻略索引"]
-    assert len(a.get("form")) == 0
+    assert len(a.get("form")) == 1
     assert len(a.number_input) == 0
     assert by_label(a.radio,"選一個問題")
     assert by_label(a.text_input,"目前配置（一行即可）")
+    assert by_label(a.selectbox,'主位特工').value is None
+    assert by_label(a.selectbox,'覺醒等級').value is None
     assert not any("本期活動完整作戰簡報" in x.value for x in a.markdown)
 
 
 def test_onboarding_contextual_edit_save_navigation_and_completion():
     a = boot()
-    by_label(a.toggle,"逐項填寫角色資料").set_value(True).run()
     by_label(a.selectbox, "主位特工").select("維納托")
-    by_label(a.number_input, "覺醒等級（不是一般星數）").set_value(6)
+    by_label(a.selectbox, "覺醒等級").set_value(6)
     by_label(a.button, "建立我的升級路線").click().run()
     assert not a.exception
     assert a.session_state["player_profile"]["awakening"] == 6
@@ -218,7 +219,7 @@ def test_unlocking_a_collectible_also_updates_distinct_owned_count():
 def test_backup_restore_is_visible_on_first_visit_and_home():
     a = boot()
     assert by_label(a.button, "套用匯入紀錄").disabled
-    assert any(x.proto.popover.label == "接續上次紀錄" for x in a.get("popover"))
+    assert any(x.proto.popover.label == "匯入紀錄" for x in a.get("popover"))
     a.session_state["player_profile"] = {"survivor": "維納托", "awakening": 8}
     a.run()
     assert not a.exception
@@ -312,7 +313,8 @@ def test_home_separates_known_shortfall_from_unknown_requirements():
     assert "還差 10" in content
     assert "待確認 · 角色碎片" in content
     assert "待確認 · 量子碎片" in content
-    assert next(e for e in a.expander if e.label == "只核對這一步的材料").proto.expanded
+    assert '核對這一步的材料' in {e.proto.popover.label for e in a.get('popover')}
+    assert by_label(a.number_input,'現有覺醒核心').value == 20
 
 
 def test_missing_stars_do_not_open_an_irrelevant_material_form():

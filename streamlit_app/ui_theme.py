@@ -234,6 +234,8 @@ button[data-testid^="stBaseButton-primary"]:hover {background:var(--accent-deep)
 .search-facts {padding:.75rem 1rem .75rem 2rem;margin:.6rem 0;background:var(--wash);border-radius:8px;}
 [data-testid="stMarkdownContainer"] .search-facts li {font-size:.9375rem;line-height:1.65;margin:.2rem 0;}
 .page-deck:empty {display:none;}
+.st-key-route_header [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.5rem!important;}
+.st-key-route_header [data-testid="stColumn"] {min-width:0!important;}
 
 @media(max-width:760px) {
   .block-container {padding:2.4rem 1rem 3rem;}
@@ -642,4 +644,48 @@ _PRO_GUIDE = """
 """
 
 from quick_ui import QUICK_STYLE
-STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + MOTION_STYLE + QUICK_STYLE + "\n</style>")
+_EASY_FLOW = """
+/* Task entry precedes the reference shelves. Keep the bird, free the first screen. */
+.st-key-guide_search_panel {padding:1rem 1.2rem;}
+.flight-scene-heading {padding:0 .1rem .4rem;}
+.flight-scene-heading .guide-hero-title {font-size:1.45rem!important;}
+.scene-deck {display:none;}
+.flight-panorama {height:130px;--bird-size:130px;border-radius:18px;}
+.flight-scene[data-flight-topic="all"] .flight-caption {display:none;}
+.scene-cloud.cloud-a {top:35px;}.scene-cloud.cloud-b {top:27px;}
+.scene-station {bottom:3px;transform:translateX(-50%) scale(.8);}
+.st-key-home_actions {padding:.35rem 0 .25rem;}
+.st-key-home_actions button {min-height:52px!important;}
+.st-key-home_actions [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.5rem!important;}
+.st-key-home_actions [data-testid="stColumn"] {min-width:0!important;}
+.st-key-home_actions button p {font-size:1rem!important;}
+.st-key-flight_topics [data-testid="stWidgetLabel"] {display:none;}
+.page-deck:empty {display:none;}
+.st-key-onboarding {padding:1rem;box-shadow:none;}
+.st-key-onboarding [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.65rem!important;}
+.st-key-onboarding [data-testid="stColumn"] {min-width:0!important;}
+.st-key-onboarding [data-testid="stFormSubmitButton"] button {width:100%;}
+.priority-entry {font-size:.875rem!important;color:var(--muted)!important;border-top:1px solid var(--line);padding-top:.65rem;}
+.st-key-quick_context_brief {border:0;padding:0;background:transparent;}
+.st-key-quick_context_brief>.stVerticalBlock {gap:.65rem;}
+.st-key-quick_context_brief .desk-heading {font-size:1.15rem!important;margin:.25rem 0 .5rem!important;}
+.priority-main {background:white;border-radius:20px;padding:1.1rem;}
+.priority-checks li {font-size:.875rem!important;line-height:1.65!important;}
+.st-key-quick_context_brief [data-testid="stHorizontalBlock"] {flex-wrap:nowrap!important;gap:.5rem!important;}
+.st-key-quick_context_brief [data-testid="stColumn"] {min-width:0!important;}
+@media(max-width:760px) {
+ .masthead {padding-bottom:.5rem;}.brand-subtitle {font-size:.875rem;}
+ .st-key-main_nav {margin-bottom:.55rem;padding:.25rem;}
+ .st-key-main_nav [role="radiogroup"] {grid-template-columns:repeat(5,minmax(0,1fr));gap:.1rem;}
+ .st-key-main_nav label[data-testid="stRadioOption"] {min-height:55px;padding:.35rem .05rem;gap:.15rem;}
+ .st-key-main_nav label p {font-size:.875rem;}
+ .st-key-main_nav label[data-testid="stRadioOption"]::before {width:1.1rem;height:1.1rem;flex-basis:1.1rem;}
+ .st-key-guide_search_panel {padding:.8rem;border-radius:22px;}
+ .flight-panorama {height:105px;--bird-size:110px;}
+ .flight-scene-heading .guide-hero-title {font-size:1.2rem!important;}
+ .st-key-home_actions button p {font-size:.875rem!important;}
+ .st-key-flight_topics [data-testid="stRadioOption"] {min-height:44px!important;}
+ .priority-main {padding:.9rem;}
+}
+"""
+STYLE = STYLE.replace("</style>", _FIELD_GUIDE + _NAV_ART + _MOTION_GUIDE + _SOFT_UI + _ROADMAP + _PRO_GUIDE + MOTION_STYLE + QUICK_STYLE + _EASY_FLOW + "\n</style>")

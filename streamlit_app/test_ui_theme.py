@@ -99,9 +99,10 @@ def test_home_has_one_goal_ledger_and_one_reasoning_drawer():
     assert sum(attrs.get("aria-label") == "優先升級目標" for _, attrs in markup.tags) == 1
     assert sum(attrs.get("role") == "listitem" for _, attrs in markup.tags) == 3
     assert any(attrs.get("aria-label") == "執行備忘" for _, attrs in markup.tags)
-    assert [e.label for e in a.expander] == ["依配置補充門檻", "貼一行更新配置", "材料缺額與詳細排序", "只核對這一步的材料", "排序依據與其他候選"]
+    assert '只核對這一步的材料' not in [e.label for e in a.expander]
+    assert len(a.get('form')) == 1  # One editable goal; the comparison doesn't duplicate its inputs.
     assert not next(e for e in a.expander if e.label=="材料缺額與詳細排序").proto.expanded
-    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成"}
+    assert {e.proto.popover.label for e in a.get("popover")} == {"備份與匯入", "記錄遊戲內完成", "核對這一步的材料"}
     # Opening the page never records an in-game completion.
     assert a.session_state["player_profile"]["awakening"] == 6
 
@@ -156,7 +157,8 @@ def test_illustrated_home_has_real_counts_and_accessible_native_routes():
     assert text.count('class="topic-heading"') == len(content.CATEGORIES)
     positions = [text.index(f'<h3>{topic}</h3>') for topic in content.CATEGORIES]
     assert positions == sorted(positions)
-    assert text.count('class="task-card-head"') == 3
+    assert text.count('class="task-card-head"') == 0
+    assert all(a.button(key=key) for key in ('start_upgrade','start_box','start_event'))
     assert '<h1 class="guide-hero-title">噠噠特攻攻略</h1>' in text
     assert a.radio[0].options == ["攻略首頁", "升級路線", "我的配置", "活動試算", "攻略索引"]
     assert not a.get("form") and "player_profile" not in a.session_state
@@ -203,4 +205,4 @@ def test_warm_cache_refreshes_art_before_theme_and_ui(monkeypatch):
     a = AppTest.from_file(APP).run(timeout=15)
     assert not a.exception
     assert callable(ui_art.guide_icon)
-    assert any('class="task-art"' in item.value for item in a.markdown)
+    assert any('class="flight-bird"' in item.value for item in a.markdown)

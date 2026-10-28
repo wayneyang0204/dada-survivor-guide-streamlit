@@ -7,6 +7,18 @@ application is not a Cloudflare Worker.
 
 ## Guide website
 
+- 2026-10-28 task-first flow: the home screen starts with three direct entries
+  (next upgrade, selector boxes, current activity). Search/categories remain in
+  place; question answers have no automatic selection, and updates/the full
+  directory are opt-in expansions. The existing flying red kite uses a shorter
+  stage, retains native controls and respects reduced motion.
+- First-time planning offers click-only character/R-level selectors or a separate
+  paste tab. No character or R-level is preselected. The main card includes the
+  game entry, target and shortages; its material form is one popover away and is
+  never duplicated in the detailed comparison. Choosing another comparison moves
+  the active form there; a return-to-priority action restores the global target.
+  Completion/undo, unknown inventory handling and backup formats are unchanged.
+
 - 2026-10-23 flow repairs: search accepts Chinese star numerals, spaced R/E/V
   notation and common question wording while retaining unknown terms. A category
   mismatch offers an explicit all-category search, including catalog-only hits;

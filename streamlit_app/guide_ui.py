@@ -253,35 +253,35 @@ def render_home(legacy: list[dict]) -> None:
                          (selected == "全部" or guide["category"] == selected) for guide in guides)
     with st.container(key="guide_search_panel"):
         st.markdown(flight_scene_markup(selected, detailed_count), unsafe_allow_html=True)
+        if selected == '全部' and not st.session_state.get('home_guide_search', '').strip():
+            with st.container(key='home_actions'):
+                st.button('看我的下一步 →', key='start_upgrade', on_click=open_tool, width='stretch', type='primary')
+                left, right = st.columns(2, gap='small')
+                left.button('自選箱怎麼選 →', key='start_box', on_click=open_guide, args=('red-choice-box',), width='stretch')
+                right.button('本期活動 →', key='start_event', on_click=open_tool, kwargs={'activity':True}, width='stretch')
+        query = st.text_input("搜尋攻略", placeholder="搜尋角色、裝備、收藏品…", max_chars=160, key="home_guide_search")
         with st.container(key="flight_topics"):
             category = st.radio("攻略分類", ("全部", *content.CATEGORIES), horizontal=True,
                                 format_func=lambda value: TOPIC_LABELS[value], key="home_topic", width="stretch")
-        query = st.text_input("搜尋攻略", placeholder="暗物質黃5、SS鞋套裝、金R3……", max_chars=160, key="home_guide_search")
-    render_library_brief(guides)
     if query.strip():
         with st.container(key="guide_search_results"):
             render_results(guides, query, category, "home_search")
         return
     if category == "全部":
         from quick_ui import decision_desk
-        decision_desk("home")
-        with st.expander("其他常查關鍵字"):
+        with st.expander('常見養成問題'):
+            decision_desk("home")
             render_quick_queries()
-        with st.container(key="task_entries"):
-            upgrade, event, catalog = st.columns(3, gap="medium")
-            for column, title, detail, artwork, tag, callback, kwargs in (
-                (upgrade, "查升級順序", "貼一行現況，先看下一個門檻", "upgrade", "配置與材料", open_tool, {}),
-                (event, "計算活動成本", "輸入進度，計算達標所需寶石", "event", "進度與寶石", open_tool, {"activity": True}),
-                (catalog, "收藏品圖鑑", "按名稱、品質或期數查詢", "collection", "名稱與效果", open_collectible_catalog, {}),
-            ):
-                with column:
-                    with st.container(key=f"task_entry_{title}"):
-                        st.markdown(f'<div class="task-card-head" data-ui-region="tool-{artwork}" data-ui-motion="true"><span class="task-tag">{tag}</span><span class="task-art">{guide_icon(artwork)}</span></div>', unsafe_allow_html=True)
-                        st.button(title + " →", on_click=callback, kwargs=kwargs, width="stretch")
-                        st.caption(detail)
-        render_featured(guides)
-    with st.container(key="flight_topic_preview"):
-        render_directory(guides, category, "home")
+        with st.expander('近期更新'):
+            render_featured(guides)
+        with st.expander('完整攻略目錄'):
+            render_library_brief(guides)
+            with st.container(key="flight_topic_preview"):
+                render_directory(guides, category, "home")
+            st.button('收藏品圖鑑 →', on_click=open_collectible_catalog, width='stretch')
+    else:
+        with st.container(key="flight_topic_preview"):
+            render_directory(guides, category, "home")
 
 
 def render_directory(guides: list[dict], category: str, prefix: str) -> None:

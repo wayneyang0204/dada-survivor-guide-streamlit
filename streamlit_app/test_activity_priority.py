@@ -156,7 +156,7 @@ def test_primary_action_opens_materials_and_never_records_completion():
     assert any('本次第一步' in m.value for m in app.markdown)
     assert not by_label(app.expander,'依配置補充門檻').proto.expanded
     assert not by_label(app.expander,'材料缺額與詳細排序').proto.expanded
-    by_label(app.button,'看這一步操作與材料').click().run()
+    by_label(app.button,'回到第一優先').click().run()
     assert by_label(app.expander,'材料缺額與詳細排序').proto.expanded
     assert app.session_state['player_profile']==p
 

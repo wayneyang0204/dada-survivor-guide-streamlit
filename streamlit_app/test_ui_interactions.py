@@ -33,15 +33,15 @@ def home():
     return AppTest.from_file(APP).run(timeout=15)
 
 
-def test_home_motion_coverage_exceeds_thirty_percent_of_main_content_blocks():
+def test_home_keeps_animated_scene_and_topic_art_without_old_task_cards():
     app = home()
     markup = Markup()
     for item in app.markdown:
         if "<style>" not in item.value:
             markup.feed(item.value)
     regions = {attrs["data-ui-region"]: attrs["data-ui-motion"] for _, attrs in markup.tags if "data-ui-region" in attrs}
-    assert set(regions) == {"home-search", "tool-upgrade", "tool-event", "tool-collection", *(f"topic-{n}" for n in range(len(CATEGORIES)))}
-    assert sum(value == "true" for value in regions.values()) / len(regions) >= .3
+    assert set(regions) == {"home-search", *(f"topic-{n}" for n in range(len(CATEGORIES)))}
+    assert regions['home-search'] == 'true'
     assert 'kite-cruise' in STYLE and 'kite-direction' in STYLE and 'icon-hop' in STYLE
 
 

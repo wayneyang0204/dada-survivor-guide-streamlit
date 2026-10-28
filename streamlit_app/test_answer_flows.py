@@ -54,7 +54,7 @@ def test_home_task_routes_and_collapsed_directory(offline_sources):
     directory = [e for e in app.expander if e.label.startswith("瀏覽")]
     assert len(directory) == sum(sum(g['category'] == c for g in content.GUIDES) > 2 for c in content.CATEGORIES)
     assert not any(e.proto.expanded for e in directory)
-    by_label(app.button, "查升級順序 →").click().run()
+    by_label(app.button, "看我的下一步 →").click().run()
     assert app.radio[0].value == "下一步"
     assert by_label(app.button, "辨識這行配置")
     assert not app.number_input
@@ -62,7 +62,7 @@ def test_home_task_routes_and_collapsed_directory(offline_sources):
     by_label(app.button, "收藏品圖鑑 →").click().run()
     assert by_label(app.selectbox, "要查什麼").value == "收藏圖鑑"
     app.radio[0].set_value("攻略首頁").run()
-    by_label(app.button, "計算活動成本 →").click().run()
+    by_label(app.button, "本期活動 →").click().run()
     assert app.radio[0].value == "活動"
     assert not app.exception
 
@@ -135,9 +135,8 @@ def test_article_resource_survives_first_time_account_setup():
     app.query_params["guide"] = "survivor-awakening"
     app.run()
     by_label(app.button, "用我的配置排升級順序").click().run()
-    by_label(app.toggle,"逐項填寫角色資料").set_value(True).run()
     by_label(app.selectbox, "主位特工").select("維納托")
-    by_label(app.number_input, "覺醒等級（不是一般星數）").set_value(6)
+    by_label(app.selectbox, "覺醒等級").set_value(6)
     by_label(app.button, "建立我的升級路線").click().run()
     assert not app.exception
     assert by_label(app.selectbox, "這次要安排的資源").value == "覺醒核心"

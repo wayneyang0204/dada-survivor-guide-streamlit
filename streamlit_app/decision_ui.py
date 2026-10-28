@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from contextlib import nullcontext
 import html
 import streamlit as st
 import next_step as engine
@@ -126,7 +127,7 @@ def star_choice(label: str, key: str, p: dict):
 
 
 def render_backup(p: dict, first_visit: bool = False) -> None:
-    with st.popover("接續上次紀錄" if first_visit else "備份與匯入", width="stretch"):
+    with st.popover("匯入紀錄" if first_visit else "備份與匯入", width="stretch"):
         st.caption("本次連線切頁會保留；重新整理、斷線或換裝置可能重置。可下載 JSON 備份再匯入，不需要遊戲帳號密碼。")
         if not first_visit:
             st.download_button("下載我的帳號紀錄", engine.export_profile(p), "dada-profile.json", "application/json", on_click="ignore")
@@ -140,7 +141,7 @@ def render_backup(p: dict, first_visit: bool = False) -> None:
                 st.error(str(exc))
 
 
-def render_step_inputs(step: dict, p: dict) -> None:
+def render_step_inputs(step: dict, p: dict, compact: bool = False) -> None:
     """One small, target-bound form instead of a trip through the whole profile."""
     kind, sid = step.get("quote_kind"), step["id"]
     p = {**p, "_input_scope": step.get("quote_key") or sid}
@@ -149,7 +150,7 @@ def render_step_inputs(step: dict, p: dict) -> None:
         return
     if step["status"] in ("星數未達", "資料未齊"):
         return
-    with st.expander("只核對這一步的材料", expanded=any(c["state"] == "unknown" for c in step.get("checks", []))):
+    with nullcontext() if compact else st.expander("只核對這一步的材料", expanded=any(c["state"] == "unknown" for c in step.get("checks", []))):
         st.caption(f"本次只核對：{step['title']}。沒有資料的項目留白。")
         with st.form(f"step_inputs_{sid}_{st.session_state.get('editor_revision', 0)}", border=False):
             values = {}
@@ -284,7 +285,7 @@ def render_completion(p: dict, step: dict) -> None:
                 st.warning(str(exc))
 
 
-def render_decision(p: dict, step: dict) -> None:
+def render_decision(p: dict, step: dict, controls: bool = True) -> None:
     esc = lambda key: html.escape(str(step.get(key) or ""))
     state_class = "" if step["status"] in ("現在可做", "材料已足") else "blocked" if step["status"] in ("星數未達", "資料未齊") else "pending"
     lead = "優先執行" if step["status"] in ("現在可做", "材料已足") else "儲備目標" if step["status"] == "先存資源" else "待核對目標"
@@ -327,7 +328,8 @@ def render_decision(p: dict, step: dict) -> None:
                 st.markdown(f'<h3 class="ledger-title">材料核對</h3><div class="decision-checks" role="list" aria-label="這一步的必要條件">{rows}</div>', unsafe_allow_html=True)
             elif step["gap"]:
                 st.info(step["gap"])
-            render_step_inputs(step, p)
+            if controls:
+                render_step_inputs(step, p)
         with notes:
             with st.container(key="route_notes"):
                 note_rows = ""
@@ -335,7 +337,8 @@ def render_decision(p: dict, step: dict) -> None:
                     if step.get(key):
                         note_rows += f'<dl class="route-note {css}"><dt>{label}</dt><dd>{esc(key)}</dd></dl>'
                 st.markdown(f'<aside aria-label="執行備忘"><h3 class="notes-heading">執行備忘</h3>{note_rows}</aside>', unsafe_allow_html=True)
-                render_completion(p, step)
+                if controls:
+                    render_completion(p, step)
                 st.button("補上這一步的資料", width="stretch", on_click=edit_resource, args=(step["resource"],))
                 st.button("看這一步的做法與取捨", width="stretch", on_click=read_direction_guide, args=(related_guide(step),))
                 st.link_button("查看這個門檻的原始依據", step["source"], width="stretch")
@@ -464,14 +467,14 @@ def render_home() -> None:
     reset_saved_widget_drafts()
     p = profile()
     first_visit = not st.session_state.get("player_profile")
-    heading, backup = st.columns([4, 1.2], vertical_alignment="center")
-    with heading:
-        page_heading("升級路線", "目前目標、停手門檻與跨系統優先順序。")
-    with backup:
-        render_backup(p, first_visit=first_visit)
-    workflow(0 if first_visit else 1)
+    with st.container(key='route_header'):
+        heading, backup = st.columns([2.2, 1.3], vertical_alignment="center")
+        with heading:
+            page_heading("升級路線", "")
+        with backup:
+            render_backup(p, first_visit=first_visit)
     if notice := st.session_state.pop("profile_notice", None):
-        st.success(notice)
+        st.caption(notice)
     if previous := st.session_state.get("completion_undo"):
         a, b = st.columns([3, 1], vertical_alignment="center")
         with a:
@@ -481,28 +484,28 @@ def render_home() -> None:
                 undo_completion()
     if first_visit:
         from quick_ui import decision_desk, intake
-        decision_desk("route")
-        intake(save,"route")
-        manual = st.toggle("逐項填寫角色資料",key="manual_setup")
-        if not manual:
-            return
-        with st.container(key="onboarding"):
-            st.markdown(f'<span class="setup-art" aria-hidden="true">{guide_icon("profile")}</span><h2 class="setup-heading">建立角色配置</h2>', unsafe_allow_html=True)
-            st.caption("必填：主要模式、主位特工、覺醒等級。其他配置可稍後補充。")
+        st.caption('先選主位與覺醒等級。收藏、寵物和庫存可以之後再補。')
+        pick, paste = st.tabs(['點選角色', '貼一行配置'])
+        with pick, st.container(key="onboarding"):
             with st.form("quick_profile", border=False):
                 mode = remember_widget("setup_mode", st.selectbox("主要模式", engine.MODES, key=widget_key("setup_mode")))
                 hero_col, level_col = st.columns(2)
                 with hero_col:
                     hero = remember_widget("setup_survivor", st.selectbox("主位特工", ("維納托", "塔洛莎", "楊大師", "金", "其他"), index=None, placeholder="選目前主位", key=widget_key("setup_survivor")))
                 with level_col:
-                    level = remember_widget("setup_awakening", st.number_input("覺醒等級（不是一般星數）", min_value=0, max_value=8, value=None, placeholder="例如 6", key=widget_key("setup_awakening")))
+                    level = remember_widget("setup_awakening", st.selectbox("覺醒等級", tuple(range(9)), index=None,
+                        format_func=lambda n: f'R{n}', placeholder="選目前等級", key=widget_key("setup_awakening")))
+                st.caption('R0 代表尚未覺醒；這裡不是一般星數。')
                 if st.form_submit_button("建立我的升級路線", type="primary"):
                     if hero is None or level is None:
                         st.error("請先填主位特工與覺醒等級；不確定的帳號資料可以之後補。")
                     else:
                         save({"mode": mode, "survivor": hero, "awakening": level})
-            st.markdown('<p class="setup-note">不需要遊戲帳號密碼。資料只保留於本次連線；離開前可從「備份與匯入」下載紀錄。</p>', unsafe_allow_html=True)
-            st.button("查看升級排序方法", on_click=read_direction_guide, args=("upgrade-roadmap",), width="stretch", type="tertiary")
+        with paste:
+            intake(save,"route")
+        st.caption('資料只保留於本次連線；可用「備份與匯入」留存紀錄。')
+        with st.expander('先查問題，不建立配置'):
+            decision_desk("route")
         return
     from quick_ui import contextual_brief, intake
     contextual_brief(p)
@@ -515,7 +518,16 @@ def render_home() -> None:
             render_detailed_route(p)
 
 
+def selected_recommendation(p: dict) -> tuple[dict, dict | None]:
+    result = engine.recommend(p, st.session_state.get('decision_resource','自動排序'))
+    candidates = ([result['primary']] if result['primary'] else []) + result['alternatives']
+    step = next((s for s in candidates if s['id'] == st.session_state.get('route_selected_id')), result['primary'])
+    return result, step
+
+
 def render_detailed_route(p: dict) -> None:
+    from quick_ui import open_details
+    st.button('回到第一優先',key='priority_open_details',on_click=open_details,type='tertiary')
     with st.container(key="route_toolbar"):
         left, context, edit = st.columns([2, 1.4, 1.2], vertical_alignment="bottom")
         with left:
@@ -532,13 +544,12 @@ def render_detailed_route(p: dict) -> None:
     focus = st.selectbox("目前最想解決的問題", engine.FOCUSES, index=engine.FOCUSES.index(p["growth_focus"]),
                          key=focus_key, on_change=update_focus, args=(focus_key,))
     remember_widget(focus_key, focus)
-    result = engine.recommend(p, scope)
-    candidates = ([result["primary"]] if result["primary"] else []) + result["alternatives"]
-    step = next((s for s in candidates if s["id"] == st.session_state.get("route_selected_id")), result["primary"])
+    result,step = selected_recommendation(p)
     if step:
         if step != result["primary"]:
             st.info("正在查看其他順位，不代表它已變成第一優先。材料核對或完成後會重新排序。")
-        render_decision(p, step)
+        main_step = engine.priority_brief(p)['primary']
+        render_decision(p, step, controls=not main_step or main_step['id'] != step['id'])
     else:
         render_next_check(p, scope)
     render_roadmap(p, step)
