@@ -74,6 +74,14 @@ def test_matrix_squad_separates_store_release_from_feature_activation():
     assert any('eventid=6827054794' in url for _,url in guide['sources'])
 
 
+def test_castle_cards_separates_no_chest_tickets_from_chest_costs():
+    guide = content.get_guide('castle-cards', content.GUIDES)
+    rendered = str(guide)
+    assert '456' in rendered and '629' in rendered and '1085' in rendered
+    assert '500／600／700／800／950逐檔重算' in rendered
+    assert '不是官方保證' in guide['caution']
+
+
 def test_home_quick_search_callback_does_not_mutate_profile():
     app = AppTest.from_file(APP).run()
     raw = {'survivor':'維納托','awakening':6,'awakening_cores':20}

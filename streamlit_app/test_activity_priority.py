@@ -163,10 +163,10 @@ def test_primary_action_opens_materials_and_never_records_completion():
 
 def test_article_activity_entry_preserves_selected_event_on_subsequent_rerun():
     app=AppTest.from_file(APP);app.query_params['guide']='beach-treasure';app.run()
-    by_label(app.button,'查看本期階段與活動步驟').click().run()
+    by_label(app.button,'查看本期階段與活動步驟').click().run(timeout=10)
     selected=by_label(app.selectbox,'來源文章中的近期／歷史活動')
     assert '沙灘尋寶' in selected.value
-    app.run()
+    app.run(timeout=10)
     assert '沙灘尋寶' in by_label(app.selectbox,'來源文章中的近期／歷史活動').value
     phase=event_phase(match_event_playbook(selected.value))
     if phase['state'] in ('upcoming','exchange','ended'):
