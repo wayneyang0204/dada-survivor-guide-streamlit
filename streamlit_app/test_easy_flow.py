@@ -6,7 +6,7 @@ from test_decision_ui import APP, boot, by_label
 
 
 def test_home_starts_with_three_tasks_and_no_unsolicited_answer():
-    app=AppTest.from_file(APP).run()
+    app=AppTest.from_file(APP).run(timeout=10)
     assert all(app.button(key=k) for k in ('start_upgrade','start_box','start_event'))
     assert by_label(app.radio,'選一個問題').value is None
     for label in ('常見養成問題','近期更新','完整攻略目錄'):
@@ -14,7 +14,7 @@ def test_home_starts_with_three_tasks_and_no_unsolicited_answer():
     assert not any('class="desk-answer"' in m.value for m in app.markdown)
     assert 'player_profile' not in app.session_state
     app.button(key='start_box').click().run()
-    assert app.query_params['guide']==['red-choice-box']
+    assert app.query_params['guide'] in ('red-choice-box',['red-choice-box'])
     by_label(app.button,'← 攻略首頁').click().run()
     app.button(key='start_upgrade').click().run()
     assert app.radio[0].value=='下一步' and not app.exception

@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'dessert-pinball',
+    category: '關卡活動',
+    title: '甜點彈珠寶藏探索：開放前先保留資源',
+    updated: '2026/11/03',
+    status: '現行',
+    summary: '官方活動卡顯示台灣時間 11 月 4 日 00:00 至 11 月 10 日 00:00；完成任務取得甜點禮券、兌換甜點彈珠，再使用彈珠台取得甜點禮盒。官方尚未公開任務量、里程碑、商店與機率。',
+    actions: ['活動開始後先領免費任務與初始資源，記錄甜點禮券、彈珠與禮盒的實際換算', '先核對累計獎勵、商店內容與剩餘倒數，再選目標', '任務表與回收率未確認前，不先開箱、不補寶石，也不宣稱免費可達特定門檻'],
+    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827040277',
+  },
+  {
     id: 'castle-cards',
     category: '關卡活動',
     title: '古堡卡牌：首翻、加翻與幽靈模式怎麼做',

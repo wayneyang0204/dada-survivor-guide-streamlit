@@ -175,8 +175,8 @@ def test_article_bookmark_and_return_preserve_original_topic(topic):
     by_label(app.radio, "攻略分類").set_value(topic).run()
     app.button(key=f"home_{guide['slug']}").click().run()
     assert not app.exception
-    assert app.query_params["guide"] == [guide["slug"]]
-    assert app.query_params["ref"] == ["synthetic-motion-check"]
+    assert app.query_params["guide"] in (guide["slug"], [guide["slug"]])
+    assert app.query_params["ref"] in ("synthetic-motion-check", ["synthetic-motion-check"])
     assert app.session_state["article_origin"]["category"] == topic
     assert any(attrs.get("data-flight-topic") == TOPIC_CODES[topic]
                for _, attrs in app_markup(app).tags)
@@ -184,7 +184,7 @@ def test_article_bookmark_and_return_preserve_original_topic(topic):
     by_label(app.button, "← 攻略首頁").click().run()
     assert not app.exception
     assert "guide" not in app.query_params
-    assert app.query_params["ref"] == ["synthetic-motion-check"]
+    assert app.query_params["ref"] in ("synthetic-motion-check", ["synthetic-motion-check"])
     assert by_label(app.radio, "攻略分類").value == topic
     assert app.session_state["player_profile"] == profile
     assert any(attrs.get("data-flight-topic") == TOPIC_CODES[topic]

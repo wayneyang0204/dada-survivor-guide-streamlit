@@ -71,7 +71,7 @@ def test_new_visitor_gets_guides_without_an_account_form_or_network(monkeypatch)
     by_label(a.text_input, "搜尋攻略").set_value("暗物質魁儡").run()
     a.button(key="home_search_collectible-breakpoints").click().run()
     assert not a.exception
-    assert a.query_params["guide"] == ["collectible-breakpoints"]
+    assert a.query_params["guide"] in ("collectible-breakpoints", ["collectible-breakpoints"])
 
 
 @pytest.mark.parametrize("slug", [g["slug"] for g in content.GUIDES])

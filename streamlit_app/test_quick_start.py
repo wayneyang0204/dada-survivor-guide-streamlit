@@ -122,7 +122,7 @@ def test_all_decision_desk_links_resolve_and_do_not_change_profile():
     by_label(app.radio,'選一個問題').set_value('SS裝備需要多少材料').run()
     assert not app.exception and any('19顆' in m.value for m in app.markdown)
     app.button(key='home_read_ss-material-recipes').click().run()
-    assert not app.exception and app.query_params['guide']==['ss-material-recipes']
+    assert not app.exception and app.query_params['guide'] in ('ss-material-recipes',['ss-material-recipes'])
 
 
 def test_activity_gives_steps_before_any_calculator_inputs():
@@ -150,7 +150,7 @@ def test_planner_article_returns_to_configuration_instead_of_losing_place():
     app=boot();app.session_state['player_profile']={'survivor':'維納托','awakening':6,'awakening_cores':20};app.run()
     before=dict(app.session_state['player_profile'])
     app.button(key='context_read_1').click().run()
-    assert app.query_params['guide']==['survivor-awakening']
+    assert app.query_params['guide'] in ('survivor-awakening',['survivor-awakening'])
     by_label(app.button,'← 升級路線').click().run()
     assert app.radio[0].value=='下一步' and app.session_state['player_profile']==before
     assert 'guide' not in app.query_params

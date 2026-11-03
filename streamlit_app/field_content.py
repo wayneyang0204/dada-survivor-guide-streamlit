@@ -5,8 +5,9 @@ are our own checklists, not a claim that a community tier list is universally be
 """
 from __future__ import annotations
 
-REVIEW_DATE = "2026-10-30"
+REVIEW_DATE = "2026-11-03"
 SOURCES = {
+    "dessert_pinball_official": ("HABBY｜甜點彈珠寶藏探索官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827040277", None),
     "castle_official": ("HABBY｜萬聖奇妙夜官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6821273114", None),
     "castle_data": ("第三方遊戲資料庫｜古堡卡牌本期規則", "https://garrytools.com/event/details/88914832", "2026-10-30"),
     "castle_missions": ("第三方遊戲資料庫｜古堡卡牌本期任務", "https://garrytools.com/event/missions/88914832", "2026-10-30"),
@@ -81,6 +82,20 @@ def entry(slug, category, title, summary, verdict, source_keys, sections, *,
 
 
 FIELD_GUIDES = [
+    entry("dessert-pinball", "活動玩法", "甜點彈珠寶藏探索：開放後先核對三種資源",
+        "官方活動卡顯示台灣時間11月4日00:00至11月10日00:00；任務取得甜點禮券、兌換甜點彈珠，再以彈珠台取得甜點禮盒。",
+        "官方尚未公開任務量、里程碑、商店與機率。活動開放後先領免費任務、分開記錄三種資源，再用遊戲內獎勵表決定停點；在此之前保留鑰匙與寶石。",
+        ["dessert_pinball_official"], [
+            table("官方已確認與尚待核對", ["項目","目前狀態","現在怎麼做"], [["活動時段","官方卡展示窗11/4 00:00至11/10 00:00","遊玩與兌換倒數仍看遊戲內畫面"],["甜點禮券","官方確認由任務取得；總量未公開","先領免費任務，開箱任務另記成本"],["甜點彈珠","官方確認以禮券兌換；比例未公開","看到實際換算後再估進度"],["甜點禮盒","官方確認由彈珠台取得並可兌獎；商店未公開","先看獎勵內容與價格，再定目標"]]),
+            procedure("開放後照這個順序", "先領登入、日常與活動免費資源，不先開箱。", "打開任務、累計獎勵與商店，把禮券、彈珠、禮盒分開記。", "用實際前段產出估算下一個有效獎勵缺口，最後才決定是否投入。"),
+            table("資料未公開時不要先做", ["不要做","原因"], [["先開大量寶箱","開箱任務給多少禮券尚未公開"],["先買彈珠或補寶石","換算、回收率與里程碑尚未公開"],["照搬舊彈球活動停點","本期獎勵與商店內容尚未核對"]]),
+        ], entrypoint="遊戲活動 → 甜點彈珠寶藏探索 → 任務／彈珠台／兌換商店",
+        stop="任務量、里程碑、商店價格與前段回收率未確認就停；不因預告文案先開箱或補寶石。",
+        after="活動開放後以遊戲內實際數值更新停損，再把獎勵對應到目前養成缺口。",
+        takeaways=["11月4日00:00開放，官方展示至11月10日00:00","禮券、彈珠、禮盒三種資源分開記","數值未公開前保留鑰匙與寶石"],
+        caution="官方活動卡只確認展示時段與基本資源流程，沒有公開任務總量、里程碑、商店價格、機率或免費可達門檻；本站不以未證實資料補空白。",
+        related=["event-budget","daily-resource-ledger"], keywords="甜點彈珠寶藏 甜點彈珠 甜點禮券 甜點禮盒 彈珠台 11月4 活動",
+        status="官方活動卡預告｜任務與獎勵待開放核對", faq=[("現在要先開箱嗎？","不要。先等活動開放並核對開箱任務、累計獎勵與商店，再以你的實際缺口決定。"),("官方卡的11月10日就是兌換截止嗎？","不能直接這樣認定。官方卡是展示窗，遊玩與兌換仍以遊戲內各自倒數為準。")]),
     entry("castle-cards", "活動玩法", "古堡卡牌：首翻後怎麼選、開箱先停在哪裡",
         "本期表列五百／六百票夸克刀、七百票高階軍備自選、八百票核心自選、九百五十票異獸靈藥；一千零八十五張任務票中有六百二十九張綁定開箱。",
         "先用四百五十六張不開箱任務票估自然進度，再逐檔加入鑰匙成本。社群稱八百與九百五十可免費達成，實際仍取決於鑰匙庫存、牌局產出與遊戲內獎勵，不作保證。",
@@ -790,6 +805,8 @@ next(g for g in FIELD_GUIDES if g["slug"] == "autumn-seabed").update(
     starts_at="2026-10-11T00:00:00+08:00", ends_at="2026-10-16T00:00:00+08:00")
 next(g for g in FIELD_GUIDES if g['slug']=='castle-cards').update(
     starts_at='2026-10-29T00:00:00+08:00', ends_at='2026-11-03T00:00:00+08:00', schedule_source='community')
+next(g for g in FIELD_GUIDES if g['slug']=='dessert-pinball').update(
+    starts_at='2026-11-04T00:00:00+08:00', ends_at='2026-11-10T00:00:00+08:00', schedule_source='official')
 next(g for g in FIELD_GUIDES if g["slug"] == "time-jigsaw").update(
     starts_at="2026-10-17T00:00:00+08:00", ends_at="2026-10-22T00:00:00+08:00",
     exchange_ends_at="2026-10-23T00:00:00+08:00", schedule_source="community")
