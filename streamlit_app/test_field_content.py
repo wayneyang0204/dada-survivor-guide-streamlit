@@ -82,12 +82,15 @@ def test_castle_cards_separates_no_chest_tickets_from_chest_costs():
     assert '不是官方保證' in guide['caution']
 
 
-def test_dessert_pinball_keeps_official_preview_separate_from_missing_numbers():
+def test_dessert_pinball_separates_no_chest_tickets_from_chest_costs():
     guide = content.get_guide('dessert-pinball', content.GUIDES)
     rendered = str(guide)
     assert '11月4日00:00' in rendered and '11月10日00:00' in rendered
-    assert '6827040277' in rendered and '任務量、里程碑、商店與機率' in guide['verdict']
-    assert '保留鑰匙與寶石' in rendered
+    assert '6827040277' in rendered and '2250' in rendered
+    assert '870' in rendered and '1380' in rendered and '380箱' in rendered
+    assert '1600' in rendered and '2200' in rendered and '3100' in rendered
+    assert 'garrytools.com/event/details/72537364' in rendered
+    assert '不把2250張任務券全算成零成本免費量' in guide['caution']
 
 
 def test_home_quick_search_callback_does_not_mutate_profile():
