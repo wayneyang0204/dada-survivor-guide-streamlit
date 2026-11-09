@@ -45,8 +45,20 @@ def test_current_button_overrides_a_stale_historical_selection():
     app=boot('攻略首頁')
     app.session_state['activity_selection']='old historical selection'
     app.button(key='start_event').click().run()
-    assert '甜點彈珠' in by_label(app.selectbox,'來源文章中的近期／歷史活動').value
+    value=by_label(app.selectbox,'來源文章中的近期／歷史活動').value
+    assert any(name in value for name in ('甜點彈珠','鮮花手作坊'))
     assert not app.exception
+
+
+def test_flower_workshop_is_official_upcoming_then_active_without_fabricated_target():
+    flower=next(m for m in EVENT_PLAYBOOKS if m['name']=='鮮花手作坊')
+    upcoming=current_playbook([flower],datetime.fromisoformat('2026-11-09T23:30:00+08:00'))
+    assert upcoming['state']=='upcoming' and not upcoming['can_spend']
+    active=current_playbook(EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-10T00:00:00+08:00'))
+    assert active['state']=='active' and active['guides'][0]=='flower-workshop'
+    assert flower['target']==0 and flower['official_event_id']=='6827046270'
+    assert '尚待遊戲內核對' in flower['mechanic'] and '11/10 00:00' in flower['period']
+    assert event_phase(flower,datetime.fromisoformat('2026-11-16T00:00:00+08:00'))['state']=='ended'
 
 
 def test_dessert_pinball_is_official_upcoming_then_active_with_sourced_target():

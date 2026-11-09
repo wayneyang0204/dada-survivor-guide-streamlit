@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'flower-workshop',
+    category: '關卡活動',
+    title: '鮮花手作坊：開放後先核對四種資料',
+    updated: '2026/11/09',
+    status: '現行',
+    summary: '官方活動卡顯示台灣時間 11 月 10 日 00:00 至 11 月 16 日 00:00；使用鮮花禮券打開花束盒，送花給特工取得好感度並兌換獎品。任務量、好感度門檻、商店與機率尚無可公開核對的數字。',
+    actions: ['開放前保留鑰匙與寶石，不照搬舊活動停點', '開放後先核對任務表、累計好感度獎勵、兌換商店與遊戲內倒數', '把禮券、花束盒、好感度與兌換貨幣分開記，再選能補目前養成缺口的獎勵'],
+    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827046270',
+  },
+  {
     id: 'dessert-pinball',
     category: '關卡活動',
     title: '甜點彈珠：1,600 神器核心自選與開箱停損',

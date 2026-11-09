@@ -82,6 +82,15 @@ def test_castle_cards_separates_no_chest_tickets_from_chest_costs():
     assert '不是官方保證' in guide['caution']
 
 
+def test_flower_workshop_keeps_official_preview_separate_from_missing_numbers():
+    guide = content.get_guide('flower-workshop', content.GUIDES)
+    rendered = str(guide)
+    assert '11月10日00:00' in rendered and '11月16日00:00' in rendered
+    assert '6827046270' in rendered and '任務量、好感度門檻、商店價格與機率' in guide['verdict']
+    assert '保留鑰匙與寶石' in rendered
+    assert '不以其他活動或未證實資料補空白' in guide['caution']
+
+
 def test_dessert_pinball_separates_no_chest_tickets_from_chest_costs():
     guide = content.get_guide('dessert-pinball', content.GUIDES)
     rendered = str(guide)

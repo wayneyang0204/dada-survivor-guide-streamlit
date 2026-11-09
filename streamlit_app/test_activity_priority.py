@@ -82,9 +82,10 @@ def test_beach_exchange_extension_is_labelled_as_community_schedule():
     assert '社群表列兌換至 10/29 00:00' in phase['action'] and not phase['can_spend']
 
 
-def test_archived_events_leave_current_answers_instead_of_reusing_old_targets():
+def test_new_official_event_replaces_archived_targets_in_current_answers():
     brief=current_playbook(EVENT_PLAYBOOKS,at('2026-11-11T00:00:00+08:00'))
-    assert brief['state']=='unknown' and '待核對' in brief['title']
+    assert brief['state']=='active' and '鮮花手作坊' in brief['title']
+    assert brief['guides'][0]=='flower-workshop'
     assert '850' not in str(brief) and '時光拼圖' not in brief['title']
 
 
