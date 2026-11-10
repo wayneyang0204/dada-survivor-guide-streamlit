@@ -32,7 +32,7 @@ def test_new_articles_are_actionable_and_evidence_is_not_faked(guide):
         if section.get('rows'):
             assert all(len(row) == len(section['columns']) for row in section['rows'])
     for source in guide['source_details']:
-        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://play.google.com/','https://garrytools.com/','https://www.facebook.com/'))
+        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://play.google.com/','https://garrytools.com/','https://www.facebook.com/','https://sio-tools.exp0.dev/'))
         if source['date']:
             assert date.fromisoformat(source['date']) <= date.fromisoformat(guide['checked'])
         else:
@@ -82,13 +82,15 @@ def test_castle_cards_separates_no_chest_tickets_from_chest_costs():
     assert '不是官方保證' in guide['caution']
 
 
-def test_flower_workshop_keeps_official_preview_separate_from_missing_numbers():
+def test_flower_workshop_separates_free_tasks_from_chest_costs():
     guide = content.get_guide('flower-workshop', content.GUIDES)
     rendered = str(guide)
     assert '11月10日00:00' in rendered and '11月16日00:00' in rendered
-    assert '6827046270' in rendered and '任務量、好感度門檻、商店價格與機率' in guide['verdict']
-    assert '保留鑰匙與寶石' in rendered
-    assert '不以其他活動或未證實資料補空白' in guide['caution']
+    assert '6827046270' in rendered and '2256' in rendered
+    assert '801' in rendered and '1455' in rendered
+    assert '250箱' in rendered and '360箱' in rendered and '460箱' in rendered and '540箱' in rendered
+    assert 'garrytools.com/event/details/42508884' in rendered
+    assert '花束出現率與約1%花束狂歡不是官方保底' in guide['caution']
 
 
 def test_dessert_pinball_separates_no_chest_tickets_from_chest_costs():

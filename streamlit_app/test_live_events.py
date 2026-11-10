@@ -50,14 +50,17 @@ def test_current_button_overrides_a_stale_historical_selection():
     assert not app.exception
 
 
-def test_flower_workshop_is_official_upcoming_then_active_without_fabricated_target():
+def test_flower_workshop_is_official_upcoming_then_active_with_sourced_target():
     flower=next(m for m in EVENT_PLAYBOOKS if m['name']=='鮮花手作坊')
     upcoming=current_playbook([flower],datetime.fromisoformat('2026-11-09T23:30:00+08:00'))
     assert upcoming['state']=='upcoming' and not upcoming['can_spend']
     active=current_playbook(EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-10T00:00:00+08:00'))
     assert active['state']=='active' and active['guides'][0]=='flower-workshop'
-    assert flower['target']==0 and flower['official_event_id']=='6827046270'
-    assert '尚待遊戲內核對' in flower['mechanic'] and '11/10 00:00' in flower['period']
+    assert flower['target']==1400 and flower['official_event_id']=='6827046270'
+    assert '1455' in flower['mechanic'] and '250 箱' in flower['verdict']
+    assert '11/14 23:59' in flower['period'] and '540 箱' in flower['verdict']
+    exchange=event_phase(flower,datetime.fromisoformat('2026-11-15T12:00:00+08:00'))
+    assert exchange['state']=='exchange'
     assert event_phase(flower,datetime.fromisoformat('2026-11-16T00:00:00+08:00'))['state']=='ended'
 
 
