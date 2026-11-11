@@ -88,9 +88,21 @@ def test_flower_workshop_separates_free_tasks_from_chest_costs():
     assert '11月10日00:00' in rendered and '11月16日00:00' in rendered
     assert '6827046270' in rendered and '2256' in rendered
     assert '801' in rendered and '1455' in rendered
-    assert '250箱' in rendered and '360箱' in rendered and '460箱' in rendered and '540箱' in rendered
+    assert '400張' in rendered and '1211' in rendered and '2666' in rendered
+    assert '50箱' in rendered and '140箱' in rendered and '250箱' in rendered and '360箱' in rendered and '540箱' in rendered
+    assert '705／795／1065' in rendered
     assert 'garrytools.com/event/details/42508884' in rendered
+    assert 'notalknote.xyz/survivor-io-flower-workshop' in rendered
     assert '花束出現率與約1%花束狂歡不是官方保底' in guide['caution']
+
+
+def test_supreme_collectibles_keep_official_launch_separate_from_community_thresholds():
+    guide = content.get_guide('supreme-collectibles', content.GUIDES)
+    rendered = str(guide)
+    assert '6832413409' in rendered and '官方活動卡' in rendered
+    assert '失重奇點' in rendered and '終極無限源' in rendered
+    assert '18件傳奇收藏品' in rendered and '第三方' in guide['caution']
+    assert '3650' in rendered and '39360' in rendered
 
 
 def test_dessert_pinball_separates_no_chest_tickets_from_chest_costs():

@@ -40,6 +40,8 @@ def test_collectible_aliases_and_id_do_not_fabricate_effects():
     catalog = load_collectible_catalog()
     assert content.search_collectibles(catalog, "時間軸魔術方")[0]["id"] == 232
     assert content.search_collectibles(catalog, "231")[0]["name"] == "暗物質傀儡"
+    assert content.search_collectibles(catalog, "294")[0]["name"] == "失重奇點"
+    assert content.search_collectibles(catalog, "終極無限源")[0]["quality"] == "至寶"
     assert not content.search_collectibles(catalog, "不存在123456")
 
 

@@ -48,7 +48,9 @@ def parse_card(body, event_id):
 
 
 def read_public(url):
-    with urlopen(Request(url,headers={'User-Agent':'SurvivorGuide/1.0 public-event-check'}),timeout=3) as response:
+    # Keep the calculator responsive when Apple's event-card endpoint is slow;
+    # a timeout is reported as unavailable and can be retried from the page.
+    with urlopen(Request(url,headers={'User-Agent':'SurvivorGuide/1.0 public-event-check'}),timeout=1) as response:
         return response.read(2_000_001).decode('utf-8')
 
 

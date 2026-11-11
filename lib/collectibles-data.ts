@@ -1,4 +1,4 @@
-export type CollectibleQuality = '傳奇' | '史詩' | '優秀' | '精良' | '普通';
+export type CollectibleQuality = '至寶' | '傳奇' | '史詩' | '優秀' | '精良' | '普通';
 
 export type Collectible = {
   id: number;
@@ -10,6 +10,7 @@ export type Collectible = {
 };
 
 const qualityByCode: Record<number, CollectibleQuality> = {
+  99: '至寶',
   11: '傳奇',
   7: '史詩',
   4: '優秀',
@@ -18,6 +19,7 @@ const qualityByCode: Record<number, CollectibleQuality> = {
 };
 
 function editionForId(id: number) {
+  if (id >= 294) return 0;
   if (id <= 30) return 1;
   if (id <= 47) return 2;
   if (id <= 78) return 3;
@@ -31,6 +33,8 @@ function editionForId(id: number) {
 }
 
 const rawCatalog = `
+294|99|shizhongqidian|失重奇點
+295|99|zhongjiwuxianyuan|終極無限源
 1|11|renleijiyintupu|人類基因圖譜
 2|11|yuanguzhihuizhishu|遠古智慧之書
 31|11|buxiudexingyunyingbi|不朽的幸運硬幣
@@ -336,8 +340,12 @@ export const COLLECTIBLES: Collectible[] = rawCatalog
       name,
       quality,
       edition: editionForId(id),
-      imageUrl: `https://wsrv.nl/?output=webp&url=https://garrytools.com/assets/img/survivor/UITexture/CollectionIcon/${id}_${slug}.png&hash=511`,
-      detailUrl: `https://garrytools.com/collections/info?collectionId=${id}`,
+      imageUrl: quality === '至寶'
+        ? `https://sio-cdn.exp0.dev/icons/game/collection_icon/${id}_${slug}.webp`
+        : `https://wsrv.nl/?output=webp&url=https://garrytools.com/assets/img/survivor/UITexture/CollectionIcon/${id}_${slug}.png&hash=511`,
+      detailUrl: quality === '至寶'
+        ? 'https://sio-tools.exp0.dev/en/releases'
+        : `https://garrytools.com/collections/info?collectionId=${id}`,
     };
   })
   .sort((a, b) => a.edition - b.edition || a.id - b.id);
@@ -457,4 +465,6 @@ export const COLLECTIBLE_SOURCES = {
   sets: 'https://garrytools.com/guide/collectionsets',
   chineseEffects: 'https://notalknote.xyz/survivorio-collection-hall/',
   official: 'https://apps.apple.com/us/app/survivor-io/id1528941310',
+  supremeOfficial: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6832413409',
+  supremeClientData: 'https://sio-tools.exp0.dev/en/releases',
 };

@@ -34,8 +34,9 @@ import { COLLECTIBLE_ADVICE, COLLECTIBLE_FREEZE } from '@/lib/guide-data';
 const views = ['投資順序', '完整圖鑑', '套組決策'] as const;
 type View = (typeof views)[number];
 
-const qualities = ['全部品質', '傳奇', '史詩', '優秀', '精良', '普通'] as const;
+const qualities = ['全部品質', '至寶', '傳奇', '史詩', '優秀', '精良', '普通'] as const;
 const qualityStyles: Record<CollectibleQuality, string> = {
+  至寶: 'border-fuchsia-300/30 bg-fuchsia-300/10 text-fuchsia-200',
   傳奇: 'border-red-300/25 bg-red-300/10 text-red-200',
   史詩: 'border-amber-300/25 bg-amber-300/10 text-amber-200',
   優秀: 'border-violet-300/25 bg-violet-300/10 text-violet-200',
@@ -63,8 +64,8 @@ export default function CollectiblesDatabase() {
       const matchesQuery =
         !needle || item.name.includes(needle) || String(item.id).includes(needle);
       const matchesQuality = quality === '全部品質' || item.quality === quality;
-      const matchesEdition =
-        edition === '全部期數' || item.edition === Number(edition.replace('第', '').replace('期', ''));
+      const matchesEdition = edition === '全部期數'
+        || (edition === '至寶收藏' ? item.edition === 0 : item.edition === Number(edition.replace('第', '').replace('期', '')));
       return matchesQuery && matchesQuality && matchesEdition;
     });
   }, [edition, quality, query]);
@@ -172,7 +173,7 @@ export default function CollectiblesDatabase() {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="rounded-full bg-primary px-2 py-1 text-[10px] font-black text-primary-foreground">{guide.priority}</span>
                           <span className={`rounded-full border px-2 py-1 text-[10px] font-black ${qualityStyles[item.quality]}`}>{item.quality}</span>
-                          <span className="text-[11px] font-bold text-muted-foreground">第{item.edition}期</span>
+                          <span className="text-[11px] font-bold text-muted-foreground">{item.edition === 0 ? '至寶收藏' : `第${item.edition}期`}</span>
                         </div>
                         <h4 className="mt-2 text-lg font-black">{item.name}</h4>
                         <p className="mt-0.5 text-xs font-bold text-primary">強化：{guide.target}</p>
@@ -225,6 +226,7 @@ export default function CollectiblesDatabase() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="全部期數">全部期數</SelectItem>
+                    <SelectItem value="至寶收藏">至寶收藏</SelectItem>
                     {Array.from({ length: 10 }, (_, index) => `第${index + 1}期`).map((item) => (
                       <SelectItem key={item} value={item}>{item}</SelectItem>
                     ))}
@@ -251,7 +253,7 @@ export default function CollectiblesDatabase() {
                     <div className="relative grid aspect-square place-items-center bg-black/15 p-5">
                       <img src={item.imageUrl} alt={item.name} className="size-full object-contain transition duration-300 group-hover:scale-105" loading="lazy" />
                       <span className={`absolute left-2.5 top-2.5 rounded-full border px-2 py-1 text-[10px] font-black ${qualityStyles[item.quality]}`}>{item.quality}</span>
-                      <span className="absolute right-2.5 top-2.5 rounded-full bg-black/45 px-2 py-1 text-[10px] font-black text-white/70">第{item.edition}期</span>
+                      <span className="absolute right-2.5 top-2.5 rounded-full bg-black/45 px-2 py-1 text-[10px] font-black text-white/70">{item.edition === 0 ? '至寶收藏' : `第${item.edition}期`}</span>
                     </div>
                     <div className="p-3.5">
                       <p className="text-[10px] font-bold text-muted-foreground">收藏編號 {item.id}</p>
@@ -333,13 +335,15 @@ export default function CollectiblesDatabase() {
           <div>
             <p className="text-xs font-black text-foreground">資料查核說明</p>
             <p className="mt-1 max-w-2xl text-[11px] font-semibold leading-5 text-muted-foreground">
-              290 件與 116 套以目前完整資料庫為基準；中文名稱與高階星級效果交叉比對中文版效果表。版本出現衝突時，以遊戲內數值與官方更新為最高優先。
+              {COLLECTIBLES.length} 件與 116 套以目前完整資料庫為基準；中文名稱與高階星級效果交叉比對中文版效果表。版本出現衝突時，以遊戲內數值與官方更新為最高優先。
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href={COLLECTIBLE_SOURCES.database} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-black text-muted-foreground hover:border-primary/30 hover:text-primary">完整收藏資料庫 <ExternalLink className="size-3" /></a>
             <a href={COLLECTIBLE_SOURCES.chineseEffects} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-black text-muted-foreground hover:border-primary/30 hover:text-primary">中文效果表 <ExternalLink className="size-3" /></a>
             <a href={COLLECTIBLE_SOURCES.official} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-black text-muted-foreground hover:border-primary/30 hover:text-primary">官方版本紀錄 <ExternalLink className="size-3" /></a>
+            <a href={COLLECTIBLE_SOURCES.supremeOfficial} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-black text-muted-foreground hover:border-primary/30 hover:text-primary">至寶官方公告 <ExternalLink className="size-3" /></a>
+            <a href={COLLECTIBLE_SOURCES.supremeClientData} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-black text-muted-foreground hover:border-primary/30 hover:text-primary">至寶客戶端資料 <ExternalLink className="size-3" /></a>
           </div>
         </div>
       </div>

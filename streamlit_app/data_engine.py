@@ -138,7 +138,7 @@ def load_collectible_catalog() -> list[dict[str, Any]]:
     match = re.search(r"const rawCatalog = `\s*(.*?)\s*`;", text, flags=re.S)
     if not match:
         return []
-    quality_names = {11: "傳奇", 7: "史詩", 4: "優秀", 3: "精良", 2: "普通"}
+    quality_names = {99: "至寶", 11: "傳奇", 7: "史詩", 4: "優秀", 3: "精良", 2: "普通"}
     catalog = []
     for row in match.group(1).splitlines():
         parts = row.strip().split("|")
@@ -151,9 +151,10 @@ def load_collectible_catalog() -> list[dict[str, Any]]:
                 "id": item_id,
                 "name": name,
                 "quality": quality_names.get(int(raw_quality), "未知"),
-                "edition": _edition_for_id(item_id),
-                "image": f"https://wsrv.nl/?output=webp&url=https://garrytools.com/assets/img/survivor/UITexture/CollectionIcon/{item_id}_{slug}.png&hash=511",
-                "link": f"https://garrytools.com/collections/info?collectionId={item_id}",
+                "edition": 0 if int(raw_quality) == 99 else _edition_for_id(item_id),
+                "edition_label": "至寶收藏" if int(raw_quality) == 99 else f"第{_edition_for_id(item_id)}期",
+                "image": (f"https://sio-cdn.exp0.dev/icons/game/collection_icon/{item_id}_{slug}.webp" if int(raw_quality) == 99 else f"https://wsrv.nl/?output=webp&url=https://garrytools.com/assets/img/survivor/UITexture/CollectionIcon/{item_id}_{slug}.png&hash=511"),
+                "link": ("https://sio-tools.exp0.dev/en/releases" if int(raw_quality) == 99 else f"https://garrytools.com/collections/info?collectionId={item_id}"),
             }
         )
     return sorted(catalog, key=lambda item: (item["edition"], item["id"]))
@@ -163,15 +164,15 @@ EVENT_PLAYBOOKS = [
     {
         "name":"鮮花手作坊", "keywords":("鮮花手作坊","鮮花禮券","花束盒","寶藏花束"), "guide_slug":"flower-workshop", "official_event_id":"6827046270",
         "starts_at":"2026-11-10T00:00:00+08:00", "ends_at":"2026-11-15T00:00:00+08:00", "exchange_ends_at":"2026-11-16T00:00:00+08:00", "schedule_source":"community", "exchange_schedule_source":"official",
-        "target":1400, "unit":"累計使用鮮花禮券",
-        "mechanic":"第三方本期任務表列總計 2256 張鮮花禮券，其中 1455 張綁定開到 600 箱；登入、主線、快速巡邏與特別行動合計 801 張，另有 10 張預設券。",
-        "verdict":"先完成非開箱任務。只算 801 張與 10 張預設券，鏡盾 1400 需開 250 箱，第二個鏡盾 1600 需開 360 箱；S 級自選 1800 需 460 箱，配件諧振自選 2000 需 540 箱。",
+        "target":2000, "unit":"累計使用鮮花禮券",
+        "mechanic":"第三方本期任務表列 2256 張鮮花禮券，其中 1455 張綁定開到 600 箱；另可用 40000 好感度換回 400 張商店禮券。非開箱 801 張加預設 10 張與商店 400 張後，基準量為 1211 張。",
+        "verdict":"先完成非開箱任務並取得足夠好感度換滿 400 張商店禮券。鏡盾 1400／1600 需開 50／140 箱；軍備自選 1800 需 250 箱，高階收藏／諧振自選 2000 需 360 箱，解構機 2400 需 540 箱。",
         "period":"第三方本期表列遊玩至 11/14 23:59；官方活動卡展示至 11/16 00:00，與第三方列出的額外一天兌換期相符。先在遊玩截止前用完禮券，兌換仍以遊戲內倒數為準。",
-        "free_hint":"非開箱任務 801 張，加 10 張預設券共 811 張；不含登入禮包、排行或額外贈送。開滿 600 箱後合計 2266，距 2400 解構機仍差 134 張。",
-        "highlights":[("1,400／1,600", "兩個鏡盾收藏品；完成其他任務後分別開 250／360 箱。"),("1,800／2,000", "S 級卓越裝備自選與配件諧振自選；分別開 460／540 箱。"),("2,400", "傳奇收藏品解構機；全任務仍差 134 張，表列購票成本 5,360 寶石。")],
-        "steps":["先做登入、主線、快速巡邏與特別行動，拿完 801 張非開箱任務券", "用第一列花束決定連線；同花束連續至少三列才有好感度，限定花籃可作後續萬用牌", "依帳號缺口停在 250、360、460 或 540 箱，不需要對應獎勵就提早停"],
-        "avoid":"不把 2256 張全算成免費量；不把第三方列出的花束機率與約 1% 花束狂歡估算當官方保底；不為 2400 解構機默認補 5,360 寶石。",
-        "tags":["11月10日本期資料","1400鏡盾","開箱停損","第三方機率非保底"],
+        "free_hint":"非開箱任務 801 張、預設 10 張與商店 400 張合計 1211 張；商店禮券需先花 40000 好感度。全任務再加商店禮券為 2666 張，但含開滿 600 箱的成本。",
+        "highlights":[("1,400／1,600", "兩個鏡盾收藏品；換滿商店禮券後分別開 50／140 箱。"),("1,800／2,000", "軍備自選與高階收藏／諧振自選；分別開 250／360 箱。"),("2,400", "傳奇收藏品解構機；換滿商店禮券後開 540 箱可達 2456。")],
+        "steps":["先做登入、主線、快速巡邏與特別行動，拿完 801 張非開箱任務券", "用前段禮券取得好感度；累積到 40000 後，換滿商店 40 組、每組 10 張的禮券", "依帳號缺口停在 50、140、250、360 或 540 箱；不需要對應獎勵就提早停"],
+        "avoid":"不把 2666 張寫成零成本免費量；它包含開滿 600 箱與 40000 好感度。不把社群平均好感度或倍率工具當官方保底，也不照抄社群文章高出 30 張的中間加總。",
+        "tags":["11月11日本期資料","商店400張禮券","2000高階自選","開箱停損"],
     },
     {
         "name":"甜點彈珠寶藏", "keywords":("甜點彈珠寶藏","甜點彈珠","甜點禮券","甜點禮盒"), "guide_slug":"dessert-pinball", "official_event_id":"6827040277",

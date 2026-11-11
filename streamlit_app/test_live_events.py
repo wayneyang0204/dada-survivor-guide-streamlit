@@ -56,9 +56,9 @@ def test_flower_workshop_is_official_upcoming_then_active_with_sourced_target():
     assert upcoming['state']=='upcoming' and not upcoming['can_spend']
     active=current_playbook(EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-10T00:00:00+08:00'))
     assert active['state']=='active' and active['guides'][0]=='flower-workshop'
-    assert flower['target']==1400 and flower['official_event_id']=='6827046270'
-    assert '1455' in flower['mechanic'] and '250 箱' in flower['verdict']
-    assert '11/14 23:59' in flower['period'] and '540 箱' in flower['verdict']
+    assert flower['target']==2000 and flower['official_event_id']=='6827046270'
+    assert '1455' in flower['mechanic'] and '400 張商店禮券' in flower['verdict']
+    assert '11/14 23:59' in flower['period'] and '360 箱' in flower['verdict'] and '540 箱' in flower['verdict']
     exchange=event_phase(flower,datetime.fromisoformat('2026-11-15T12:00:00+08:00'))
     assert exchange['state']=='exchange'
     assert event_phase(flower,datetime.fromisoformat('2026-11-16T00:00:00+08:00'))['state']=='ended'
