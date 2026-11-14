@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'version-5-4-0',
+    category: '最新系統',
+    title: '5.4.0：毀滅戰甲、異寵化形與冰霜戰靴異星神煉',
+    updated: '2026/11/14',
+    status: '現行',
+    summary: '官方安卓商店已上架 5.4.0，新增 356–360 章、傳奇載具「毀滅戰甲」、區域行動新副本與月礦巔峰王者分組，並預告異寵化形、冰霜戰靴異星神煉及新活動。蘋果商店查核仍為 5.3.1。',
+    actions: ['安卓商店出現更新按鈕再升級；蘋果玩家先等商店推送，不把安卓版本號當成已安裝', '毀滅戰甲先查看遊戲內入口、取得方式與完整升星預覽，再決定是否投入載具資源', '異寵化形與冰霜戰靴異星神煉仍是即將開啟；精確效果與成本公開前先保留核心、自選箱及重置資源'],
+    sourceUrl: 'https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=zh_TW&gl=TW',
+  },
+  {
     id: 'flower-workshop',
     category: '關卡活動',
     title: '鮮花手作坊：商店 400 張禮券與新停點',

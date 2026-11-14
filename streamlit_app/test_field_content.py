@@ -48,6 +48,7 @@ def test_new_content_is_traditional_chinese_except_search_aliases():
 
 
 @pytest.mark.parametrize('query,slug', [
+    ('毀滅戰甲怎麼準備','version-5-4-0'),
     ('矩陣小隊怎麼準備','matrix-squad-preview'),
     ('伊狑值得換嗎','elaine-build'), ('伊羚','elaine-build'),
     ('協同帶誰','synergy-vs-link'), ('哪吒和洛基','divine-fire-team'),
@@ -72,6 +73,26 @@ def test_matrix_squad_separates_store_release_from_feature_activation():
     assert '10月29日官方矩陣小隊活動卡已標示現已登場' in guide['summary']
     assert '成本仍須遊戲內核對' in guide['caution']
     assert any('eventid=6827054794' in url for _,url in guide['sources'])
+
+
+def test_version_540_separates_live_features_from_coming_soon_and_platform_rollout():
+    guide = content.get_guide('version-5-4-0', content.GUIDES)
+    rendered = str(guide)
+    for term in ('356～360', '毀滅戰甲', '異寵化形', '冰霜戰靴', '區域行動', '月礦遠征'):
+        assert term in rendered
+    assert '安卓5.4.0已上線' in rendered
+    assert '蘋果仍為5.3.1' in rendered
+    assert '即將上線' in rendered and '即將開啟' in rendered
+    assert any('play.google.com/store/apps/details' in url for _, url in guide['sources'])
+    assert '精確效果、解鎖條件、材料消耗' in guide['caution']
+
+
+def test_boots_guide_does_not_reuse_old_routes_as_alien_forge_data():
+    guide = content.get_guide('ss-boots-check', content.GUIDES)
+    rendered = str(guide)
+    assert '5.4.0' in rendered and '異星神煉即將開啟' in rendered
+    assert '舊E／V效果' in rendered
+    assert '沒有精確效果、解鎖條件或成本' in guide['caution']
 
 
 def test_castle_cards_separates_no_chest_tickets_from_chest_costs():
