@@ -48,6 +48,7 @@ def test_new_content_is_traditional_chinese_except_search_aliases():
 
 
 @pytest.mark.parametrize('query,slug', [
+    ('魔法階梯要先做什麼','magic-stairs-preview'),
     ('毀滅戰甲怎麼準備','version-5-4-0'),
     ('矩陣小隊怎麼準備','matrix-squad-preview'),
     ('伊狑值得換嗎','elaine-build'), ('伊羚','elaine-build'),
@@ -80,11 +81,19 @@ def test_version_540_separates_live_features_from_coming_soon_and_platform_rollo
     rendered = str(guide)
     for term in ('356～360', '毀滅戰甲', '異寵化形', '冰霜戰靴', '區域行動', '月礦遠征'):
         assert term in rendered
-    assert '安卓5.4.0已上線' in rendered
-    assert '蘋果仍為5.3.1' in rendered
+    assert '安卓與台灣蘋果商店皆已上架5.4.0' in rendered
     assert '即將上線' in rendered and '即將開啟' in rendered
     assert any('play.google.com/store/apps/details' in url for _, url in guide['sources'])
-    assert '精確效果、解鎖條件、材料消耗' in guide['caution']
+    assert all(term in guide['caution'] for term in ('精確效果', '解鎖條件', '材料消耗'))
+
+
+def test_magic_stairs_only_uses_officially_visible_schedule_and_actions():
+    guide = content.get_guide('magic-stairs-preview', content.GUIDES)
+    rendered = str(guide)
+    assert '11月16日00:00' in rendered and '11月22日00:00' in rendered
+    assert '每日登入' in rendered and '魔法硬幣' in rendered and '尋找寶藏' in rendered
+    assert '任務總量、里程碑、兌換商店、硬幣價格或獎勵數量' in guide['caution']
+    assert any('eventid=6827050925' in url for _, url in guide['sources'])
 
 
 def test_boots_guide_does_not_reuse_old_routes_as_alien_forge_data():
