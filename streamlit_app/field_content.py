@@ -5,10 +5,11 @@ are our own checklists, not a claim that a community tier list is universally be
 """
 from __future__ import annotations
 
-REVIEW_DATE = "2026-11-15"
+REVIEW_DATE = "2026-11-21"
 SOURCES = {
     "official_android_540": ("官方安卓商店｜5.4.0版本（11月12日更新）", "https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=zh_TW&gl=TW", "2026-11-12"),
     "official_ios_540": ("官方台灣蘋果商店｜5.4.0版本（11月13日更新）", "https://apps.apple.com/tw/app/survivor-io/id1528941310", "2026-11-13"),
+    "golden_autumn_store_official": ("HABBY｜金秋限時店官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6835347656", None),
     "magic_stairs_official": ("HABBY｜魔法階梯官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827050925", None),
     "flower_workshop_official": ("HABBY｜鮮花手作坊官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827046270", None),
     "flower_workshop_data": ("第三方遊戲資料庫｜鮮花手作坊里程碑與玩法", "https://garrytools.com/event/details/42508884", "2026-11-10"),
@@ -94,6 +95,33 @@ def entry(slug, category, title, summary, verdict, source_keys, sections, *,
 
 
 FIELD_GUIDES = [
+    entry("golden-autumn-store-preview", "活動玩法", "金秋限時店：11月22日起先做免費任務",
+        "官方活動卡顯示台灣時間11月22日00:00至11月27日00:00。完成任務可取得金色樹葉、抽取格子鋪中的道具，再用秋季元素兌換獎勵；目前沒有可核對的任務總量、抽取機率、里程碑或商店表。",
+        "活動開放後先完成不需開箱或寶石的免費任務，再逐項核對格子鋪規則與秋季元素兌換表。完整數值未公開前，不提前開箱、買樹葉或花寶石。",
+        ["golden_autumn_store_official"], [
+            table("官方已確認", ["項目", "內容"], [
+                ["展示窗", "台灣時間11月22日00:00至11月27日00:00"],
+                ["活動資源", "完成任務可取得金色樹葉"],
+                ["基本玩法", "使用樹葉抽取格子鋪中的道具"],
+                ["兌換", "收集秋季元素道具兌換獎勵"]]),
+            table("還不能先算的數字", ["資料", "目前狀態", "操作"], [
+                ["免費樹葉總量", "未公開", "開放後分開記錄免費任務與付費來源"],
+                ["抽取機率與保底", "未公開", "不保證每片樹葉的平均回收"],
+                ["里程碑與兌換表", "未公開", "不預填必追獎勵或固定停點"],
+                ["遊玩與兌換截止", "只確認官方展示窗", "以遊戲內兩種倒數為準"]]),
+            procedure("活動開啟後第一次檢查", "先領登入與免費任務，記下遊戲內遊玩及兌換倒數。",
+                "打開金色樹葉任務、格子鋪與秋季元素兌換表，分開記錄免費與需開箱的來源。",
+                "只有獎勵、機率與成本能逐項核對後才計算停點；資料不足就只做免費操作。"),
+        ], entrypoint="遊戲活動 → 金秋限時店 → 任務／格子鋪／秋季元素兌換",
+        stop="目前停在免費任務與資料核對；任務、抽取規則、里程碑與商店表未公開前，不投入鑰匙或寶石。",
+        after="活動開放並看得到完整表後，再按帳號缺口比較第一個高價值獎勵，不套用其他格子或尋寶活動的回收率。",
+        takeaways=["官方展示窗為11月22日00:00至11月27日00:00", "任務取得金色樹葉，抽格子鋪並收集秋季元素兌獎", "完整數值未公開，先做免費任務、不提前開箱或花寶石"],
+        caution="官方活動卡只確認展示窗、任務取得金色樹葉、格子鋪抽取與秋季元素兌換，沒有公布免費總量、抽取機率、保底、里程碑、兌換價格或獎勵數量。展示窗也不直接等於遊戲與兌換的完整截止時間。",
+        related=["event-budget", "daily-resource-ledger", "magic-stairs-preview", "version-5-4-0"], keywords="金秋限時店 金色樹葉 格子鋪 秋季元素 11月22日 11月27日 秋季商店",
+        status="官方活動預告｜完整數值待遊戲內核對",
+        faq=[("現在要先開箱嗎？", "不用。官方尚未公布開箱任務、里程碑或獎勵表，先保留鑰匙。"),
+             ("展示窗就是兌換截止嗎？", "不一定。官方卡展示窗只作活動曝光，遊玩與兌換倒數仍以遊戲內為準。")]),
+
     entry("magic-stairs-preview", "活動玩法", "魔法階梯：11月16日起先拿每日登入硬幣",
         "官方活動卡顯示台灣時間11月16日00:00至11月22日00:00，並確認活動期間每日登入可累積魔法硬幣、尋找寶藏。目前沒有可核對的任務總量、里程碑、商店或付費成本。",
         "11月16日起每日登入，先領官方已確認的魔法硬幣。看到遊戲內任務、里程碑與兌換表後再計算自然進度；完整數值未公開前，不提前開箱、買硬幣或花寶石。",

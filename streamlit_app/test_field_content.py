@@ -48,6 +48,7 @@ def test_new_content_is_traditional_chinese_except_search_aliases():
 
 
 @pytest.mark.parametrize('query,slug', [
+    ('金秋限時店要先做什麼','golden-autumn-store-preview'),
     ('魔法階梯要先做什麼','magic-stairs-preview'),
     ('毀滅戰甲怎麼準備','version-5-4-0'),
     ('矩陣小隊怎麼準備','matrix-squad-preview'),
@@ -94,6 +95,15 @@ def test_magic_stairs_only_uses_officially_visible_schedule_and_actions():
     assert '每日登入' in rendered and '魔法硬幣' in rendered and '尋找寶藏' in rendered
     assert '任務總量、里程碑、兌換商店、硬幣價格或獎勵數量' in guide['caution']
     assert any('eventid=6827050925' in url for _, url in guide['sources'])
+
+
+def test_golden_autumn_store_only_uses_officially_visible_schedule_and_actions():
+    guide = content.get_guide('golden-autumn-store-preview', content.GUIDES)
+    rendered = str(guide)
+    assert '11月22日00:00' in rendered and '11月27日00:00' in rendered
+    assert '金色樹葉' in rendered and '格子鋪' in rendered and '秋季元素' in rendered
+    assert '免費總量、抽取機率、保底、里程碑、兌換價格或獎勵數量' in guide['caution']
+    assert any('eventid=6835347656' in url for _, url in guide['sources'])
 
 
 def test_boots_guide_does_not_reuse_old_routes_as_alien_forge_data():

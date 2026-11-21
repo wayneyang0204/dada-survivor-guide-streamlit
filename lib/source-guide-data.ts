@@ -26,6 +26,16 @@ export const SOURCE_API_URL =
 
 export const SOURCE_GUIDES: SourceGuide[] = [
   {
+    id: 'golden-autumn-store-preview',
+    category: '關卡活動',
+    title: '金秋限時店：先做免費任務，完整表公開再算停點',
+    updated: '2026/11/21',
+    status: '現行',
+    summary: '官方活動卡顯示台灣時間 11 月 22 日 00:00 至 11 月 27 日 00:00，並確認完成任務可取得金色樹葉、抽取格子鋪道具，再用秋季元素兌換獎勵。目前沒有可核對的任務總量、抽取機率、商店表或付費成本。',
+    actions: ['活動開放後先完成不需開箱與寶石的免費任務', '逐項核對金色樹葉任務、格子鋪抽取規則與秋季元素兌換表', '完整數值未公開前，不為未知獎勵提前開箱、購買樹葉或使用寶石'],
+    sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6835347656',
+  },
+  {
     id: 'magic-stairs-preview',
     category: '關卡活動',
     title: '魔法階梯：先拿每日登入硬幣，完整表公開再算停點',

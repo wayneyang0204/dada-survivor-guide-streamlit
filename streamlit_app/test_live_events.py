@@ -46,7 +46,7 @@ def test_current_button_overrides_a_stale_historical_selection():
     app.session_state['activity_selection']='old historical selection'
     app.button(key='start_event').click().run()
     value=by_label(app.selectbox,'來源文章中的近期／歷史活動').value
-    assert any(name in value for name in ('甜點彈珠','鮮花手作坊'))
+    assert any(name in value for name in ('魔法階梯','金秋限時店'))
     assert not app.exception
 
 
@@ -72,6 +72,20 @@ def test_dessert_pinball_is_official_upcoming_then_active_with_sourced_target():
     assert active['state']=='active' and active['can_spend']
     assert dessert['target']==1600 and dessert['official_event_id']=='6827040277'
     assert '1380' in dessert['mechanic'] and '380 箱' in dessert['verdict']
+
+
+def test_magic_stairs_hands_off_to_golden_autumn_store_on_official_boundaries():
+    magic=next(m for m in EVENT_PLAYBOOKS if m['name']=='魔法階梯')
+    golden=next(m for m in EVENT_PLAYBOOKS if m['name']=='金秋限時店')
+    current=current_playbook(EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-21T12:00:00+08:00'))
+    assert current['state']=='active' and current['guides'][0]=='magic-stairs-preview'
+    upcoming=event_phase(golden,datetime.fromisoformat('2026-11-21T12:00:00+08:00'))
+    assert upcoming['state']=='upcoming' and not upcoming['can_spend']
+    active=current_playbook(EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-22T00:00:00+08:00'))
+    assert active['state']=='active' and active['guides'][0]=='golden-autumn-store-preview'
+    assert magic['official_event_id']=='6827050925' and golden['official_event_id']=='6835347656'
+    result={'state':'ok','cards':[dict(id='6835347656',title='金秋限時店開啟！',starts_at=golden['starts_at'],ends_at=golden['ends_at'],url=BASE+'?eventid=6835347656')]}
+    assert not unlisted_cards(result,EVENT_PLAYBOOKS,datetime.fromisoformat('2026-11-22T12:00:00+08:00'))
 
 
 def test_actual_official_snapshot_can_be_parsed_when_available():
