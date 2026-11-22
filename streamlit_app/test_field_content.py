@@ -50,7 +50,7 @@ def test_new_content_is_traditional_chinese_except_search_aliases():
 @pytest.mark.parametrize('query,slug', [
     ('金秋限時店要先做什麼','golden-autumn-store-preview'),
     ('魔法階梯要先做什麼','magic-stairs-preview'),
-    ('毀滅戰甲怎麼準備','version-5-4-0'),
+    ('毀滅戰甲怎麼準備','ruinous-warskitter-checklist'),
     ('矩陣小隊怎麼準備','matrix-squad-preview'),
     ('伊狑值得換嗎','elaine-build'), ('伊羚','elaine-build'),
     ('協同帶誰','synergy-vs-link'), ('哪吒和洛基','divine-fire-team'),
@@ -86,6 +86,16 @@ def test_version_540_separates_live_features_from_coming_soon_and_platform_rollo
     assert '即將上線' in rendered and '即將開啟' in rendered
     assert any('play.google.com/store/apps/details' in url for _, url in guide['sources'])
     assert all(term in guide['caution'] for term in ('精確效果', '解鎖條件', '材料消耗'))
+
+
+def test_ruinous_warskitter_community_numbers_are_never_presented_as_official():
+    guide = content.get_guide('ruinous-warskitter-checklist', content.GUIDES)
+    rendered = str(guide)
+    for term in ('80個傳奇載具碎片', '24個零件', '30%易傷', '第三方客戶端／社群資料'):
+        assert term in rendered
+    assert '官方商店沒有公布80碎片' in guide['caution']
+    assert '社群推估，不是官方日期' in rendered
+    assert any('notalknote.xyz/survivor-io-5-4-0-ruinous-warskitter' in url for _, url in guide['sources'])
 
 
 def test_magic_stairs_only_uses_officially_visible_schedule_and_actions():

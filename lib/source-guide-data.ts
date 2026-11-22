@@ -46,6 +46,16 @@ export const SOURCE_GUIDES: SourceGuide[] = [
     sourceUrl: 'https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6827050925',
   },
   {
+    id: 'ruinous-warskitter-checklist',
+    category: '載具養成',
+    title: '毀滅戰甲怎麼準備：社群數值只作遊戲內核對清單',
+    updated: '2026/11/22',
+    status: '需版本核對',
+    summary: '官方 5.4.0 說明只確認毀滅戰甲上線。別說筆記 11 月 21 日文章彙整客戶端與社群資料，列出 80 碎片解鎖、24 個零件、30% 易傷及八列詞條；精確數值仍須用遊戲內入口與完整預覽覆核。',
+    actions: ['先打開毀滅戰甲入口，核對解鎖碎片、零件格與基礎技能', '逐星查看升星效果與每列詞條，不用文章數字直接推算總傷害', '任何數值或開放狀態不一致就停止投入，異寵化形日期與成本也先保留'],
+    sourceUrl: 'https://notalknote.xyz/survivor-io-5-4-0-ruinous-warskitter-xenoforms-guide/',
+  },
+  {
     id: 'version-5-4-0',
     category: '最新系統',
     title: '5.4.0：毀滅戰甲、異寵化形與冰霜戰靴異星神煉',
