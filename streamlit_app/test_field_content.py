@@ -107,13 +107,16 @@ def test_magic_stairs_only_uses_officially_visible_schedule_and_actions():
     assert any('eventid=6827050925' in url for _, url in guide['sources'])
 
 
-def test_golden_autumn_store_only_uses_officially_visible_schedule_and_actions():
+def test_golden_autumn_store_recomputes_chest_breakpoints_from_mission_rows():
     guide = content.get_guide('golden-autumn-store-preview', content.GUIDES)
     rendered = str(guide)
     assert '11月22日00:00' in rendered and '11月27日00:00' in rendered
-    assert '金色樹葉' in rendered and '格子鋪' in rendered and '秋季元素' in rendered
-    assert '免費總量、抽取機率、保底、里程碑、兌換價格或獎勵數量' in guide['caution']
+    for term in ('123', '197', '320', '360箱', '600箱', '28,800'):
+        assert term in rendered
+    assert '220檔不用開滿300箱與逐列任務表不符' in guide['caution']
     assert any('eventid=6835347656' in url for _, url in guide['sources'])
+    assert any('garrytools.com/event/missions/14563787' in url for _, url in guide['sources'])
+    assert any('notalknote.xyz/survivor-io-goldfall-grid' in url for _, url in guide['sources'])
 
 
 def test_boots_guide_does_not_reuse_old_routes_as_alien_forge_data():
