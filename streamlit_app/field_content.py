@@ -5,10 +5,11 @@ are our own checklists, not a claim that a community tier list is universally be
 """
 from __future__ import annotations
 
-REVIEW_DATE = "2026-11-23"
+REVIEW_DATE = "2026-11-25"
 SOURCES = {
-    "official_android_540": ("官方安卓商店｜5.4.0版本（11月12日更新）", "https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=zh_TW&gl=TW", "2026-11-12"),
+    "official_android_540": ("官方安卓商店｜5.4.0版本（頁面日期11月24日）", "https://play.google.com/store/apps/details?id=com.dxx.firenow&hl=zh_TW&gl=TW", "2026-11-24"),
     "official_ios_540": ("官方台灣蘋果商店｜5.4.0版本（11月13日更新）", "https://apps.apple.com/tw/app/survivor-io/id1528941310", "2026-11-13"),
+    "ruinous_warskitter_official": ("官方台灣蘋果商店｜毀滅戰甲登場活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6833864700", None),
     "ruinous_warskitter_community": ("別說筆記｜毀滅戰甲與異寵化形整理（第三方客戶端／社群資料）", "https://notalknote.xyz/survivor-io-5-4-0-ruinous-warskitter-xenoforms-guide/", "2026-11-21"),
     "golden_autumn_store_official": ("HABBY｜金秋限時店官方活動卡", "https://apps.apple.com/tw/app/survivor-io/id1528941310?eventid=6835347656", None),
     "golden_autumn_store_community": ("別說筆記｜金秋格子鋪本期攻略", "https://notalknote.xyz/survivor-io-goldfall-grid-event-guide-2026/", "2026-11-22"),
@@ -168,11 +169,11 @@ FIELD_GUIDES = [
              ("展示窗就是兌換截止嗎？", "不一定。官方卡展示窗只作活動曝光，遊玩與兌換倒數仍以遊戲內為準。")]),
 
     entry("ruinous-warskitter-checklist", "載具與模組", "毀滅戰甲怎麼準備：80碎片、24零件與易傷數值核對",
-        "官方5.4.0說明只確認傳奇載具毀滅戰甲上線。別說筆記11月21日文章彙整客戶端與社群資料，列出80碎片解鎖、24個零件、30%易傷與八列詞條；這些精確數值不是官方商店說明。",
+        "5.4.0毀滅戰甲官方活動卡確認載具已登場，武器會自動鎖定目標。別說筆記11月21日彙整的80碎片、24個零件、30%易傷與八列詞條屬第三方資料，請核對遊戲內預覽。",
         "先打開遊戲內毀滅戰甲入口，逐項核對解鎖碎片、零件格、基礎技能、升星效果與八列詞條。全部一致後才投入第一個可完成門檻；任一數值不符就停止。",
-        ["official_android_540", "official_ios_540", "ruinous_warskitter_community"], [
+        ["ruinous_warskitter_official", "official_android_540", "official_ios_540", "ruinous_warskitter_community"], [
             table("來源層級先分清", ["資料", "可確認狀態", "現在怎麼用"], [
-                ["官方商店5.4.0說明", "確認毀滅戰甲上線", "用來確認版本與功能狀態"],
+                ["官方活動卡", "已登場，武器會自動鎖定目標", "台灣時間11月22日00:00至12月23日00:00為卡片展示期間，取得期限請看遊戲內說明"],
                 ["別說筆記11月21日文章", "彙整客戶端與社群資料", "只作遊戲內逐項核對清單"],
                 ["遊戲內載具入口", "帳號實際顯示", "解鎖、升星與零件投入的最終依據"]]),
             table("文章列出的載具檢查值", ["項目", "第三方文章數值", "投入前核對"], [
@@ -191,11 +192,11 @@ FIELD_GUIDES = [
                 "只投入能完整達成的第一個門檻；任何數值、對象或開放狀態不一致就停止。"),
         ], entrypoint="載具 → 毀滅戰甲 → 解鎖／升星／零件網格／技能預覽",
         stop="遊戲內沒有完整顯示解鎖成本、下一星效果與零件網格，或與第三方文章任一數字不符，就停止開自選箱與合成零件。",
-        after="全部核對一致後，再把0星解鎖與第一個升星門檻分開比較；異寵化形仍等官方日期和正式入口。",
-        takeaways=["官方只確認毀滅戰甲在5.4.0上線", "80碎片、24零件與30%易傷屬第三方客戶端／社群資料", "先用遊戲內完整預覽逐項核對，一項不符就停止投入"],
+        after="已持有時，維持相同特工、裝備與異寵，對同一頭目比較現用載具與毀滅戰甲的命中、易傷覆蓋和傷害，再決定是否升星。",
+        takeaways=["官方確認載具已登場且武器可自動鎖定", "80碎片、24零件與30%易傷屬第三方客戶端／社群資料", "投入前先核對解鎖和升星預覽，已持有就先對同一頭目比較"],
         caution="官方商店沒有公布80碎片、24個零件、30%易傷、八列詞條、異寵化形成本或12月4日日期。上述精確數值來自別說筆記彙整的客戶端與社群資料，正式實裝可能調整；本站不把它們寫成官方保證。",
         related=["version-5-4-0", "mount-layout", "mount-modules", "xeno-unlock"], keywords="毀滅戰甲 80碎片 24零件 殲滅模式 易傷 八列詞條 8行12列 異寵化形 240碎片 10核心",
-        status="第三方客戶端／社群資料｜實裝畫面待核對",
+        status="5.4.0已登場｜社群數值待遊戲內核對",
         faq=[("現在可以直接開80個自選碎片嗎？", "先看自選箱是否已列出毀滅戰甲，並核對遊戲內解鎖成本；文章數字不能代替帳號畫面。"),
              ("異寵化形12月4日一定開嗎？", "不一定。這是社群推估，不是官方日期；等官方活動卡或遊戲內倒數。")]),
 

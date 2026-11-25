@@ -94,6 +94,9 @@ def test_ruinous_warskitter_community_numbers_are_never_presented_as_official():
     for term in ('80個傳奇載具碎片', '24個零件', '30%易傷', '第三方客戶端／社群資料'):
         assert term in rendered
     assert '官方商店沒有公布80碎片' in guide['caution']
+    assert '武器會自動鎖定目標' in guide['summary']
+    assert '12月23日00:00為卡片展示期間' in rendered
+    assert any('eventid=6833864700' in url for _, url in guide['sources'])
     assert '社群推估，不是官方日期' in rendered
     assert any('notalknote.xyz/survivor-io-5-4-0-ruinous-warskitter' in url for _, url in guide['sources'])
 
