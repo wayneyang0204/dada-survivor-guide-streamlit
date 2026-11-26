@@ -77,15 +77,27 @@ def test_matrix_squad_separates_store_release_from_feature_activation():
     assert any('eventid=6827054794' in url for _,url in guide['sources'])
 
 
-def test_version_540_separates_live_features_from_coming_soon_and_platform_rollout():
+def test_version_541_keeps_prior_release_notes_and_feature_status():
     guide = content.get_guide('version-5-4-0', content.GUIDES)
     rendered = str(guide)
     for term in ('356～360', '毀滅戰甲', '異寵化形', '冰霜戰靴', '區域行動', '月礦遠征'):
         assert term in rendered
-    assert '安卓與台灣蘋果商店皆已上架5.4.0' in rendered
+    assert '安卓與臺灣蘋果商店皆已上架5.4.1' in rendered
+    assert '沿用5.4.0' in rendered
     assert '即將上線' in rendered and '即將開啟' in rendered
     assert any('play.google.com/store/apps/details' in url for _, url in guide['sources'])
     assert all(term in guide['caution'] for term in ('精確效果', '解鎖條件', '材料消耗'))
+
+
+def test_frozen_realm_keeps_third_party_schedule_and_chest_costs_clear():
+    guide = content.get_guide('frozen-realm-preview', content.GUIDES)
+    assert '第三方預排' in guide['status']
+    assert '11月28日00:00至12月3日00:00' in guide['summary']
+    budget = next(s for s in guide['sections'] if s['title'] == '本期冰鎬任務暫列')
+    amounts = dict(budget['rows'])
+    assert sum(int(amounts[k]) for k in ('登入', '主線', '快速巡邏', '特別行動')) == int(amounts['非開箱任務小計']) == 644
+    assert int(amounts['開箱任務（開到600箱）']) + 644 == int(amounts['任務合計'].replace(',', ''))
+    assert any(url.endswith('/event/missions/26426226') for _, url in guide['sources'])
 
 
 def test_ruinous_warskitter_community_numbers_are_never_presented_as_official():
