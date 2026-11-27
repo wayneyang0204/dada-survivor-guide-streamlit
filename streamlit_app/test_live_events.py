@@ -46,7 +46,7 @@ def test_current_button_overrides_a_stale_historical_selection():
     app.session_state['activity_selection']='old historical selection'
     app.button(key='start_event').click().run()
     value=by_label(app.selectbox,'來源文章中的近期／歷史活動').value
-    assert any(name in value for name in ('魔法階梯','金秋限時店','金秋格子鋪'))
+    assert any(name in value for name in ('魔法階梯','金秋限時店','金秋格子鋪','冰雪世界探險'))
     assert not app.exception
 
 
@@ -96,3 +96,14 @@ def test_actual_official_snapshot_can_be_parsed_when_available():
     if path.exists():
         card=parse_card(path.read_text(encoding='utf-8'),'6821273114')
         assert card and '古堡' in card['title'] and card['starts_at']=='2026-10-28T16:00:00+00:00'
+
+
+def test_frozen_realm_promoted_after_goldfall_and_displays_earlier_play_cutoff():
+    frozen = next(model for model in EVENT_PLAYBOOKS if model.get('official_event_id') == '6835772068')
+    assert frozen['target'] == 0
+    upcoming = current_playbook(EVENT_PLAYBOOKS, datetime.fromisoformat('2026-11-27T09:00:00+08:00'))
+    assert upcoming['state'] == 'upcoming' and upcoming['guides'][0] == 'frozen-realm-preview'
+    active = current_playbook(EVENT_PLAYBOOKS, datetime.fromisoformat('2026-11-28T00:00:00+08:00'))
+    assert active['state'] == 'active' and active['guides'][0] == 'frozen-realm-preview'
+    assert event_phase(frozen, datetime.fromisoformat('2026-12-03T00:00:00+08:00'))['state'] == 'ended'
+    assert 'exchange_ends_at' not in frozen

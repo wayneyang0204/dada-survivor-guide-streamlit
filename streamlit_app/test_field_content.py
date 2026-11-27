@@ -89,10 +89,12 @@ def test_version_541_keeps_prior_release_notes_and_feature_status():
     assert all(term in guide['caution'] for term in ('精確效果', '解鎖條件', '材料消耗'))
 
 
-def test_frozen_realm_keeps_third_party_schedule_and_chest_costs_clear():
+def test_frozen_realm_keeps_display_window_and_play_deadline_separate():
     guide = content.get_guide('frozen-realm-preview', content.GUIDES)
-    assert '第三方預排' in guide['status']
-    assert '11月28日00:00至12月3日00:00' in guide['summary']
+    assert '官方活動卡' in guide['status']
+    assert '11月28日00:00至12月4日00:00' in guide['summary']
+    assert '第三方表列遊玩至12月3日00:00前' in guide['summary']
+    assert any(url.endswith('eventid=6835772068') for _, url in guide['sources'])
     budget = next(s for s in guide['sections'] if s['title'] == '本期冰鎬任務暫列')
     amounts = dict(budget['rows'])
     assert sum(int(amounts[k]) for k in ('登入', '主線', '快速巡邏', '特別行動')) == int(amounts['非開箱任務小計']) == 644
