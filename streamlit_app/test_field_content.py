@@ -32,7 +32,7 @@ def test_new_articles_are_actionable_and_evidence_is_not_faked(guide):
         if section.get('rows'):
             assert all(len(row) == len(section['columns']) for row in section['rows'])
     for source in guide['source_details']:
-        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://play.google.com/','https://garrytools.com/','https://www.facebook.com/','https://sio-tools.exp0.dev/'))
+        assert source['url'].startswith(('https://notalknote.xyz/','https://apps.apple.com/','https://play.google.com/','https://garrytools.com/','https://www.facebook.com/','https://sio-tools.exp0.dev/','https://www.sotwe.com/Survivor_ioJP?lang=en'))
         if source['date']:
             assert date.fromisoformat(source['date']) <= date.fromisoformat(guide['checked'])
         else:
